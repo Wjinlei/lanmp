@@ -19,220 +19,193 @@ include(){
     fi
 }
 
-install_prefix_setting(){
-    while :
-    do
-        clear
-        echo
-        echo "+----------------------------------------------------------------------"
-        echo "| Hws-LinuxMaster 1.0 FOR CentOS/Ubuntu/Debian"
-        echo "+----------------------------------------------------------------------"
-        echo "| Copyright © 2004-2099 HWS(https://www.hws.com) All rights reserved."
-        echo "+----------------------------------------------------------------------"
-        echo "| The Panel URL will be http://SERVER_IP:6588 when installed."
-        echo "+----------------------------------------------------------------------"
-        echo
-        echo "+----------------------------------------------------------------------"
-        echo -n "Do you want to install Hws-LinuxMaster to the /usr/local/hwslinuxmaster directory now?(y/n): "
-        read user_select
-        if [[ "${user_select}" == "y" || "${user_select}" == "Y" ]]; then
-            install_prefix=/usr/local/hwslinuxmaster
-            break
-        elif [[ "${user_select}" == "n" || "${user_select}" == "N" ]]; then
-            while :
-            do
-                echo -n "Input your absolute path(eg: /www): "
-                read user_input
-                mkdir -p ${user_input}
-                if [ "$?" -ne 0 ]; then
-                    echo "The directory name you entered is invalid,Please try again."
-                    continue
-                fi
-                install_prefix=${user_input}
-                break
-            done
-            break
-        else
-            continue
-        fi
-    done
-}
-
 main(){
-    clear
-    check_ram
-    display_os_info
-    begin_install
+    case "$1" in
+        -h|--help)
+            printf "Usage: $0 [Options] [Install Path]
+Options:
+-h, --help                      Print this help text and exit
+--install-apache24              Install apache2.4
+--install-nginx                 Install nginx
+--install-mysql55               Install mysql5.5
+--install-mysql56               Install mysql5.6
+--install-mysql57               Install mysql5.7
+--install-mysql80               Install mysql8.0
+--install-php53                 Install php5.3
+--install-php54                 Install php5.4
+--install-php55                 Install php5.5
+--install-php56                 Install php5.6
+--install-php70                 Install php7.0
+--install-php71                 Install php7.1
+--install-php72                 Install php7.2
+--install-php73                 Install php7.3
+--install-pma49                 Install pma4.9
+--install-pureftpd              Install pureftpd
+--install-redis                 Install redis-server
+"
+            ;;
+        --install-apache24)
+            InstallPreSetting
+            include apache24
+            if [ $# -ge 2 ]; then
+                wwwroot_dir=${2}/www
+                default_site_dir=${2}/www/default
+                apache24_install_path_name=${2##*/}
+                apache24_location=${2}
+            fi
+            install_apache24
+            ;;
+        --install-nginx)
+            InstallPreSetting
+            include nginx
+            if [ $# -ge 2 ]; then
+                wwwroot_dir=${2}/www
+                default_site_dir=${2}/www/default
+                nginx_install_path_name=${2##*/}
+                nginx_location=${2}
+            fi
+            install_nginx
+            ;;
+        --install-mysql55)
+            InstallPreSetting
+            include mysql55
+            if [ $# -ge 2 ]; then
+                mysql_data_location=${2}/mysql_data
+                mysql55_location=${2}
+            fi
+            install_mysql55
+            ;;
+        --install-mysql56)
+            InstallPreSetting
+            include mysql56
+            if [ $# -ge 2 ]; then
+                mysql_data_location=${2}/mysql_data
+                mysql56_location=${2}
+            fi
+            install_mysql56
+            ;;
+        --install-mysql57)
+            InstallPreSetting
+            include mysql57
+            if [ $# -ge 2 ]; then
+                mysql_data_location=${2}/mysql_data
+                mysql57_location=${2}
+            fi
+            install_mysql57
+            ;;
+        --install-mysql80)
+            InstallPreSetting
+            include mysql80
+            if [ $# -ge 2 ]; then
+                mysql_data_location=${2}/mysql_data
+                mysql80_location=${2}
+            fi
+            install_mysql80
+            ;;
+        --install-php53)
+            InstallPreSetting
+            include php53
+            if [ $# -ge 2 ]; then
+                php53_install_path_name=${2##*/}
+                php53_location=${2}
+            fi
+            install_php53
+            ;;
+        --install-php54)
+            InstallPreSetting
+            include php54
+            if [ $# -ge 2 ]; then 
+                php54_install_path_name=${2##*/}
+                php54_location=${2}
+            fi
+            install_php54
+            ;;
+        --install-php55)
+            InstallPreSetting
+            include php55
+            if [ $# -ge 2 ]; then 
+                php55_install_path_name=${2##*/}
+                php55_location=${2}
+            fi
+            install_php55
+            ;;
+        --install-php56)
+            InstallPreSetting
+            include php56
+            if [ $# -ge 2 ]; then 
+                php56_install_path_name=${2##*/}
+                php56_location=${2}
+            fi
+            install_php56
+            ;;
+        --install-php70)
+            InstallPreSetting
+            include php70
+            if [ $# -ge 2 ]; then 
+                php70_install_path_name=${2##*/}
+                php70_location=${2}
+            fi
+            install_php70
+            ;;
+        --install-php71)
+            InstallPreSetting
+            include php71
+            if [ $# -ge 2 ]; then 
+                php71_install_path_name=${2##*/}
+                php71_location=${2}
+            fi
+            install_php71
+            ;;
+        --install-php72)
+            InstallPreSetting
+            include php72
+            if [ $# -ge 2 ]; then 
+                php72_install_path_name=${2##*/}
+                php72_location=${2}
+            fi
+            install_php72
+            ;;
+        --install-php73)
+            InstallPreSetting
+            include php73
+            if [ $# -ge 2 ]; then 
+                php73_install_path_name=${2##*/}
+                php73_location=${2}
+            fi
+            install_php73
+            ;;
+        --install-pma49)
+            InstallPreSetting
+            include pma49
+            [ $# -ge 2 ] && default_site_dir=${2}
+            install_pma49
+            ;;
+        --install-pureftpd)
+            InstallPreSetting
+            include pureftpd
+            if [ $# -ge 2 ]; then 
+                pureftpd_install_path_name=${2##*/}
+                pureftpd_location=${2}
+            fi
+            install_pureftpd
+            ;;
+        --install-redis)
+            InstallPreSetting
+            include redis
+            if [ $# -ge 2 ]; then 
+                redis_install_path_name=${2##*/}
+                redis_location=${2}
+            fi
+            install_redis
+            ;;
+        *)
+            echo "Please Usage: $0 -h, Show Help"
+            ;;
+    esac
 }
 
-install_prefix_setting
 include config
 include public
-include apache
-include nginx
-include mysql
-include php
-include pureftpd
 load_config
-rootness
-check_command_exist "sqlite3"
-sqlite3 "${install_prefix}/hwslinuxmaster.db" <<EOF
-PRAGMA foreign_keys = ON;
-CREATE TABLE IF NOT EXISTS hws_webserver (
-	Id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-	Path TEXT NOT NULL,
-	Name TEXT NOT NULL,
-	Version TEXT NOT NULL,
-	ServerType INTEGER NOT NULL
-	);
-CREATE TABLE IF NOT EXISTS hws_dbserver (
-	Id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-	Path TEXT NOT NULL,
-	Name TEXT NOT NULL,
-	Version TEXT NOT NULL,
-	Port INTEGER NOT NULL DEFAULT 3306,
-	PassWord TEXT,
-	ServerType INTEGER NOT NULL
-	);
-CREATE TABLE IF NOT EXISTS hws_ftpserver (
-	Id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-	Path TEXT NOT NULL,
-	Name TEXT NOT NULL,
-	Version TEXT NOT NULL,
-	Port INTEGER NOT NULL DEFAULT 21,
-	ServerType INTEGER NOT NULL
-	);
-CREATE TABLE IF NOT EXISTS hws_cacheserver (
-	Id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-	Path TEXT NOT NULL,
-	Name TEXT NOT NULL,
-	Version TEXT NOT NULL,
-	Port INTEGER NOT NULL DEFAULT 6379,
-	ServerType INTEGER NOT NULL
-	);
-CREATE TABLE IF NOT EXISTS hws_php (
-	Id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-	Path TEXT NOT NULL,
-	Name TEXT NOT NULL,
-	Version TEXT NOT NULL
-	);
-CREATE TABLE IF NOT EXISTS hws_sysconfig (
-	Id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-	Key TEXT NOT NULL,
-	Value TEXT
-	);
-CREATE TABLE IF NOT EXISTS hws_admin (
-	Id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-	UserName TEXT NOT NULL,
-	PassWord TEXT NOT NULL,
-	LastTime TEXT,
-	LastIp TEXT
-	);
-CREATE TABLE IF NOT EXISTS hws_db (
-	Id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-	DbName TEXT NOT NULL,
-	DbUser TEXT NOT NULL,
-	PassWord TEXT,
-	SiteName TEXT,
-	FOREIGN KEY (SiteName) REFERENCES hws_host_site(Name) ON DELETE SET NULL ON UPDATE CASCADE
-	);
-CREATE TABLE IF NOT EXISTS hws_host (
-	Id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-	Path TEXT NOT NULL,
-	FtpUser TEXT NOT NULL,
-	FtpPassWord TEXT NOT NULL,
-	FtpStatus INTEGER NOT NULL DEFAULT 1,
-	FtpSecType INTEGER NOT NULL DEFAULT 0,
-	FtpSecList TEXT,
-	DbId INTEGER,
-	Comment TEXT,
-	Connect INTEGER,
-	BandWidth INTEGER,
-	SiteNum INTEGER NOT NULL DEFAULT 5,
-	SiteId INTEGER,
-	FOREIGN KEY (DbId) REFERENCES hws_db(Id) ON DELETE SET NULL ON UPDATE CASCADE,
-	FOREIGN KEY (SiteId) REFERENCES hws_host_site(Id) ON DELETE SET NULL ON UPDATE CASCADE
-	);
-CREATE TABLE IF NOT EXISTS hws_host_site (
-	Id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-	HostId INTEGER NOT NULL,
-	Status INTEGER NOT NULL DEFAULT 1,
-	Path TEXT NOT NULL,
-	Name TEXT NOT NULL,
-	SslId INTEGER,
-	IndexFile TEXT DEFAULT 'index.php default.php index.html index.htm',
-	Code404 TEXT DEFAULT '404.html 404.htm',
-	Code301 TEXT,
-	ToHttps INTEGER NOT NULL DEFAULT 0,
-	PhpVersion INTEGER,
-	LogStatus INTEGER NOT NULL DEFAULT 1,
-	HtaccessStatus INTEGER NOT NULL DEFAULT 1,
-	IpSecType INTEGER NOT NULL DEFAULT 0,
-	IpSecList TEXT,
-	FOREIGN KEY (HostId) REFERENCES hws_host(Id) ON DELETE CASCADE ON UPDATE CASCADE,
-	FOREIGN KEY (SslId) REFERENCES hws_ssl(Id) ON DELETE SET NULL ON UPDATE CASCADE,
-	FOREIGN KEY (PhpVersion) REFERENCES hws_php(Id) ON DELETE SET NULL ON UPDATE CASCADE
-	);
-CREATE TABLE IF NOT EXISTS hws_host_site_domain (
-	Id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-	DomainName TEXT NOT NULL,
-	Port INTEGER DEFAULT 80,
-	SiteId INTEGER,
-	FOREIGN KEY (SiteId) REFERENCES hws_host_site(Id) ON DELETE CASCADE ON UPDATE CASCADE
-	);
-CREATE TABLE IF NOT EXISTS hws_ssl (
-	Id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-	Name TEXT NOT NULL,
-	Pem TEXT NOT NULL,
-	Key TEXT NOT NULL,
-	Chain TEXT,
-	Expire TEXT NOT NULL
-	);
-CREATE TABLE IF NOT EXISTS hws_log (
-	Id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-	LogTime TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
-	Ip TEXT NOT NULL,
-	LogType INTEGER NOT NULL,
-	Content TEXT NOT NULL,
-	User TEXT NOT NULL
-	);
-
-CREATE UNIQUE INDEX IF NOT EXISTS hws_webserver_unique_name ON hws_webserver (Name);
-CREATE UNIQUE INDEX IF NOT EXISTS hws_dbserver_unique_name ON hws_dbserver (Name);
-CREATE UNIQUE INDEX IF NOT EXISTS hws_ftpserver_unique_name ON hws_ftpserver (Name);
-CREATE UNIQUE INDEX IF NOT EXISTS hws_cacheserver_unique_name ON hws_cacheserver (Name);
-CREATE UNIQUE INDEX IF NOT EXISTS hws_php_unique_name ON hws_php (Name);
-CREATE UNIQUE INDEX IF NOT EXISTS hws_sysconfig_unique_name ON hws_sysconfig (Key);
-CREATE UNIQUE INDEX IF NOT EXISTS hws_admin_unique_username ON hws_admin (UserName);
-CREATE UNIQUE INDEX IF NOT EXISTS hws_db_unique_dbname ON hws_db (DbName);
-CREATE UNIQUE INDEX IF NOT EXISTS hws_db_unique_dbuser ON hws_db (DbUser);
-CREATE UNIQUE INDEX IF NOT EXISTS hws_host_unique_ftpuser ON hws_host (FtpUser);
-CREATE UNIQUE INDEX IF NOT EXISTS hws_host_site_unique_name ON hws_host_site (Name);
-CREATE UNIQUE INDEX IF NOT EXISTS hws_host_site_domain_unique_domainname_port ON hws_host_site_domain (DomainName, Port);
-CREATE UNIQUE INDEX IF NOT EXISTS hws_ssl_unique_name ON hws_ssl (Name);
-CREATE UNIQUE INDEX IF NOT EXISTS hws_ssl_unique_pem ON hws_ssl (Pem);
-CREATE UNIQUE INDEX IF NOT EXISTS hws_ssl_unique_key ON hws_ssl (Key);
-CREATE INDEX IF NOT EXISTS hws_host_ftpstatus ON hws_host (FtpStatus);
-CREATE INDEX IF NOT EXISTS hws_host_dbid ON hws_host (DbId);
-CREATE INDEX IF NOT EXISTS hws_host_siteid ON hws_host (SiteId);
-CREATE INDEX IF NOT EXISTS hws_host_comment ON hws_host (Comment);
-CREATE INDEX IF NOT EXISTS hws_host_site_hostid ON hws_host_site (HostId);
-CREATE INDEX IF NOT EXISTS hws_host_site_status ON hws_host_site (Status);
-CREATE INDEX IF NOT EXISTS hws_host_site_sslid ON hws_host_site (SslId);
-CREATE INDEX IF NOT EXISTS hws_host_site_phpversion ON hws_host_site (PhpVersion);
-CREATE INDEX IF NOT EXISTS hws_host_site_domain_port ON hws_host_site_domain (Port);
-CREATE INDEX IF NOT EXISTS hws_host_site_domain_siteid ON hws_host_site_domain (SiteId);
-CREATE INDEX IF NOT EXISTS hws_log_ip ON hws_log (Ip);
-CREATE INDEX IF NOT EXISTS hws_log_user ON hws_log (User);
-CREATE INDEX IF NOT EXISTS hws_log_logtime ON hws_log (LogTime);
-
-INSERT INTO hws_sysconfig (key, value) VALUES ("Prefix", "${install_prefix}");
-INSERT INTO hws_sysconfig (key, value) VALUES ("WwwRootDir", "${web_root_dir}");
-INSERT INTO hws_sysconfig (key, value) VALUES ("OsVersion", "$(get_opsy)");
-INSERT INTO hws_sysconfig (key, value) VALUES ("CurrentWebServer", "");
-INSERT INTO hws_sysconfig (key, value) VALUES ("CurrentDbServer", "");
-INSERT INTO hws_sysconfig (key, value) VALUES ("CurrentFtpServer", "");
-INSERT INTO hws_sysconfig (key, value) VALUES ("CurrentCacheServer", "");
-EOF
-
-main 2>&1 | tee /tmp/install.log
+IsRoot
+main "$@" 2>&1 | tee /tmp/install.log
