@@ -38,12 +38,12 @@ L(Linux) + A(Apache) + N(Nginx) + M(MySQL) + P(PHP) 安装脚本<br/>
 ### 支持的操作系统
 - CentOS-6.x
 - CentOS-7.x (recommend)
+- CentOS-8.x (theoretically support)
 - Fedora-29
 - Debian-8.x
 - Debian-9.x (recommend)
 - Ubuntu-16.x
 - Ubuntu-18.x (recommend)
-- CentOS
 
 ### 使用方法
 ```
