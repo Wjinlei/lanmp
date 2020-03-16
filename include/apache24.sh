@@ -180,6 +180,7 @@ _config_apache(){
     echo "ProtocolsHonorOrder On" >> ${apache24_location}/conf/httpd.conf
     echo "Protocols h2 http/1.1" >> ${apache24_location}/conf/httpd.conf
     sed -i 's/Require host .example.com/Require host localhost/g' ${apache24_location}/conf/extra/httpd-info.conf
+    sed -i "s@AddType\(.*\)Z@AddType\1Z\n    AddType application/x-httpd-php .php .phtml\n    AddType appication/x-httpd-php-source .phps@" ${apache24_location}/conf/httpd.conf
     sed -i "s@^export LD_LIBRARY_PATH.*@export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:${openssl_location}/lib@" ${apache24_location}/bin/envvars
     cat > ${apache24_location}/conf/extra/httpd-vhosts.conf <<EOF
 IncludeOptional ${apache24_location}/conf/vhost/*.conf
