@@ -29,6 +29,7 @@ Options:
 "
             ;;
         --install-php-redis)
+            InstallPreSetting
             include php-redis
             install_php_redis ${2} ${3}
             ;;

@@ -175,6 +175,7 @@ Options:
             install_php73
             ;;
         --install-pma49)
+            InstallPreSetting
             include pma49
             [ $# -ge 2 ] && default_site_dir=${2}
             install_pma49
