@@ -175,15 +175,27 @@ vhost_add(){
     ServerName ${domain_names%% *}
     ServerAlias ${domain_names}
     DocumentRoot ${website_root}
+
+    #ErrorLog "${website_root}/logs/${domain_names%% *}-error_log"
+    #CustomLog "${website_root}/logs/${domain_names%% *}-access_log" combined
+
+    #DENY FILES
+    <Files ~ (\\.user.ini|\\.htaccess|\\.git|\\.svn|\\.project|LICENSE|README.md)\$>
+        Order allow,deny
+        Deny from all
+    </Files>
+
     <Directory ${website_root}>
         SetOutputFilter DEFLATE
         Options FollowSymLinks
         AllowOverride All
         Order Deny,Allow
         Require all granted
-        DirectoryIndex index.php default.php index.html index.htm
+        DirectoryIndex index.php default.php index.html index.htm default.html default.htm
+        <FilesMatch \\.php\$>
+            SetHandler "proxy:unix:${php}|fcgi://localhost"
+        </FilesMatch>
     </Directory>
-ProxyPassMatch ^/(.*\\.php(/.*)?)\$ unix:${php}|fcgi://localhost${website_root}/
 </VirtualHost>
 EOF
         else
