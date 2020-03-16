@@ -41,7 +41,7 @@ install_redis(){
         fi
         ${redis_location}/bin/redis-server ${redis_location}/etc/redis.conf
         cat >> ${prefix}/install.result <<EOF
-Redis Install Path: ${redis_location}
+Redis Install Path:${redis_location}
 
 EOF
         rm -f ${redis_filename}.tar.gz

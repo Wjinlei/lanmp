@@ -85,7 +85,8 @@ install_nginx(){
     _success "${nginx_filename} install completed..."
     cat >> ${prefix}/install.result <<EOF
 Install Time: $(date +%Y-%m-%d_%H:%M:%S)
-Nginx Install Path: ${nginx_location}
+Nginx Install Path:${nginx_location}
+WwwRootDir:${wwwroot_dir}
 
 EOF
     rm -f /tmp/${pcre_filename}.tar.gz

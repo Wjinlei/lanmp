@@ -397,7 +397,7 @@ install_php73(){
         _config_php
     fi
     cat >> ${prefix}/install.result <<EOF
-php73 Install Path: ${php73_location}
+php73 Install Path:${php73_location}
 
 EOF
     _success "${php73_filename} install completed..."

@@ -398,7 +398,7 @@ install_php72(){
         _config_php
     fi
     cat >> ${prefix}/install.result <<EOF
-php72 Install Path: ${php72_location}
+php72 Install Path:${php72_location}
 
 EOF
     _success "${php72_filename} install completed..."

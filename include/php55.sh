@@ -379,7 +379,7 @@ install_php55(){
         _config_php
     fi
     cat >> ${prefix}/install.result <<EOF
-php55 Install Path: ${php55_location}
+php55 Install Path:${php55_location}
 
 EOF
     _success "${php55_filename} install completed..."

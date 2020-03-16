@@ -169,9 +169,9 @@ install_mysql80(){
     ${mysql80_location}/support-files/mysql.server restart >/dev/null 2>&1
     cat >> ${prefix}/install.result <<EOF
 Install Time: $(date +%Y-%m-%d_%H:%M:%S)
-MySQL80 Install Path: ${mysql80_location}
-MySQL80 Data Path: ${mysql_data_location}
-MySQL80 Root PassWord: ${mysql_pass}
+MySQL80 Install Path:${mysql80_location}
+MySQL80 Data Path:${mysql_data_location}
+MySQL80 Root PassWord:${mysql_pass}
 MySQL Config File: /etc/my.cnf
 
 EOF

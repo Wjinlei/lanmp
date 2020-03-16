@@ -400,7 +400,7 @@ install_php71(){
         _config_php
     fi
     cat >> ${prefix}/install.result <<EOF
-php71 Install Path: ${php71_location}
+php71 Install Path:${php71_location}
 
 EOF
     _success "${php71_filename} install completed..."

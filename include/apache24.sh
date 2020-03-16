@@ -152,7 +152,8 @@ install_apache24(){
     _success "${apache24_filename} install completed..."
     cat >> ${prefix}/install.result <<EOF
 Install Time: $(date +%Y-%m-%d_%H:%M:%S)
-Apache24 Install Path: ${apache24_location}
+Apache24 Install Path:${apache24_location}
+WwwRootDir:${wwwroot_dir}
 
 EOF
     rm -f /tmp/${apr_filename}.tar.gz

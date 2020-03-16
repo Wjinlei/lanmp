@@ -366,7 +366,7 @@ install_php54(){
         _config_php
     fi
     cat >> ${prefix}/install.result <<EOF
-php54 Install Path: ${php54_location}
+php54 Install Path:${php54_location}
 
 EOF
     _success "${php54_filename} install completed..."

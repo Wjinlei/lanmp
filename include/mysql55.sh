@@ -173,9 +173,9 @@ install_mysql55(){
     ${mysql55_location}/support-files/mysql.server restart >/dev/null 2>&1
     cat >> ${prefix}/install.result <<EOF
 Install Time: $(date +%Y-%m-%d_%H:%M:%S)
-MySQL55 Install Path: ${mysql55_location}
-MySQL55 Data Path: ${mysql_data_location}
-MySQL55 Root PassWord: ${mysql_pass}
+MySQL55 Install Path:${mysql55_location}
+MySQL55 Data Path:${mysql_data_location}
+MySQL55 Root PassWord:${mysql_pass}
 MySQL Config File: /etc/my.cnf
 
 EOF

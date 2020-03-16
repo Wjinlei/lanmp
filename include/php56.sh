@@ -379,7 +379,7 @@ install_php56(){
         _config_php
     fi
     cat >> ${prefix}/install.result <<EOF
-php56 Install Path: ${php56_location}
+php56 Install Path:${php56_location}
 
 EOF
     _success "${php56_filename} install completed..."

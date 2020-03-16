@@ -367,7 +367,7 @@ install_php53(){
         _config_php
     fi
     cat >> ${prefix}/install.result <<EOF
-php53 Install Path: ${php53_location}
+php53 Install Path:${php53_location}
 
 EOF
     _success "${php53_filename} install completed..."
