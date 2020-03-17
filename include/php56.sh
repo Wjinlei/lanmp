@@ -250,7 +250,7 @@ EOF
     pid = ${php56_location}/var/run/default.pid
     error_log = ${php56_location}/var/log/default.log
 [default]
-    listen = /run/php-fpm/${php56_filename}-default.sock
+    listen = /tmp/${php56_filename}-default.sock
     listen.owner = www
     listen.group = www
     listen.mode = 0660
@@ -263,7 +263,6 @@ EOF
     pm.min_spare_servers = 1
     pm.max_spare_servers = 3
 EOF
-    mkdir -p /run/php-fpm
     mkdir -p ${php56_location}/var/run
     mkdir -p ${php56_location}/var/log
     ${php56_location}/sbin/php-fpm -y ${php56_location}/etc/default.conf >/dev/null 2>&1

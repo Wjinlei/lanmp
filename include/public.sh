@@ -314,46 +314,6 @@ CheckInstalled(){
     fi
 }
 
-_install_finally(){
-    _info "Starting clean up..."
-    cd ${cur_dir}
-    rm -rf ${cur_dir}/software
-    rm -fr ${cur_dir}/include
-    _info "Clean up completed..."
-
-    sleep 1
-    netstat -tunlp
-    echo
-    _info "Start time     : ${StartDate}"
-    _info "Completion time: $(date "+%Y-%m-%d %H:%M:%S") (Use:$(_red $[($(date +%s)-StartDateSecond)/60]) minutes)"
-    echo
-    cat > ${install_prefix}/uninstall.sh <<EOF
-#!/usr/bin/env bash
-
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
-export PATH
-
-killall -9 mysqld >/dev/null 2>&1
-killall -9 httpd >/dev/null 2>&1
-killall -9 nginx >/dev/null 2>&1
-killall -9 pure-ftpd >/dev/null 2>&1
-killall -9 php-fpm >/dev/null 2>&1
-killall -9 redis-server >/dev/null 2>&1
-
-rm -fr ${soft_location}
-rm -f ${install_prefix}/install.result
-ls ${install_prefix}
-netstat -tunlp
-echo
-echo "uninstall completed!"
-EOF
-    chmod +x ${install_prefix}/uninstall.sh
-    [ -f "${install_prefix}/install.result" ] && cat ${install_prefix}/install.result
-    _success "install completed! See ${install_prefix}/install.result"
-
-    exit 0
-}
-
 InstallPreSetting(){
     _check_ram
     _disable_selinux

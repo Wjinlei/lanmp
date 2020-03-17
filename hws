@@ -11,7 +11,7 @@ mysql_location=$(cat /hwslinuxmaster/install.result 2>/dev/null|grep -E "MySQL.*
 mysqlroot_passwd=$(cat /hwslinuxmaster/install.result 2>/dev/null|grep -E "MySQL.*Root.*PassWord" |cut -d: -f2|tail -n 1 2>/dev/null)
 
 php_arr=(
-$(ls -l /run/php-fpm/*-default.sock 2>/dev/null|awk -F' ' '{print $NF}')
+$(ls -l /tmp/*-default.sock 2>/dev/null|awk -F' ' '{print $NF}')
 )
 php_arr_len=${#php_arr[@]}
 
@@ -97,7 +97,7 @@ vhost_add(){
         if [ "${php_arr_len}" != 0 ]; then
             display_php_menu
         else
-            echo -e "\033[31mError:\033[0m /run/php-fpm without php sock." && exit 1
+            echo -e "\033[31mError:\033[0m /tmp without php sock." && exit 1
         fi
     fi
 
@@ -199,7 +199,7 @@ vhost_add(){
 </VirtualHost>
 EOF
         else
-            echo -e "\033[31mError:\033[0m /run/php-fpm without php sock." && exit 1
+            echo -e "\033[31mError:\033[0m /tmp without php sock." && exit 1
         fi
         # Restart apache
         echo "Reloading the apache config file..."
@@ -239,7 +239,7 @@ server {
 EOF
             fi
         else
-            echo -e "\033[31mError:\033[0m /run/php-fpm without php sock." && exit 1
+            echo -e "\033[31mError:\033[0m /tmp without php sock." && exit 1
         fi
         # Restart nginx
         echo "Reloading the nginx config file..."

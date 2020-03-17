@@ -237,7 +237,7 @@ _config_php(){
     pid = ${php53_location}/var/run/default.pid
     error_log = ${php53_location}/var/log/default.log
 [default]
-    listen = /run/php-fpm/${php53_filename}-default.sock
+    listen = /tmp/${php53_filename}-default.sock
     listen.owner = www
     listen.group = www
     listen.mode = 0660
@@ -250,7 +250,6 @@ _config_php(){
     pm.min_spare_servers = 1
     pm.max_spare_servers = 3
 EOF
-    mkdir -p /run/php-fpm
     mkdir -p ${php53_location}/var/run
     mkdir -p ${php53_location}/var/log
     ${php53_location}/sbin/php-fpm -y ${php53_location}/etc/default.conf >/dev/null 2>&1

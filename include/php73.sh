@@ -272,7 +272,7 @@ EOF
     pid = ${php73_location}/var/run/default.pid
     error_log = ${php73_location}/var/log/default.log
 [default]
-    listen = /run/php-fpm/${php73_filename}-default.sock
+    listen = /tmp/${php73_filename}-default.sock
     listen.owner = www
     listen.group = www
     listen.mode = 0660
@@ -285,7 +285,6 @@ EOF
     pm.min_spare_servers = 1
     pm.max_spare_servers = 3
 EOF
-    mkdir -p /run/php-fpm
     mkdir -p ${php73_location}/var/run
     mkdir -p ${php73_location}/var/log
     ${php73_location}/sbin/php-fpm -y ${php73_location}/etc/default.conf >/dev/null 2>&1
