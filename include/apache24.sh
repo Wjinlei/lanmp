@@ -205,6 +205,19 @@ SSLCompression off
 Mutex sysvsem default
 SSLStrictSNIVHostCheck on
 EOF
+    cat > /etc/logrotate.d/hws_apache24 <<EOF
+${apache24_location}/logs/*log {
+    daily
+    rotate 30
+    missingok
+    notifempty
+    compress
+    sharedscripts
+    postrotate
+        [ ! -f ${apache24_location}/logs/httpd.pid ] || kill -USR1 \`cat ${apache24_location}/logs/httpd.pid\`
+    endscript
+}
+EOF
 
 # httpd modules array
 httpd_mod_list=(
