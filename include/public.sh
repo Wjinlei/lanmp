@@ -130,6 +130,7 @@ _install_tools(){
             psmisc
             zip
             unzip
+            bzip2
         )
         for depend in ${yum_depends[@]}
         do
@@ -150,6 +151,7 @@ _install_tools(){
             psmisc
             zip
             unzip
+            bzip2
         )
         for depend in ${apt_depends[@]}
         do
