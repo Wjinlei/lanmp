@@ -153,7 +153,7 @@ install_apache24(){
     cat >> ${prefix}/install.result <<EOF
 Install Time: $(date +%Y-%m-%d_%H:%M:%S)
 Apache24 Install Path:${apache24_location}
-WwwRootDir:${wwwroot_dir}
+Apache24 Www Root Dir:${wwwroot_dir}
 
 EOF
     rm -f /tmp/${apr_filename}.tar.gz

@@ -3,10 +3,11 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
-web_root_dir=$(cat /hwslinuxmaster/install.result 2>/dev/null|grep -E "WwwRootDir" |cut -d: -f2|tail -n 1 2>/dev/null)
-apache_location=$(cat /hwslinuxmaster/install.result 2>/dev/null|grep -E "Apache.*Install.*Path" |cut -d: -f2|tail -n 1 2>/dev/null)
-nginx_location=$(cat /hwslinuxmaster/install.result 2>/dev/null|grep -E "Nginx.*Install.*Path" |cut -d: -f2|tail -n 1 2>/dev/null)
-pureftpd_location=$(cat /hwslinuxmaster/install.result 2>/dev/null|grep -E "Pureftpd.*Install.*Path" |cut -d: -f2|tail -n 1 2>/dev/null)
+apache24_location=$(cat /hwslinuxmaster/install.result 2>/dev/null|grep "Apache24 Install Path" |cut -d: -f2|tail -n 1 2>/dev/null)
+apache24_www_root=$(cat /hwslinuxmaster/install.result 2>/dev/null|grep "Apache24 Www Root Dir" |cut -d: -f2|tail -n 1 2>/dev/null)
+nginx_location=$(cat /hwslinuxmaster/install.result 2>/dev/null|grep "Nginx Install Path" |cut -d: -f2|tail -n 1 2>/dev/null)
+nginx_www_root=$(cat /hwslinuxmaster/install.result 2>/dev/null|grep "Nginx Www Root Dir" |cut -d: -f2|tail -n 1 2>/dev/null)
+pureftpd_location=$(cat /hwslinuxmaster/install.result 2>/dev/null|grep "Pureftpd Install Path" |cut -d: -f2|tail -n 1 2>/dev/null)
 mysql_location=$(cat /hwslinuxmaster/install.result 2>/dev/null|grep -E "MySQL.*Install.*Path" |cut -d: -f2|tail -n 1 2>/dev/null)
 mysqlroot_passwd=$(cat /hwslinuxmaster/install.result 2>/dev/null|grep -E "MySQL.*Root.*PassWord" |cut -d: -f2|tail -n 1 2>/dev/null)
 
@@ -17,23 +18,23 @@ php_arr_len=${#php_arr[@]}
 
 vhost_add(){
     # Apache
-    if [ "${apache_location}" != "" ]; then
+    if [ "${apache24_location}" != "" ]; then
         while :
         do
             read -p "Do you want to create a configuration file for apache? [y/n]:" apache_create
             case ${apache_create} in
             y|Y)
-                apache_count=$(ls -l `find /proc/ -iname exe` 2>/dev/null|grep -c "${apache_location}/bin/httpd")
+                apache_count=$(ls -l `find /proc/ -iname exe` 2>/dev/null|grep -c "${apache24_location}/bin/httpd")
                 if [ ${apache_count} -eq 0 ]; then
                     echo "Info: Apache looks like not running, Try to starting Apache..."
-                    ${apache_location}/bin/apachectl start > /dev/null 2>&1
+                    ${apache24_location}/bin/apachectl start > /dev/null 2>&1
                     if [ $? -ne 0 ]; then
                         echo -e "\033[31mError:\033[0m Apache starting failed!"
                         exit 1
                     fi
                 fi
-                read -p "Please enter domain names (for example: hws.com www.hws.com): " domain_names
-                for i in ${domain_names}; do
+                read -p "Please enter domain names (for example: hws.com www.hws.com): " apache24_domain_names
+                for i in ${apache24_domain_names}; do
                     if apache_vhost_is_exist ${i}; then
                         echo -e "\033[31mError:\033[0m virtual host [${i}] is existed, please check it and try again."
                         break
@@ -58,10 +59,10 @@ vhost_add(){
     if [ "${nginx_location}" != "" ]; then
         while :
         do
-            read -p "Do you want to create a configuration file for nginx? [y/n]:" apache_create
-            case ${apache_create} in
+            read -p "Do you want to create a configuration file for nginx? [y/n]:" nginx_create
+            case ${nginx_create} in
             y|Y)
-                nginx_count=$(ls -l `find /proc/ -iname exe` 2>/dev/null|grep -c "${apache_location}/sbin/nginx")
+                nginx_count=$(ls -l `find /proc/ -iname exe` 2>/dev/null|grep -c "${nginx_location}/sbin/nginx")
                 if [ ${nginx_count} -eq 0 ]; then
                     echo "Info: Nginx looks like not running, Try to starting Nginx..."
                     ${nginx_location}/sbin/nginx
@@ -70,8 +71,8 @@ vhost_add(){
                         exit 1
                     fi
                 fi
-                read -p "Please enter domain names (for example: hws.com www.hws.com): " domain_names
-                for i in ${domain_names}; do
+                read -p "Please enter domain names (for example: hws.com www.hws.com): " nginx_domain_names
+                for i in ${nginx_domain_names}; do
                     if nginx_vhost_is_exist ${i}; then
                         echo -e "\033[31mError:\033[0m virtual host [${i}] is existed, please check it and try again."
                         break
@@ -138,46 +139,48 @@ vhost_add(){
 
     # Pureftpd
     if [ "${pureftpd_location}" != "" ]; then
-        while :
-        do
-            read -p "Do you want to create a ftp user with same name? [y/n]:" ftp_create
-            case ${ftp_create} in
-            y|Y)
-                pureftpd_count=$(ls -l `find /proc/ -iname exe` 2>/dev/null|grep -c "${pureftpd_location}/sbin/pure-ftpd")
-                if [ ${pureftpd_count} -eq 0 ]; then
-                    echo "Info: Pureftpd looks like not running, Try to starting pureftpd..."
-                    ${pureftpd_location}/sbin/pure-ftpd  ${pureftpd_location}/etc/pure-ftpd.conf
-                    if [ $? -ne 0 ]; then
-                        echo -e "\033[31mError:\033[0m Pureftpd starting failed!"
-                        exit 1
+        if [[ "${apache_create}" = "y" || "${nginx_create}" = "y" ]]; then
+            while :
+            do
+                read -p "Do you want to create a ftp user with same name? [y/n]:" ftp_create
+                case ${ftp_create} in
+                y|Y)
+                    pureftpd_count=$(ls -l `find /proc/ -iname exe` 2>/dev/null|grep -c "${pureftpd_location}/sbin/pure-ftpd")
+                    if [ ${pureftpd_count} -eq 0 ]; then
+                        echo "Info: Pureftpd looks like not running, Try to starting pureftpd..."
+                        ${pureftpd_location}/sbin/pure-ftpd  ${pureftpd_location}/etc/pure-ftpd.conf
+                        if [ $? -ne 0 ]; then
+                            echo -e "\033[31mError:\033[0m Pureftpd starting failed!"
+                            exit 1
+                        fi
                     fi
-                fi
-                ftp_create="y"
-                ;;
-            n|N)
-                echo "Do not create a ftp user"
-                echo
-                ftp_create="n"
-                break
-                ;;
-            *) echo "Please enter only y or n"
-            esac
-        done
+                    ftp_create="y"
+                    ;;
+                n|N)
+                    echo "Do not create a ftp user"
+                    echo
+                    ftp_create="n"
+                    break
+                    ;;
+                *) echo "Please enter only y or n"
+                esac
+            done
+        fi
     fi
 
     # Create apache config
     if [ "${apache_create}" = "y" ]; then
-        website_root=${web_root_dir}/${domain_names%% *}
+        local website_root=${apache24_www_root}/${apache24_domain_names%% *}
         mkdir -p ${website_root}
         if [ ${php_arr_len} != 0 ]; then
-            cat > ${apache_location}/conf/vhost/${domain_names%% *}.conf << EOF
+            cat > ${apache24_location}/conf/vhost/${apache24_domain_names%% *}.conf << EOF
 <VirtualHost *:80>
-    ServerName ${domain_names%% *}
-    ServerAlias ${domain_names}
+    ServerName ${apache24_domain_names%% *}
+    ServerAlias ${apache24_domain_names}
     DocumentRoot ${website_root}
 
-    #ErrorLog "${website_root}/logs/${domain_names%% *}-error_log"
-    #CustomLog "${website_root}/logs/${domain_names%% *}-access_log" combined
+    #ErrorLog "${website_root}/logs/${apache24_domain_names%% *}-error_log"
+    #CustomLog "${website_root}/logs/${apache24_domain_names%% *}-access_log" combined
 
     #DENY FILES
     <Files ~ (\\.user.ini|\\.htaccess|\\.git|\\.svn|\\.project|LICENSE|README.md)\$>
@@ -203,8 +206,8 @@ EOF
         fi
         # Restart apache
         echo "Reloading the apache config file..."
-        if ${apache_location}/bin/apachectl -t; then
-            ${apache_location}/bin/apachectl restart >/dev/null 2>&1
+        if ${apache24_location}/bin/apachectl -t; then
+            ${apache24_location}/bin/apachectl restart >/dev/null 2>&1
             echo "Reload succeed"
             echo
         else
@@ -212,20 +215,27 @@ EOF
             exit 1
         fi
         chown -R www:www ${website_root}
-        echo "Virtual host [${domain_names%% *}] has been created"
+        # Create Ftp User
+        if [ "$ftp_create" = "y" ]; then
+            echo "Create Ftp User [${apache24_domain_names%% *}]"
+            ${pureftpd_location}/bin/pure-pw useradd ${apache24_domain_names%% *} -u www -d ${website_root}
+            ${pureftpd_location}/bin/pure-pw mkdb
+            ${pureftpd_location}/bin/pure-pw list
+        fi
+        echo "Virtual host [${apache24_domain_names%% *}] has been created"
         echo "Website root directory is: ${website_root}"
         echo
     fi
     # Create nginx config
     if [ "${nginx_create}" = "y" ]; then
         if [ ${php_arr_len} != 0 ]; then
-            website_root=${web_root_dir}/${domain_names%% *}
+            local website_root=${nginx_www_root}/${nginx_domain_names%% *}
             mkdir -p ${website_root}
             if [ ${php_arr_len} != 0 ]; then
-                cat > ${nginx_location}/etc/vhost/${domain_names%% *}.conf<<EOF
+                cat > ${nginx_location}/etc/vhost/${nginx_domain_names%% *}.conf<<EOF
 server {
     listen 80;
-    server_name ${domain_names};
+    server_name ${nginx_domain_names};
     root ${website_root};
     index index.php default.php index.html index.htm;
 
@@ -252,7 +262,14 @@ EOF
             exit 1
         fi
         chown -R www:www ${website_root}
-        echo "Virtual host [${domain_names%% *}] has been created"
+        # Create Ftp User
+        if [ "$ftp_create" = "y" ]; then
+            echo "Create Ftp User [${nginx_domain_names%% *}]"
+            ${pureftpd_location}/bin/pure-pw useradd ${nginx_domain_names%% *} -u www -d ${website_root}
+            ${pureftpd_location}/bin/pure-pw mkdb
+            ${pureftpd_location}/bin/pure-pw list
+        fi
+        echo "Virtual host [${nginx_domain_names%% *}] has been created"
         echo "Website root directory is: ${website_root}"
         echo
     fi
@@ -267,23 +284,15 @@ FLUSH PRIVILEGES;
 EOF
         echo "Database [${dbname}] and mysql user [${dbname}] has been created"
     fi
-
-    # Create Ftp User
-    if [ "$ftp_create" = "y" ]; then
-        echo "Create Ftp User [${domain_names%% *}]"
-        ${pureftpd_location}/bin/pure-pw useradd ${domain_names%% *} -u www -d ${website_root}
-        ${pureftpd_location}/bin/pure-pw mkdb
-        ${pureftpd_location}/bin/pure-pw list
-    fi
     echo "All done"
 }
 
 vhost_list(){
-    if [ $(ls ${apache_location}/conf/vhost/ 2>/dev/null| grep ".conf$" | grep -v "none" | grep -v "default" | wc -l) -gt 0 ]; then
+    if [ $(ls ${apache24_location}/conf/vhost/ 2>/dev/null| grep ".conf$" | grep -v "none" | grep -v "default" | wc -l) -gt 0 ]; then
         echo "Apache Server Name"
         echo "------------"
     fi
-    ls ${apache_location}/conf/vhost/ 2>/dev/null| grep ".conf$" | grep -v "none" | grep -v "default" | sed 's/.conf//g'
+    ls ${apache24_location}/conf/vhost/ 2>/dev/null| grep ".conf$" | grep -v "none" | grep -v "default" | sed 's/.conf//g'
     echo
     if [ $(ls ${nginx_location}/etc/vhost/ 2>/dev/null| grep ".conf$" | grep -v "none" | grep -v "default" | wc -l) -gt 0 ]; then
         echo "Nginx Server Name"
@@ -293,39 +302,73 @@ vhost_list(){
 }
 
 vhost_del(){
-    if [ "${apache_location}" != "" ]; then
-        read -p "Please enter a domain you want to delete it (for example: www.lamp.sh): " domain
-        if apache_vhost_is_exist "${domain}"; then
-            rm -f ${apache_location}/conf/vhost/${domain}.conf
-            echo "Virtual host [${domain}] has been deleted, and website files will not be deleted."
-            echo "You need to delete the website files by manually if necessary."
-            echo "Reloading the apache config file..."
-            if ${apache_location}/bin/apachectl -t; then
-                ${apache_location}/bin/apachectl restart >/dev/null 2>&1
-                echo "Reload succeed"
+    if [ "${apache24_location}" != "" ]; then
+        while :
+        do
+            read -p "Do you want to delete a configuration file for apache? [y/n]:" apache_delete
+            case ${apache_delete} in
+            y|Y)
+                if [ "${apache24_location}" != "" ]; then
+                    read -p "Please enter a domain you want to delete it (for example: www.hws.com): " domain
+                    if apache_vhost_is_exist "${domain}"; then
+                        rm -f ${apache24_location}/conf/vhost/${domain}.conf
+                        echo "Virtual host [${domain}] has been deleted, and website files will not be deleted."
+                        echo "You need to delete the website files by manually if necessary."
+                        echo "Reloading the apache config file..."
+                        if ${apache24_location}/bin/apachectl -t; then
+                            ${apache24_location}/bin/apachectl restart >/dev/null 2>&1
+                            echo "Reload succeed"
+                            echo
+                        else
+                            echo -e "\033[31mError:\033[0m Reload failed. Apache config file had an error, please fix it and try again"
+                            exit 1
+                        fi
+                    fi
+                fi
+                break
+                ;;
+            n|N)
+                echo "Do not delete a configuration file for apache"
                 echo
-            else
-                echo -e "\033[31mError:\033[0m Reload failed. Apache config file had an error, please fix it and try again"
-                exit 1
-            fi
-        fi
+                break
+                ;;
+            *) echo "Please enter only y or n"
+            esac
+        done
     fi
     if [ "${nginx_location}" != "" ]; then
-        read -p "Please enter a domain you want to delete it (for example: www.lamp.sh): " domain
-        if nginx_vhost_is_exist "${domain}"; then
-            rm -f ${nginx_location}/etc/vhost/${domain}.conf
-            echo "Virtual host [${domain}] has been deleted, and website files will not be deleted."
-            echo "You need to delete the website files by manually if necessary."
-            echo "Reloading the apache config file..."
-            if ${apache_location}/sbin/ngint -t; then
-                ${nginx_location}/sbin/nginx -s reload >/dev/null 2>&1
-                echo "Reload succeed"
+        while :
+        do
+            read -p "Do you want to delete a configuration file for nginx? [y/n]:" nginx_delete
+            case ${nginx_delete} in
+            y|Y)
+                if [ "${nginx_location}" != "" ]; then
+                    read -p "Please enter a domain you want to delete it (for example: www.hws.com): " domain
+                    if nginx_vhost_is_exist "${domain}"; then
+                        rm -f ${nginx_location}/etc/vhost/${domain}.conf
+                        echo "Virtual host [${domain}] has been deleted, and website files will not be deleted."
+                        echo "You need to delete the website files by manually if necessary."
+                        echo "Reloading the apache config file..."
+                        if ${nginx_location}/sbin/nginx -t; then
+                            ${nginx_location}/sbin/nginx -s reload >/dev/null 2>&1
+                            echo "Reload succeed"
+                            echo
+                        else
+                            echo -e "\033[31mError:\033[0m Reload failed. Nginx config file had an error, please fix it and try again"
+                            exit 1
+                        fi
+                    fi
+                fi
+                break
+            ;;
+            n|N)
+                echo "Do not delete a configuration file for nginx"
                 echo
-            else
-                echo -e "\033[31mError:\033[0m Reload failed. Apache config file had an error, please fix it and try again"
-                exit 1
-            fi
-        fi
+                break
+                ;;
+            *) echo "Please enter only y or n"
+            esac
+        done
     fi
 }
 
@@ -361,7 +404,7 @@ display_php_menu(){
 }
 
 apache_vhost_is_exist(){
-    local conf_file="${apache_location}/conf/vhost/$1.conf"
+    local conf_file="${apache24_location}/conf/vhost/$1.conf"
     if [ -f "${conf_file}" ]; then
         return 0
     else
