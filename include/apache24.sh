@@ -174,7 +174,7 @@ _config_apache(){
     sed -i 's/^ServerAdmin you@example.com/ServerAdmin admin@localhost/' ${apache24_location}/conf/httpd.conf
     sed -i 's/^#ServerName www.example.com:80/ServerName 0.0.0.0:80/' ${apache24_location}/conf/httpd.conf
     sed -i 's@^#Include conf/extra/httpd-info.conf@Include conf/extra/httpd-info.conf@' ${apache24_location}/conf/httpd.conf
-    sed -i 's@DirectoryIndex index.html@DirectoryIndex index.html index.php@' ${apache24_location}/conf/httpd.conf
+    sed -i 's@DirectoryIndex index.html@DirectoryIndex index.php default.php index.html index.htm default.html default.htm@' ${apache24_location}/conf/httpd.conf
     sed -i "s@^DocumentRoot.*@DocumentRoot \"${default_site_dir}\"@" ${apache24_location}/conf/httpd.conf
     sed -i "s@^<Directory \"${apache24_location}/htdocs\">@<Directory \"${default_site_dir}\">@" ${apache24_location}/conf/httpd.conf
     echo "ServerTokens ProductOnly" >> ${apache24_location}/conf/httpd.conf
