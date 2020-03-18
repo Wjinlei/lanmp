@@ -191,8 +191,8 @@ Options:
             install_redis
             ;;
         --install-pma49)
-            InstallPreSetting
             if [ $# -ge 2 ]; then
+                InstallPreSetting
                 include pma49
                 install_pma49 ${2}
             else
