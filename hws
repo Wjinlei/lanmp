@@ -155,6 +155,7 @@ vhost_add(){
                         fi
                     fi
                     ftp_create="y"
+                    break
                     ;;
                 n|N)
                     echo "Do not create a ftp user"

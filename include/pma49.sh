@@ -1,7 +1,5 @@
 install_pma49(){
-    if [ ! -d "${1}" ]; then
-        echo "Path does not exist" && exit 1
-    fi
+    mkdir -p ${1}
     rm -fr ${1}/pma
     cd /tmp
     _info "${phpmyadmin49_filename} install start..."
@@ -14,7 +12,6 @@ install_pma49(){
     tar zxf phpmyadmin-conf.tar.gz
     cp -f config.inc.php ${1}/pma/config.inc.php
     mkdir -p ${1}/pma/{upload,save}
-    chown -R www:www ${1}/pma
     _success "${phpmyadmin49_filename} install completed..."
     rm -f /tmp/${phpmyadmin49_filename}.tar.gz
     rm -f /tmp/phpmyadmin-conf.tar.gz
