@@ -143,8 +143,21 @@ http {
     server_tokens off;
 }
 EOF
-    cat > /etc/logrotate.d/hws_nginx <<EOF
+    cat > /etc/logrotate.d/hws_nginx_log <<EOF
 ${nginx_location}/logs/*log {
+    daily
+    rotate 30
+    missingok
+    notifempty
+    compress
+    sharedscripts
+    postrotate
+        [ ! -f ${nginx_location}/var/run/nginx.pid ] || kill -USR1 \`cat ${nginx_location}/var/run/nginx.pid\`
+    endscript
+}
+EOF
+    cat > /etc/logrotate.d/hws_nginx_site_log <<EOF
+${wwwroot_dir}/*/log/*log {
     daily
     rotate 30
     missingok

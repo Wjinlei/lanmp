@@ -171,16 +171,18 @@ vhost_add(){
     # Create apache config
     if [ "${apache_create}" = "y" ]; then
         local website_root=${apache24_www_root}/${apache24_domain_names%% *}
-        mkdir -p ${website_root}
+        mkdir -p ${website_root}/web
+        mkdir -p ${website_root}/log
+        mkdir -p ${website_root}/other
         if [ ${php_arr_len} != 0 ]; then
             cat > ${apache24_location}/conf/vhost/${apache24_domain_names%% *}.conf << EOF
 <VirtualHost *:80>
     ServerName ${apache24_domain_names%% *}
     ServerAlias ${apache24_domain_names}
-    DocumentRoot ${website_root}
+    DocumentRoot ${website_root}/web
 
-    #ErrorLog "${website_root}/logs/${apache24_domain_names%% *}-error_log"
-    #CustomLog "${website_root}/logs/${apache24_domain_names%% *}-access_log" combined
+    ErrorLog "${website_root}/log/${apache24_domain_names%% *}-error.log"
+    CustomLog "${website_root}/log/${apache24_domain_names%% *}-access.log" combined
 
     #DENY FILES
     <Files ~ (\\.user.ini|\\.htaccess|\\.git|\\.svn|\\.project|LICENSE|README.md)\$>
@@ -188,7 +190,7 @@ vhost_add(){
         Deny from all
     </Files>
 
-    <Directory ${website_root}>
+    <Directory ${website_root}/web>
         SetOutputFilter DEFLATE
         Options FollowSymLinks
         AllowOverride All
@@ -230,14 +232,18 @@ EOF
     if [ "${nginx_create}" = "y" ]; then
         if [ ${php_arr_len} != 0 ]; then
             local website_root=${nginx_www_root}/${nginx_domain_names%% *}
-            mkdir -p ${website_root}
+            mkdir -p ${website_root}/web
+            mkdir -p ${website_root}/log
+            mkdir -p ${website_root}/other
             if [ ${php_arr_len} != 0 ]; then
                 cat > ${nginx_location}/etc/vhost/${nginx_domain_names%% *}.conf<<EOF
 server {
     listen 80;
     server_name ${nginx_domain_names};
-    root ${website_root};
-    index index.php default.php index.html index.htm;
+    root ${website_root}/web;
+    index index.php default.php index.html index.htm default.html default.htm
+    error_log "${website_root}/log/${apache24_domain_names%% *}-error.log"
+    access_log "${website_root}/log/${apache24_domain_names%% *}-access.log" combined
 
     location ~ \.php\$ {
         fastcgi_pass unix:${php};
