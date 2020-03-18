@@ -196,11 +196,11 @@ Options:
                 include pma49
                 install_pma49 ${2}
             else
-                echo "Please specify the installation path" && exit 1
+                echo "Missing parameters,Please specify the installation path" && exit 1
             fi
             ;;
         *)
-            echo "Please Usage: $0 -h, Show Help"
+            echo "Missing parameters,Please Usage: $0 -h, Show Help" && exit 1
             ;;
     esac
 }

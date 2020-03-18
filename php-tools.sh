@@ -29,12 +29,16 @@ Options:
 "
             ;;
         --install-php-redis)
-            InstallPreSetting
-            include php-redis
-            install_php_redis ${2} ${3}
+            if [ $# -ge 3 ]; then
+                InstallPreSetting
+                include php-redis
+                install_php_redis ${2} ${3}
+            else
+                echo "Missing parameters,Please Usage: $0 -h, Show Help" && exit 1
+            fi
             ;;
         *)
-            echo "Please Usage: $0 -h, Show Help"
+            echo "Missing parameters,Please Usage: $0 -h, Show Help" && exit 1
             ;;
     esac
 }

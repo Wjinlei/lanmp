@@ -55,10 +55,7 @@ EOF
 }
 
 install_php_redis(){
-    if [ "$#" -lt 2 ]; then
-        echo "Missing parameters,Please Usage: $0 -h, Show Help"
-        exit 1
-    fi
+    [ "$#" -lt 2 ] && echo "Missing parameters,Please Usage: $0 -h, Show Help" && exit 1
     ${1} --version > /dev/null 2>&1
     if [ "$?" -ne 0 ]; then
         echo "php-config does not exist or php-config error"
