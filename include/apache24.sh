@@ -19,6 +19,7 @@ _install_apache_depend(){
 
     id -u www >/dev/null 2>&1
     [ $? -ne 0 ] && useradd -M -U www -r -d /dev/null -s /sbin/nologin
+    mkdir -p ${wwwroot_dir}
     _success "Install dependencies packages for Apache completed..."
 }
 
