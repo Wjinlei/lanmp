@@ -157,7 +157,6 @@ phpmyadmin49_download_url="https://files.phpmyadmin.net/phpMyAdmin/4.9.4/phpMyAd
 
 # Other
 wwwroot_dir=${prefix}/www
-default_site_dir=${prefix}/www/default
 mysql_data_location=${prefix}/mysql_data
 mysql_port=3306
 redis_port=6379

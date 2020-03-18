@@ -19,8 +19,6 @@ _install_apache_depend(){
 
     id -u www >/dev/null 2>&1
     [ $? -ne 0 ] && useradd -M -U www -r -d /dev/null -s /sbin/nologin
-
-    mkdir -p ${default_site_dir}
     _success "Install dependencies packages for Apache completed..."
 }
 
@@ -175,8 +173,6 @@ _config_apache(){
     sed -i 's/^#ServerName www.example.com:80/ServerName 0.0.0.0:80/' ${apache24_location}/conf/httpd.conf
     sed -i 's@^#Include conf/extra/httpd-info.conf@Include conf/extra/httpd-info.conf@' ${apache24_location}/conf/httpd.conf
     sed -i 's@DirectoryIndex index.html@DirectoryIndex index.php default.php index.html index.htm default.html default.htm@' ${apache24_location}/conf/httpd.conf
-    sed -i "s@^DocumentRoot.*@DocumentRoot \"${default_site_dir}\"@" ${apache24_location}/conf/httpd.conf
-    sed -i "s@^<Directory \"${apache24_location}/htdocs\">@<Directory \"${default_site_dir}\">@" ${apache24_location}/conf/httpd.conf
     echo "ServerTokens ProductOnly" >> ${apache24_location}/conf/httpd.conf
     echo "ProtocolsHonorOrder On" >> ${apache24_location}/conf/httpd.conf
     echo "Protocols h2 http/1.1" >> ${apache24_location}/conf/httpd.conf

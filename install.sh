@@ -24,24 +24,24 @@ main(){
         -h|--help)
             printf "Usage: $0 [Options] [Install Path]
 Options:
--h, --help                      Print this help text and exit
---install-apache24              Install apache2.4
---install-nginx                 Install nginx
---install-mysql55               Install mysql5.5
---install-mysql56               Install mysql5.6
---install-mysql57               Install mysql5.7
---install-mysql80               Install mysql8.0
---install-php53                 Install php5.3
---install-php54                 Install php5.4
---install-php55                 Install php5.5
---install-php56                 Install php5.6
---install-php70                 Install php7.0
---install-php71                 Install php7.1
---install-php72                 Install php7.2
---install-php73                 Install php7.3
---install-pma49                 Install pma4.9
---install-pureftpd              Install pureftpd
---install-redis                 Install redis-server
+-h, --help                  Print this help text and exit
+--install-apache24          Install apache2.4       Default Path: /hwslinuxmaster/soft/apache24
+--install-nginx             Install nginx           Default Path: /hwslinuxmaster/soft/nginx
+--install-mysql55           Install mysql5.5        Default Path: /hwslinuxmaster/soft/mysql55
+--install-mysql56           Install mysql5.6        Default Path: /hwslinuxmaster/soft/mysql56
+--install-mysql57           Install mysql5.7        Default Path: /hwslinuxmaster/soft/mysql57
+--install-mysql80           Install mysql8.0        Default Path: /hwslinuxmaster/soft/mysql80
+--install-php53             Install php5.3          Default Path: /hwslinuxmaster/soft/php/php53
+--install-php54             Install php5.4          Default Path: /hwslinuxmaster/soft/php/php54
+--install-php55             Install php5.5          Default Path: /hwslinuxmaster/soft/php/php55
+--install-php56             Install php5.6          Default Path: /hwslinuxmaster/soft/php/php56
+--install-php70             Install php7.0          Default Path: /hwslinuxmaster/soft/php/php70
+--install-php71             Install php7.1          Default Path: /hwslinuxmaster/soft/php/php71
+--install-php72             Install php7.2          Default Path: /hwslinuxmaster/soft/php/php72
+--install-php73             Install php7.3          Default Path: /hwslinuxmaster/soft/php/php73
+--install-pureftpd          Install pureftpd        Default Path: /hwslinuxmaster/soft/pure-ftpd
+--install-redis             Install redis-server    Default Path: /hwslinuxmaster/soft/redis-server
+--install-pma49             Install pma4.9          Default Path: Not Default
 "
             ;;
         --install-apache24)
@@ -49,7 +49,6 @@ Options:
             include apache24
             if [ $# -ge 2 ]; then
                 wwwroot_dir=${2}/www
-                default_site_dir=${2}/www/default
                 apache24_install_path_name=${2##*/}
                 apache24_location=${2}
             fi
@@ -60,7 +59,6 @@ Options:
             include nginx
             if [ $# -ge 2 ]; then
                 wwwroot_dir=${2}/www
-                default_site_dir=${2}/www/default
                 nginx_install_path_name=${2##*/}
                 nginx_location=${2}
             fi
@@ -174,12 +172,6 @@ Options:
             fi
             install_php73
             ;;
-        --install-pma49)
-            InstallPreSetting
-            include pma49
-            [ $# -ge 2 ] && default_site_dir=${2}
-            install_pma49
-            ;;
         --install-pureftpd)
             InstallPreSetting
             include pureftpd
@@ -197,6 +189,15 @@ Options:
                 redis_location=${2}
             fi
             install_redis
+            ;;
+        --install-pma49)
+            InstallPreSetting
+            if [ $# -ge 2 ]; then
+                include pma49
+                install_pma49 ${2}
+            else
+                echo "Please specify the installation path" && exit 1
+            fi
             ;;
         *)
             echo "Please Usage: $0 -h, Show Help"
