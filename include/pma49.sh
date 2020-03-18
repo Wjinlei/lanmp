@@ -12,6 +12,9 @@ install_pma49(){
     tar zxf phpmyadmin-conf.tar.gz
     cp -f config.inc.php ${1}/pma/config.inc.php
     mkdir -p ${1}/pma/{upload,save}
+    local tmpUser=$(ls -ld ${1}|awk '{print $3}')
+    local tmpGroup=$(ls -ld ${1}|awk '{print $4}')
+    chown -R ${tmpUser}:${tmpGroup} ${1}/pma
     _success "${phpmyadmin49_filename} install completed..."
     rm -f /tmp/${phpmyadmin49_filename}.tar.gz
     rm -f /tmp/phpmyadmin-conf.tar.gz
