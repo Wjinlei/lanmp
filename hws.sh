@@ -451,9 +451,9 @@ IsRoot(){
 display_usage(){
 printf "
 Usage: `basename $0` [ add | del | list ]
-add     Create a new Apache virtual host
-del     Delete a Apache virtual host
-list    List all of Apache virtual hosts
+add     Create a new virtual host
+del     Delete a virtual host
+list    List all of virtual hosts
 
 "
 }
