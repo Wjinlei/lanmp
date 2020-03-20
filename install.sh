@@ -22,7 +22,7 @@ include(){
 main(){
     case "$1" in
         -h|--help)
-            printf "Usage: $0 [Options] [Install Path]
+            printf "Usage: $0 [Options] [Install Path] [...]
 Options:
 -h, --help                  Print this help text and exit
 --install-apache24          Install apache2.4       Default Path: /hwslinuxmaster/soft/apache24
@@ -71,6 +71,9 @@ Options:
                 mysql_data_location=${2}/mysql_data
                 mysql55_location=${2}
             fi
+            if [ $# -ge 3 ]; then
+                mysql_pass=${3}
+            fi
             install_mysql55
             ;;
         --install-mysql56)
@@ -79,6 +82,9 @@ Options:
             if [ $# -ge 2 ]; then
                 mysql_data_location=${2}/mysql_data
                 mysql56_location=${2}
+            fi
+            if [ $# -ge 3 ]; then
+                mysql_pass=${3}
             fi
             install_mysql56
             ;;
@@ -89,6 +95,9 @@ Options:
                 mysql_data_location=${2}/mysql_data
                 mysql57_location=${2}
             fi
+            if [ $# -ge 3 ]; then
+                mysql_pass=${3}
+            fi
             install_mysql57
             ;;
         --install-mysql80)
@@ -97,6 +106,9 @@ Options:
             if [ $# -ge 2 ]; then
                 mysql_data_location=${2}/mysql_data
                 mysql80_location=${2}
+            fi
+            if [ $# -ge 3 ]; then
+                mysql_pass=${3}
             fi
             install_mysql80
             ;;

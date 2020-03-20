@@ -146,7 +146,6 @@ EOF
 install_mysql55(){
     killall mysqld > /dev/null 2>&1
     [ -d "${mysql_data_location}" ] && mv ${mysql_data_location} ${mysql_data_location}-$(date +%Y-%m-%d_%H:%M:%S).bak
-    local mysql_pass=$(GenPassWord)
     _install_mysql_depend
     Is64bit && sys_bit=x86_64 || sys_bit=i686
     cd /tmp
