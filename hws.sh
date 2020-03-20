@@ -286,7 +286,7 @@ EOF
         ${mysql_location}/bin/mysql -uroot -p${mysqlroot_passwd} >/dev/null 2>&1 <<EOF
 CREATE DATABASE IF NOT EXISTS \`${dbname}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 CREATE USER '${dbname}'@'%' IDENTIFIED BY '${dbpass}';
-GRANT ALL PRIVILEGES ON \`${dbname}\` . * TO '${dbname}'@'%';
+GRANT ALL PRIVILEGES ON \`${dbname}\`.* TO '${dbname}'@'%';
 FLUSH PRIVILEGES;
 EOF
         echo "Database [${dbname}] and mysql user [${dbname}] has been created"
