@@ -242,9 +242,9 @@ server {
     listen 80;
     server_name ${nginx_domain_names};
     root ${website_root}/web;
-    index index.php default.php index.html index.htm default.html default.htm
-    error_log "${website_root}/log/${apache24_domain_names%% *}-error.log"
-    access_log "${website_root}/log/${apache24_domain_names%% *}-access.log" combined
+    index index.php default.php index.html index.htm default.html default.htm;
+    error_log "${website_root}/log/${apache24_domain_names%% *}-error.log";
+    access_log "${website_root}/log/${apache24_domain_names%% *}-access.log" combined;
 
     location ~ \.php\$ {
         fastcgi_pass unix:${php};
