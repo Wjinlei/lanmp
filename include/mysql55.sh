@@ -131,7 +131,7 @@ max-connect-errors             = 1000000
 log-bin                        = mysql-bin
 log-bin-index                  = mysql-bin.index
 sync-binlog                    = 1
-expire-logs-days               = 15
+expire-logs-days               = 3
 
 # REPLICATION
 relay-log                      = relay-bin
