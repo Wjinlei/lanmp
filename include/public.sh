@@ -31,18 +31,22 @@ IsRoot(){
 
 DownloadFile(){
     local cur_dir=$(pwd)
-    rm -f ${1}
-    wget --no-check-certificate -cv -t3 -T60 -O ${1} ${download_root_url}${1}
-    if [ $? -eq 0 ]; then
-        _success "$1 download completed..."
+    if [ -s "$1" ]; then
+        _info "$1 [found]"
     else
-        rm -f ${1}
-        _warn "$1 download failed, retrying download from secondary url..."
-        wget --no-check-certificate -cv -t3 -T60 -O $1 ${2}
+        _info "$1 not found, download now..."
+        wget --no-check-certificate -cv -t3 -T60 -O ${1} ${download_root_url}${1}
         if [ $? -eq 0 ]; then
             _success "$1 download completed..."
         else
-            _error "Failed to download $1, please download it to ${cur_dir} directory manually and try again."
+            rm -f ${1}
+            _warn "$1 download failed, retrying download from secondary url..."
+            wget --no-check-certificate -cv -t3 -T60 -O $1 ${2}
+            if [ $? -eq 0 ]; then
+                _success "$1 download completed..."
+            else
+                _error "Failed to download $1, please download it to ${cur_dir} directory manually and try again."
+            fi
         fi
     fi
 }
