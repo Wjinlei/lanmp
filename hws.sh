@@ -246,7 +246,7 @@ server {
     error_log "${website_root}/log/${apache24_domain_names%% *}-error.log";
     access_log "${website_root}/log/${apache24_domain_names%% *}-access.log" combined;
 
-    location \.php\$ {
+    location ~ \.php\$ {
         fastcgi_pass unix:${php};
         fastcgi_index index.php;
         fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
