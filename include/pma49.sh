@@ -22,8 +22,6 @@ install_pma49(){
             local tmpGroup=$(ls -ld ${1}|awk '{print $4}')
             chown -R ${tmpUser}:${tmpGroup} ${1}/pma
             _success "${phpmyadmin49_filename} install completed..."
-            rm -f /tmp/${phpmyadmin49_filename}.tar.gz
-            rm -f /tmp/phpmyadmin-conf.tar.gz
             rm -f /tmp/config.inc.php
         else
             echo "${1}/pma Directory already exists" && exit 1

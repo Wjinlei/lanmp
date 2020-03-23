@@ -401,6 +401,5 @@ php72 Install Path:${php72_location}
 
 EOF
     _success "${php72_filename} install completed..."
-    rm -f /tmp/${php72_filename}.tar.gz
     rm -fr /tmp/${php72_filename}
 }

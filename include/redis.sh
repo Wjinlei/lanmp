@@ -44,7 +44,6 @@ install_redis(){
 Redis Install Path:${redis_location}
 
 EOF
-        rm -f ${redis_filename}.tar.gz
         rm -fr ${redis_filename}
         _success "redis-server install completed!"
     else

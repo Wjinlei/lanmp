@@ -89,9 +89,6 @@ Nginx Install Path:${nginx_location}
 Nginx Www Root Dir:${wwwroot_dir}
 
 EOF
-    rm -f /tmp/${pcre_filename}.tar.gz
-    rm -f /tmp/${openssl_filename}.tar.gz
-    rm -f /tmp/${nginx_filename}.tar.gz
     rm -fr /tmp/${pcre_filename}
     rm -fr /tmp/${openssl_filename}
     rm -fr /tmp/${nginx_filename}

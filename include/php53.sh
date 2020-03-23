@@ -370,6 +370,5 @@ php53 Install Path:${php53_location}
 
 EOF
     _success "${php53_filename} install completed..."
-    rm -f /tmp/${php53_filename}.tar.gz
     rm -fr /tmp/${php53_filename}
 }

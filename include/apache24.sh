@@ -155,9 +155,6 @@ Apache24 Install Path:${apache24_location}
 Apache24 Www Root Dir:${wwwroot_dir}
 
 EOF
-    rm -f /tmp/${apr_filename}.tar.gz
-    rm -f /tmp/${apr_util_filename}.tar.gz
-    rm -f /tmp/${apache24_filename}.tar.gz
     rm -fr /tmp/${apache24_filename}
 }
 

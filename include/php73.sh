@@ -400,6 +400,5 @@ php73 Install Path:${php73_location}
 
 EOF
     _success "${php73_filename} install completed..."
-    rm -f /tmp/${php73_filename}.tar.gz
     rm -fr /tmp/${php73_filename}
 }

@@ -403,6 +403,5 @@ php71 Install Path:${php71_location}
 
 EOF
     _success "${php71_filename} install completed..."
-    rm -f /tmp/${php71_filename}.tar.gz
     rm -fr /tmp/${php71_filename}
 }

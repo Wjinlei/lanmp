@@ -20,7 +20,6 @@ _install_php_redis4(){
 extension = ${php_extension_dir}/redis.so
 EOF
     fi
-    rm -f ${php_redis4_filename}.tgz
     rm -fr ${php_redis4_filename}
     _success "PHP extension redis install completed!"
     _info "Plase Restart Php..."
@@ -48,7 +47,6 @@ _install_php_redis5(){
 extension = ${php_extension_dir}/redis.so
 EOF
     fi
-    rm -f ${php_redis5_filename}.tgz
     rm -fr ${php_redis5_filename}
     _success "PHP extension redis install completed!"
     _info "Plase Restart Php..."

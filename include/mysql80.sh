@@ -175,6 +175,5 @@ MySQL Config File: /etc/my.cnf
 
 EOF
     _success "Install ${mysql80_filename} completed..."
-    rm -f /tmp/${mysql80_filename}.tar.xz
     rm -fr /tmp/${mysql80_filename}
 }

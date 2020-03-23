@@ -382,6 +382,5 @@ php55 Install Path:${php55_location}
 
 EOF
     _success "${php55_filename} install completed..."
-    rm -f /tmp/${php55_filename}.tar.gz
     rm -fr /tmp/${php55_filename}
 }

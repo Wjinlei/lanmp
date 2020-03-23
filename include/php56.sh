@@ -382,6 +382,5 @@ php56 Install Path:${php56_location}
 
 EOF
     _success "${php56_filename} install completed..."
-    rm -f /tmp/${php56_filename}.tar.gz
     rm -fr /tmp/${php56_filename}
 }

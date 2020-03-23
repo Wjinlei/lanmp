@@ -369,6 +369,5 @@ php54 Install Path:${php54_location}
 
 EOF
     _success "${php54_filename} install completed..."
-    rm -f /tmp/${php54_filename}.tar.gz
     rm -fr /tmp/${php54_filename}
 }

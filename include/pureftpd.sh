@@ -74,7 +74,6 @@ Install Time: $(date +%Y-%m-%d_%H:%M:%S)
 Pureftpd Install Path:${pureftpd_location}
 
 EOF
-    rm -f /tmp/${pureftpd_filename}.tar.gz
     rm -fr /tmp/${pureftpd_filename}
 }
 

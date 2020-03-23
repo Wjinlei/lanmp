@@ -179,6 +179,5 @@ MySQL Config File: /etc/my.cnf
 
 EOF
     _success "Install ${mysql57_filename} completed..."
-    rm -f /tmp/${mysql57_filename}.tar.gz
     rm -fr /tmp/${mysql57_filename}
 }
