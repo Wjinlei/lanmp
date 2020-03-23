@@ -158,7 +158,7 @@ install_mysql80(){
         tar Jxf ${mysql80_filename}.tar.xz
     fi
     _info "Moving ${mysql80_filename} files..."
-    mv ${mysql80_filename}/* ${mysql80_location}
+    mv -f ${mysql80_filename}/* ${mysql80_location}
     _create_mysql_config
     _info "Init MySQL..."
     echo "default_authentication_plugin  = mysql_native_password" >> /etc/my.cnf

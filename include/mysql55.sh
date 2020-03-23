@@ -163,7 +163,7 @@ install_mysql55(){
         tar zxf ${mysql55_filename}.tar.gz
     fi
     _info "Moving ${mysql55_filename} files..."
-    mv ${mysql55_filename}/* ${mysql55_location}
+    mv -f ${mysql55_filename}/* ${mysql55_location}
     _create_mysql_config
     _info "Init MySQL..."
     ${mysql55_location}/scripts/mysql_install_db --basedir=${mysql55_location} --datadir=${mysql_data_location} --user=mysql

@@ -163,7 +163,7 @@ install_mysql56(){
         tar zxf ${mysql56_filename}.tar.gz
     fi
     _info "Moving ${mysql56_filename} files..."
-    mv ${mysql56_filename}/* ${mysql56_location}
+    mv -f ${mysql56_filename}/* ${mysql56_location}
     _create_mysql_config
     _info "Init MySQL..."
     ${mysql56_location}/scripts/mysql_install_db --basedir=${mysql56_location} --datadir=${mysql_data_location} --user=mysql

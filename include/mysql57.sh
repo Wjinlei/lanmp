@@ -163,7 +163,7 @@ install_mysql57(){
         tar zxf ${mysql57_filename}.tar.gz
     fi
     _info "Moving ${mysql57_filename} files..."
-    mv ${mysql57_filename}/* ${mysql57_location}
+    mv -f ${mysql57_filename}/* ${mysql57_location}
     _create_mysql_config
     _info "Init MySQL..."
     ${mysql57_location}/bin/mysqld --initialize-insecure --basedir=${mysql57_location} --datadir=${mysql_data_location} --user=mysql
