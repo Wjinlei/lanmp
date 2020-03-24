@@ -13,6 +13,8 @@ _install_pureftpd_depends(){
             InstallPack "apt -y install ${depend}"
         done
     fi
+    id -u www >/dev/null 2>&1
+    [ $? -ne 0 ] && useradd -M -U www -r -d /dev/null -s /sbin/nologin
     _success "Install dependencies packages for Pureftpd completed..."
 }
 
