@@ -22,26 +22,27 @@ include(){
 main(){
     case "$1" in
         -h|--help)
-            printf "Usage: $0 [Options] [Install Path] [...]
+            printf "Usage: $0 Options [Parameter...]
 Options:
--h, --help                  Print this help text and exit
---install-apache24          Install apache2.4       Default Path: /hwslinuxmaster/soft/apache24
---install-nginx             Install nginx           Default Path: /hwslinuxmaster/soft/nginx
---install-mysql55           Install mysql5.5        Default Path: /hwslinuxmaster/soft/mysql55
---install-mysql56           Install mysql5.6        Default Path: /hwslinuxmaster/soft/mysql56
---install-mysql57           Install mysql5.7        Default Path: /hwslinuxmaster/soft/mysql57
---install-mysql80           Install mysql8.0        Default Path: /hwslinuxmaster/soft/mysql80
---install-php53             Install php5.3          Default Path: /hwslinuxmaster/soft/php/php53
---install-php54             Install php5.4          Default Path: /hwslinuxmaster/soft/php/php54
---install-php55             Install php5.5          Default Path: /hwslinuxmaster/soft/php/php55
---install-php56             Install php5.6          Default Path: /hwslinuxmaster/soft/php/php56
---install-php70             Install php7.0          Default Path: /hwslinuxmaster/soft/php/php70
---install-php71             Install php7.1          Default Path: /hwslinuxmaster/soft/php/php71
---install-php72             Install php7.2          Default Path: /hwslinuxmaster/soft/php/php72
---install-php73             Install php7.3          Default Path: /hwslinuxmaster/soft/php/php73
---install-pureftpd          Install pureftpd        Default Path: /hwslinuxmaster/soft/pure-ftpd
---install-redis             Install redis-server    Default Path: /hwslinuxmaster/soft/redis-server
---install-pma49             Install pma4.9          Default Path: Not Default
+-h, --help  Print this help text and exit
+
+--install-apache24 [Install Path] [Www Root Path]
+--install-nginx [Install Path] [Www Root Path]
+--install-mysql55 [Install Path] [MySQL Root Password] [MySQL Data Path]
+--install-mysql56 [Install Path] [MySQL Root Password] [MySQL Data Path]
+--install-mysql57 [Install Path] [MySQL Root Password] [MySQL Data Path]
+--install-mysql80 [Install Path] [MySQL Root Password] [MySQL Data Path]
+--install-php53 [Install Path]
+--install-php54 [Install Path] 
+--install-php55 [Install Path]
+--install-php56 [Install Path] 
+--install-php70 [Install Path]
+--install-php71 [Install Path] 
+--install-php72 [Install Path]
+--install-php73 [Install Path]
+--install-pureftpd [Install Path]
+--install-redis [Install Path]
+--install-pma49 Install Path
 "
             ;;
         --install-apache24)
@@ -52,6 +53,7 @@ Options:
                 apache24_install_path_name=${2##*/}
                 apache24_location=${2}
             fi
+            [ $# -ge 3 ] && wwwroot_dir=${3}
             install_apache24
             ;;
         --install-nginx)
@@ -62,6 +64,7 @@ Options:
                 nginx_install_path_name=${2##*/}
                 nginx_location=${2}
             fi
+            [ $# -ge 3 ] && wwwroot_dir=${3}
             install_nginx
             ;;
         --install-mysql55)
@@ -71,9 +74,8 @@ Options:
                 mysql_data_location=${2}/mysql_data
                 mysql55_location=${2}
             fi
-            if [ $# -ge 3 ]; then
-                mysql_pass=${3}
-            fi
+            [ $# -ge 3 ] && mysql_pass=${3}
+            [ $# -ge 4 ] && mysql_data_location=${4}
             install_mysql55
             ;;
         --install-mysql56)
@@ -83,9 +85,8 @@ Options:
                 mysql_data_location=${2}/mysql_data
                 mysql56_location=${2}
             fi
-            if [ $# -ge 3 ]; then
-                mysql_pass=${3}
-            fi
+            [ $# -ge 3 ] && mysql_pass=${3}
+            [ $# -ge 4 ] && mysql_data_location=${4}
             install_mysql56
             ;;
         --install-mysql57)
@@ -95,9 +96,8 @@ Options:
                 mysql_data_location=${2}/mysql_data
                 mysql57_location=${2}
             fi
-            if [ $# -ge 3 ]; then
-                mysql_pass=${3}
-            fi
+            [ $# -ge 3 ] && mysql_pass=${3}
+            [ $# -ge 4 ] && mysql_data_location=${4}
             install_mysql57
             ;;
         --install-mysql80)
@@ -107,9 +107,8 @@ Options:
                 mysql_data_location=${2}/mysql_data
                 mysql80_location=${2}
             fi
-            if [ $# -ge 3 ]; then
-                mysql_pass=${3}
-            fi
+            [ $# -ge 3 ] && mysql_pass=${3}
+            [ $# -ge 4 ] && mysql_data_location=${4}
             install_mysql80
             ;;
         --install-php53)
