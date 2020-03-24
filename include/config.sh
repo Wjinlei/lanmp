@@ -33,26 +33,26 @@ apr_util_download_url="http://ftp.jaist.ac.jp/pub/apache//apr/apr-util-1.6.1.tar
 
 # apache24
 apache24_install_path_name="apache24"
-apache24_location=${prefix}/soft/${apache24_install_path_name}
+apache24_location=${prefix}/server/${apache24_install_path_name}
 apache24_filename="httpd-2.4.41"
 apache24_download_url="http://ftp.jaist.ac.jp/pub/apache//httpd/httpd-2.4.41.tar.gz"
 
 # nginx
 nginx_install_path_name="nginx"
-nginx_location=${prefix}/soft/${nginx_install_path_name}
+nginx_location=${prefix}/server/${nginx_install_path_name}
 nginx_filename="nginx-1.16.1"
 nginx_download_url="http://nginx.org/download/nginx-1.16.1.tar.gz"
 
 # pureftpd_filename
 pureftpd_install_path_name="pure-ftpd"
-pureftpd_location=${prefix}/soft/${pureftpd_install_path_name}
+pureftpd_location=${prefix}/server/${pureftpd_install_path_name}
 pureftpd_filename="pure-ftpd-1.0.49"
 pureftpd_download_url="https://download.pureftpd.org/pub/pure-ftpd/releases/pure-ftpd-1.0.49.tar.gz"
 
 # redis
 redis_install_path_name="redis-server"
 redis_filename="redis-5.0.6"
-redis_location=${prefix}/soft/${redis_install_path_name}
+redis_location=${prefix}/server/${redis_install_path_name}
 redis_download_url="http://download.redis.io/releases/redis-5.0.6.tar.gz"
 
 # php-redis
@@ -62,10 +62,10 @@ php_redis5_filename="redis-5.1.1"
 php_redis5_download_url="https://pecl.php.net/get/redis-5.1.1.tgz"
 
 # mysql
-mysql55_location=${prefix}/soft/mysql55
-mysql56_location=${prefix}/soft/mysql56
-mysql57_location=${prefix}/soft/mysql57
-mysql80_location=${prefix}/soft/mysql80
+mysql55_location=${prefix}/server/mysql55
+mysql56_location=${prefix}/server/mysql56
+mysql57_location=${prefix}/server/mysql57
+mysql80_location=${prefix}/server/mysql80
 mysql55_i686_filename="mysql-5.5.62-linux-glibc2.12-i686"
 mysql55_i686_download_url="https://cdn.mysql.com/Downloads/MySQL-5.5/${mysql55_i686_filename}.tar.gz"
 mysql55_x86_64_filename="mysql-5.5.62-linux-glibc2.12-x86_64"
@@ -94,16 +94,16 @@ php71_install_path_name="php71"
 php72_install_path_name="php72"
 php73_install_path_name="php73"
 php74_install_path_name="php74"
-php52_location=${prefix}/soft/php/${php52_install_path_name}
-php53_location=${prefix}/soft/php/${php53_install_path_name}
-php54_location=${prefix}/soft/php/${php54_install_path_name}
-php55_location=${prefix}/soft/php/${php55_install_path_name}
-php56_location=${prefix}/soft/php/${php56_install_path_name}
-php70_location=${prefix}/soft/php/${php70_install_path_name}
-php71_location=${prefix}/soft/php/${php71_install_path_name}
-php72_location=${prefix}/soft/php/${php72_install_path_name}
-php73_location=${prefix}/soft/php/${php73_install_path_name}
-php74_location=${prefix}/soft/php/${php74_install_path_name}
+php52_location=${prefix}/server/php/${php52_install_path_name}
+php53_location=${prefix}/server/php/${php53_install_path_name}
+php54_location=${prefix}/server/php/${php54_install_path_name}
+php55_location=${prefix}/server/php/${php55_install_path_name}
+php56_location=${prefix}/server/php/${php56_install_path_name}
+php70_location=${prefix}/server/php/${php70_install_path_name}
+php71_location=${prefix}/server/php/${php71_install_path_name}
+php72_location=${prefix}/server/php/${php72_install_path_name}
+php73_location=${prefix}/server/php/${php73_install_path_name}
+php74_location=${prefix}/server/php/${php74_install_path_name}
 php52_filename="php-5.2.17"
 php52_download_url="http://museum.php.net/php5/php-5.2.17.tar.gz"
 php53_filename="php-5.3.29"
@@ -162,5 +162,5 @@ mysql_pass=$(cat /dev/urandom | head -1 | md5sum | head -c 16)
 mysql_port=3306
 redis_port=6379
 pureftpd_port=21
-backup_dir=${prefix}/Backup
+backup_dir=${prefix}/backup
 }
