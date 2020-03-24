@@ -164,7 +164,7 @@ AutoRename no
 AnonymousCantUpload no
 
 # default yes
-CreateHomeDir yes
+CreateHomeDir no
 
 # default /var/run/pure-ftpd.pid
 PIDFile ${pureftpd_location}/var/run/pure-ftpd.pid
