@@ -26,24 +26,24 @@ main(){
 Options:
 -h, --help  Print this help text and exit
 
---install-apache24 [Install Path] [Www Root Path]
---install-nginx [Install Path] [Www Root Path]
---install-mysql55 [Install Path] [MySQL Root Password] [MySQL Data Path]
---install-mysql56 [Install Path] [MySQL Root Password] [MySQL Data Path]
---install-mysql57 [Install Path] [MySQL Root Password] [MySQL Data Path]
---install-mysql80 [Install Path] [MySQL Root Password] [MySQL Data Path]
---install-php53 [Install Path]
---install-php54 [Install Path]
---install-php55 [Install Path]
---install-php56 [Install Path]
---install-php70 [Install Path]
---install-php71 [Install Path]
---install-php72 [Install Path]
---install-php73 [Install Path]
---install-pureftpd [Install Path]
---install-redis [Install Path]
---install-pma49 <Install Path>
---install-gotty [Install Path]
+--install-nginx
+--install-apache24
+--install-mysql55
+--install-mysql56
+--install-mysql57
+--install-mysql80
+--install-php53
+--install-php54
+--install-php55
+--install-php56
+--install-php70
+--install-php71
+--install-php72
+--install-php73
+--install-redis
+--install-pureftpd
+--install-pma49
+--install-gotty
 "
             ;;
         --install-apache24)
