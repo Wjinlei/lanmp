@@ -22,7 +22,7 @@ include(){
 main(){
     case "$1" in
         -h|--help)
-            printf "Usage: $0 Options [Parameter...]
+            printf "Usage: $0 <Options> [Parameter...]
 Options:
 -h, --help  Print this help text and exit
 
@@ -33,16 +33,17 @@ Options:
 --install-mysql57 [Install Path] [MySQL Root Password] [MySQL Data Path]
 --install-mysql80 [Install Path] [MySQL Root Password] [MySQL Data Path]
 --install-php53 [Install Path]
---install-php54 [Install Path] 
+--install-php54 [Install Path]
 --install-php55 [Install Path]
---install-php56 [Install Path] 
+--install-php56 [Install Path]
 --install-php70 [Install Path]
---install-php71 [Install Path] 
+--install-php71 [Install Path]
 --install-php72 [Install Path]
 --install-php73 [Install Path]
 --install-pureftpd [Install Path]
 --install-redis [Install Path]
---install-pma49 Install Path
+--install-pma49 <Install Path>
+--install-gotty [Install Path]
 "
             ;;
         --install-apache24)
@@ -209,6 +210,13 @@ Options:
             else
                 echo "Missing parameters,Please specify the installation path" && exit 1
             fi
+            ;;
+        --install-gotty)
+            include gotty
+            if [ $# -ge 2 ]; then
+                gotty_location=${2}
+            fi
+            install_gotty
             ;;
         *)
             echo "Missing parameters,Please Usage: $0 -h, Show Help" && exit 1
