@@ -31,11 +31,11 @@ apr_download_url="http://ftp.jaist.ac.jp/pub/apache//apr/apr-1.7.0.tar.gz"
 apr_util_filename="apr-util-1.6.1"
 apr_util_download_url="http://ftp.jaist.ac.jp/pub/apache//apr/apr-util-1.6.1.tar.gz"
 
-# apache24
-apache24_install_path_name="apache24"
-apache24_location=${prefix}/server/${apache24_install_path_name}
-apache24_filename="httpd-2.4.41"
-apache24_download_url="http://ftp.jaist.ac.jp/pub/apache//httpd/httpd-2.4.41.tar.gz"
+# apache
+apache_install_path_name="apache"
+apache_location=${prefix}/server/${apache_install_path_name}
+apache_filename="httpd-2.4.41"
+apache_download_url="http://ftp.jaist.ac.jp/pub/apache//httpd/httpd-2.4.41.tar.gz"
 
 # nginx
 nginx_install_path_name="nginx"

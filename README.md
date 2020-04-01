@@ -51,11 +51,11 @@ L(Linux) + A(Apache) + N(Nginx) + M(MySQL) + P(PHP) 安装脚本<br/>
 ./install.sh --help
 
 example:
-# 安装apache2.4到默认位置(/hwslinuxmaster)
-./install.sh --install-apache24 
+# 安装apache到默认位置(/hwslinuxmaster)
+./install.sh --install-apache
 
-# 安装apache2.4到/www/apache24目录
-./install.sh --install-apache24 /www/apache24 
+# 安装apache到/www/apache目录
+./install.sh --install-apache /www/apache
 
 PS:参数以空格分隔,第一个参数表示要执行的功能,第二参数表示要安装的位置,如果指定,则默认安装到/hwslinuxmaster
 

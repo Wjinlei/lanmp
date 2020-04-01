@@ -3,8 +3,8 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
-apache24_location=$(cat /hwslinuxmaster/install.result 2>/dev/null|grep "Apache24 Install Path" |cut -d: -f2|tail -n 1 2>/dev/null)
-apache24_www_root=$(cat /hwslinuxmaster/install.result 2>/dev/null|grep "Apache24 Www Root Dir" |cut -d: -f2|tail -n 1 2>/dev/null)
+apache_location=$(cat /hwslinuxmaster/install.result 2>/dev/null|grep "Apache Install Path" |cut -d: -f2|tail -n 1 2>/dev/null)
+apache_www_root=$(cat /hwslinuxmaster/install.result 2>/dev/null|grep "Apache Www Root Dir" |cut -d: -f2|tail -n 1 2>/dev/null)
 nginx_location=$(cat /hwslinuxmaster/install.result 2>/dev/null|grep "Nginx Install Path" |cut -d: -f2|tail -n 1 2>/dev/null)
 nginx_www_root=$(cat /hwslinuxmaster/install.result 2>/dev/null|grep "Nginx Www Root Dir" |cut -d: -f2|tail -n 1 2>/dev/null)
 pureftpd_location=$(cat /hwslinuxmaster/install.result 2>/dev/null|grep "Pureftpd Install Path" |cut -d: -f2|tail -n 1 2>/dev/null)
@@ -18,23 +18,23 @@ php_arr_len=${#php_arr[@]}
 
 vhost_add(){
     # Apache
-    if [ "${apache24_location}" != "" ]; then
+    if [ "${apache_location}" != "" ]; then
         while :
         do
             read -p "Do you want to create a configuration file for apache? [y/n]:" apache_create
             case ${apache_create} in
             y|Y)
-                apache_count=$(ls -l `find /proc/ -iname exe` 2>/dev/null|grep -c "${apache24_location}/bin/httpd")
+                apache_count=$(ls -l `find /proc/ -iname exe` 2>/dev/null|grep -c "${apache_location}/bin/httpd")
                 if [ ${apache_count} -eq 0 ]; then
                     echo "Info: Apache looks like not running, Try to starting Apache..."
-                    ${apache24_location}/bin/apachectl start > /dev/null 2>&1
+                    ${apache_location}/bin/apachectl start > /dev/null 2>&1
                     if [ $? -ne 0 ]; then
                         echo -e "\033[31mError:\033[0m Apache starting failed!"
                         exit 1
                     fi
                 fi
-                read -p "Please enter domain names (for example: hws.com www.hws.com): " apache24_domain_names
-                for i in ${apache24_domain_names}; do
+                read -p "Please enter domain names (for example: hws.com www.hws.com): " apache_domain_names
+                for i in ${apache_domain_names}; do
                     if apache_vhost_is_exist ${i}; then
                         echo -e "\033[31mError:\033[0m virtual host [${i}] is existed, please check it and try again."
                         break
@@ -171,19 +171,19 @@ vhost_add(){
 
     # Create apache config
     if [ "${apache_create}" = "y" ]; then
-        local website_root=${apache24_www_root}/${apache24_domain_names%% *}
+        local website_root=${apache_www_root}/${apache_domain_names%% *}
         mkdir -p ${website_root}/web
         mkdir -p ${website_root}/log
         mkdir -p ${website_root}/other
         if [ ${php_arr_len} != 0 ]; then
-            cat > ${apache24_location}/conf/vhost/${apache24_domain_names%% *}.conf << EOF
+            cat > ${apache_location}/conf/vhost/${apache_domain_names%% *}.conf << EOF
 <VirtualHost *:80>
-    ServerName ${apache24_domain_names%% *}
-    ServerAlias ${apache24_domain_names}
+    ServerName ${apache_domain_names%% *}
+    ServerAlias ${apache_domain_names}
     DocumentRoot ${website_root}/web
 
-    ErrorLog "${website_root}/log/${apache24_domain_names%% *}-error.log"
-    CustomLog "${website_root}/log/${apache24_domain_names%% *}-access.log" combined
+    ErrorLog "${website_root}/log/${apache_domain_names%% *}-error.log"
+    CustomLog "${website_root}/log/${apache_domain_names%% *}-access.log" combined
 
     #DENY FILES
     <Files ~ (\\.user.ini|\\.htaccess|\\.git|\\.svn|\\.project|LICENSE|README.md)\$>
@@ -209,8 +209,8 @@ EOF
         fi
         # Restart apache
         echo "Reloading the apache config file..."
-        if ${apache24_location}/bin/apachectl -t; then
-            ${apache24_location}/bin/apachectl restart >/dev/null 2>&1
+        if ${apache_location}/bin/apachectl -t; then
+            ${apache_location}/bin/apachectl restart >/dev/null 2>&1
             echo "Reload succeed"
             echo
         else
@@ -220,12 +220,12 @@ EOF
         chown -R www:www ${website_root}
         # Create Ftp User
         if [ "$ftp_create" = "y" ]; then
-            echo "Create Ftp User [${apache24_domain_names%% *}]"
-            ${pureftpd_location}/bin/pure-pw useradd ${apache24_domain_names%% *} -u www -d ${website_root}
+            echo "Create Ftp User [${apache_domain_names%% *}]"
+            ${pureftpd_location}/bin/pure-pw useradd ${apache_domain_names%% *} -u www -d ${website_root}
             ${pureftpd_location}/bin/pure-pw mkdb
             ${pureftpd_location}/bin/pure-pw list
         fi
-        echo "Virtual host [${apache24_domain_names%% *}] has been created"
+        echo "Virtual host [${apache_domain_names%% *}] has been created"
         echo "Website root directory is: ${website_root}"
         echo
     fi
@@ -243,8 +243,8 @@ server {
     server_name ${nginx_domain_names};
     root ${website_root}/web;
     index index.php default.php index.html index.htm default.html default.htm;
-    error_log "${website_root}/log/${apache24_domain_names%% *}-error.log";
-    access_log "${website_root}/log/${apache24_domain_names%% *}-access.log" combined;
+    error_log "${website_root}/log/${apache_domain_names%% *}-error.log";
+    access_log "${website_root}/log/${apache_domain_names%% *}-access.log" combined;
 
     location ~ \.php\$ {
         fastcgi_pass unix:${php};
@@ -295,11 +295,11 @@ EOF
 }
 
 vhost_list(){
-    if [ $(ls ${apache24_location}/conf/vhost/ 2>/dev/null| grep ".conf$" | grep -v "none" | grep -v "default" | wc -l) -gt 0 ]; then
+    if [ $(ls ${apache_location}/conf/vhost/ 2>/dev/null| grep ".conf$" | grep -v "none" | grep -v "default" | wc -l) -gt 0 ]; then
         echo "Apache Server Name"
         echo "------------"
     fi
-    ls ${apache24_location}/conf/vhost/ 2>/dev/null| grep ".conf$" | grep -v "none" | grep -v "default" | sed 's/.conf//g'
+    ls ${apache_location}/conf/vhost/ 2>/dev/null| grep ".conf$" | grep -v "none" | grep -v "default" | sed 's/.conf//g'
     echo
     if [ $(ls ${nginx_location}/etc/vhost/ 2>/dev/null| grep ".conf$" | grep -v "none" | grep -v "default" | wc -l) -gt 0 ]; then
         echo "Nginx Server Name"
@@ -309,21 +309,21 @@ vhost_list(){
 }
 
 vhost_del(){
-    if [ "${apache24_location}" != "" ]; then
+    if [ "${apache_location}" != "" ]; then
         while :
         do
             read -p "Do you want to delete a configuration file for apache? [y/n]:" apache_delete
             case ${apache_delete} in
             y|Y)
-                if [ "${apache24_location}" != "" ]; then
+                if [ "${apache_location}" != "" ]; then
                     read -p "Please enter a domain you want to delete it (for example: www.hws.com): " domain
                     if apache_vhost_is_exist "${domain}"; then
-                        rm -f ${apache24_location}/conf/vhost/${domain}.conf
+                        rm -f ${apache_location}/conf/vhost/${domain}.conf
                         echo "Virtual host [${domain}] has been deleted, and website files will not be deleted."
                         echo "You need to delete the website files by manually if necessary."
                         echo "Reloading the apache config file..."
-                        if ${apache24_location}/bin/apachectl -t; then
-                            ${apache24_location}/bin/apachectl restart >/dev/null 2>&1
+                        if ${apache_location}/bin/apachectl -t; then
+                            ${apache_location}/bin/apachectl restart >/dev/null 2>&1
                             echo "Reload succeed"
                             echo
                         else
@@ -411,7 +411,7 @@ display_php_menu(){
 }
 
 apache_vhost_is_exist(){
-    local conf_file="${apache24_location}/conf/vhost/$1.conf"
+    local conf_file="${apache_location}/conf/vhost/$1.conf"
     if [ -f "${conf_file}" ]; then
         return 0
     else

@@ -92,21 +92,21 @@ _install_nghttp2(){
 }
 
 
-install_apache24(){ 
+install_apache(){ 
     killall httpd > /dev/null 2>&1
     mkdir -p ${backup_dir}
-    if [ -d "${apache24_location}" ]; then 
-        if [ -d "${backup_dir}/${apache24_install_path_name}" ]; then
-            mv ${backup_dir}/${apache24_install_path_name} ${backup_dir}/${apache24_install_path_name}-$(date +%Y-%m-%d_%H:%M:%S).bak
+    if [ -d "${apache_location}" ]; then 
+        if [ -d "${backup_dir}/${apache_install_path_name}" ]; then
+            mv ${backup_dir}/${apache_install_path_name} ${backup_dir}/${apache_install_path_name}-$(date +%Y-%m-%d_%H:%M:%S).bak
         fi
-        mv ${apache24_location} ${backup_dir}
+        mv ${apache_location} ${backup_dir}
     fi
     _install_apache_depend 
     cd /tmp
-    _info "Downloading and Extracting ${apache24_filename} files..."
-    DownloadFile "${apache24_filename}.tar.gz" ${apache24_download_url}
-    rm -fr ${apache24_filename}
-    tar zxf ${apache24_filename}.tar.gz
+    _info "Downloading and Extracting ${apache_filename} files..."
+    DownloadFile "${apache_filename}.tar.gz" ${apache_download_url}
+    rm -fr ${apache_filename}
+    tar zxf ${apache_filename}.tar.gz
     _info "Downloading and Extracting ${apr_filename} files..."
     DownloadFile "${apr_filename}.tar.gz" ${apr_download_url}
     rm -fr ${apr_filename}
@@ -115,15 +115,15 @@ install_apache24(){
     DownloadFile "${apr_util_filename}.tar.gz" ${apr_util_download_url}
     rm -fr ${apr_util_filename}
     tar zxf ${apr_util_filename}.tar.gz
-    cd ${apache24_filename}
+    cd ${apache_filename}
     mv /tmp/${apr_filename} srclib/apr
     mv /tmp/${apr_util_filename} srclib/apr-util
-    _info "Make Install ${apache24_filename}..."
-    apache_configure_args="--prefix=${apache24_location} \
-    --bindir=${apache24_location}/bin \
-    --sbindir=${apache24_location}/bin \
-    --sysconfdir=${apache24_location}/conf \
-    --libexecdir=${apache24_location}/modules \
+    _info "Make Install ${apache_filename}..."
+    apache_configure_args="--prefix=${apache_location} \
+    --bindir=${apache_location}/bin \
+    --sbindir=${apache_location}/bin \
+    --sysconfdir=${apache_location}/conf \
+    --libexecdir=${apache_location}/modules \
     --with-pcre=${pcre_location} \
     --with-ssl=${openssl_location} \
     --with-nghttp2=${nghttp2_location} \
@@ -136,52 +136,52 @@ install_apache24(){
     CheckError "parallel_make"
     CheckError "make install"
     unset LDFLAGS
-    if [ -d "${backup_dir}/${apache24_install_path_name}" ]; then
-        if [ -d "${backup_dir}/${apache24_install_path_name}/conf" ]; then
-            rm -fr ${apache24_location}/conf
-            cp -fr ${backup_dir}/${apache24_install_path_name}/conf ${apache24_location}
+    if [ -d "${backup_dir}/${apache_install_path_name}" ]; then
+        if [ -d "${backup_dir}/${apache_install_path_name}/conf" ]; then
+            rm -fr ${apache_location}/conf
+            cp -fr ${backup_dir}/${apache_install_path_name}/conf ${apache_location}
         fi
     else
-        _info "Config ${apache24_filename}"
+        _info "Config ${apache_filename}"
         _config_apache
     fi
-    ${apache24_location}/bin/httpd -t
-    _info "Start ${apache24_filename}"
-    ${apache24_location}/bin/apachectl restart > /dev/null 2>&1
-    _success "${apache24_filename} install completed..."
+    ${apache_location}/bin/httpd -t
+    _info "Start ${apache_filename}"
+    ${apache_location}/bin/apachectl restart > /dev/null 2>&1
+    _success "${apache_filename} install completed..."
     cat >> ${prefix}/install.result <<EOF
 Install Time: $(date +%Y-%m-%d_%H:%M:%S)
-Apache24 Install Path:${apache24_location}
-Apache24 Www Root Dir:${wwwroot_dir}
+Apache Install Path:${apache_location}
+Apache Www Root Dir:${wwwroot_dir}
 
 EOF
-    rm -fr /tmp/${apache24_filename}
+    rm -fr /tmp/${apache_filename}
 }
 
 _config_apache(){
-    [ -f "${apache24_location}/conf/httpd.conf" ] && cp -f ${apache24_location}/conf/httpd.conf ${apache24_location}/conf/httpd.conf.bak
-    [ -f "${apache24_location}/conf/extra/httpd-vhosts.conf" ] && cp -f ${apache24_location}/conf/extra/httpd-vhosts.conf ${apache24_location}/conf/extra/httpd-vhosts.conf.bak
+    [ -f "${apache_location}/conf/httpd.conf" ] && cp -f ${apache_location}/conf/httpd.conf ${apache_location}/conf/httpd.conf.bak
+    [ -f "${apache_location}/conf/extra/httpd-vhosts.conf" ] && cp -f ${apache_location}/conf/extra/httpd-vhosts.conf ${apache_location}/conf/extra/httpd-vhosts.conf.bak
     # httpd.conf
-    grep -qE "^\s*#\s*Include conf/extra/httpd-vhosts.conf" ${apache24_location}/conf/httpd.conf && \
-    sed -i 's#^\s*\#\s*Include conf/extra/httpd-vhosts.conf#Include conf/extra/httpd-vhosts.conf#' ${apache24_location}/conf/httpd.conf || \
-    sed -i '$aInclude conf/extra/httpd-vhosts.conf' ${apache24_location}/conf/httpd.conf
-    sed -i 's/^User.*/User www/i' ${apache24_location}/conf/httpd.conf
-    sed -i 's/^Group.*/Group www/i' ${apache24_location}/conf/httpd.conf
-    sed -i 's/^ServerAdmin you@example.com/ServerAdmin admin@localhost/' ${apache24_location}/conf/httpd.conf
-    sed -i 's/^#ServerName www.example.com:80/ServerName 0.0.0.0:80/' ${apache24_location}/conf/httpd.conf
-    sed -i 's@^#Include conf/extra/httpd-info.conf@Include conf/extra/httpd-info.conf@' ${apache24_location}/conf/httpd.conf
-    sed -i 's@DirectoryIndex index.html@DirectoryIndex index.php default.php index.html index.htm default.html default.htm@' ${apache24_location}/conf/httpd.conf
-    echo "ServerTokens ProductOnly" >> ${apache24_location}/conf/httpd.conf
-    echo "ProtocolsHonorOrder On" >> ${apache24_location}/conf/httpd.conf
-    echo "Protocols h2 http/1.1" >> ${apache24_location}/conf/httpd.conf
-    sed -i 's/Require host .example.com/Require host localhost/g' ${apache24_location}/conf/extra/httpd-info.conf
-    sed -i "s@AddType\(.*\)Z@AddType\1Z\n    AddType application/x-httpd-php .php .phtml\n    AddType application/x-httpd-php-source .phps@" ${apache24_location}/conf/httpd.conf
-    sed -i "s@^export LD_LIBRARY_PATH.*@export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:${openssl_location}/lib@" ${apache24_location}/bin/envvars
-    cat > ${apache24_location}/conf/extra/httpd-vhosts.conf <<EOF
-IncludeOptional ${apache24_location}/conf/vhost/*.conf
+    grep -qE "^\s*#\s*Include conf/extra/httpd-vhosts.conf" ${apache_location}/conf/httpd.conf && \
+    sed -i 's#^\s*\#\s*Include conf/extra/httpd-vhosts.conf#Include conf/extra/httpd-vhosts.conf#' ${apache_location}/conf/httpd.conf || \
+    sed -i '$aInclude conf/extra/httpd-vhosts.conf' ${apache_location}/conf/httpd.conf
+    sed -i 's/^User.*/User www/i' ${apache_location}/conf/httpd.conf
+    sed -i 's/^Group.*/Group www/i' ${apache_location}/conf/httpd.conf
+    sed -i 's/^ServerAdmin you@example.com/ServerAdmin admin@localhost/' ${apache_location}/conf/httpd.conf
+    sed -i 's/^#ServerName www.example.com:80/ServerName 0.0.0.0:80/' ${apache_location}/conf/httpd.conf
+    sed -i 's@^#Include conf/extra/httpd-info.conf@Include conf/extra/httpd-info.conf@' ${apache_location}/conf/httpd.conf
+    sed -i 's@DirectoryIndex index.html@DirectoryIndex index.php default.php index.html index.htm default.html default.htm@' ${apache_location}/conf/httpd.conf
+    echo "ServerTokens ProductOnly" >> ${apache_location}/conf/httpd.conf
+    echo "ProtocolsHonorOrder On" >> ${apache_location}/conf/httpd.conf
+    echo "Protocols h2 http/1.1" >> ${apache_location}/conf/httpd.conf
+    sed -i 's/Require host .example.com/Require host localhost/g' ${apache_location}/conf/extra/httpd-info.conf
+    sed -i "s@AddType\(.*\)Z@AddType\1Z\n    AddType application/x-httpd-php .php .phtml\n    AddType application/x-httpd-php-source .phps@" ${apache_location}/conf/httpd.conf
+    sed -i "s@^export LD_LIBRARY_PATH.*@export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:${openssl_location}/lib@" ${apache_location}/bin/envvars
+    cat > ${apache_location}/conf/extra/httpd-vhosts.conf <<EOF
+IncludeOptional ${apache_location}/conf/vhost/*.conf
 EOF
-    mkdir -p ${apache24_location}/conf/vhost/
-    cat > ${apache24_location}/conf/extra/httpd-ssl.conf <<EOF
+    mkdir -p ${apache_location}/conf/vhost/
+    cat > ${apache_location}/conf/extra/httpd-ssl.conf <<EOF
 Listen 443
 AddType application/x-x509-ca-cert .crt
 AddType application/x-pkcs7-crl .crl
@@ -199,8 +199,8 @@ SSLCompression off
 Mutex sysvsem default
 SSLStrictSNIVHostCheck on
 EOF
-    cat > /etc/logrotate.d/hws_apache24_log <<EOF
-${apache24_location}/logs/*log {
+    cat > /etc/logrotate.d/hws_apache_log <<EOF
+${apache_location}/logs/*log {
     daily
     rotate 30
     missingok
@@ -208,11 +208,11 @@ ${apache24_location}/logs/*log {
     compress
     sharedscripts
     postrotate
-        [ ! -f ${apache24_location}/logs/httpd.pid ] || kill -USR1 \`cat ${apache24_location}/logs/httpd.pid\`
+        [ ! -f ${apache_location}/logs/httpd.pid ] || kill -USR1 \`cat ${apache_location}/logs/httpd.pid\`
     endscript
 }
 EOF
-    cat > /etc/logrotate.d/hws_apache24_site_log <<EOF
+    cat > /etc/logrotate.d/hws_apache_site_log <<EOF
 ${wwwroot_dir}/*/log/*log {
     daily
     rotate 30
@@ -221,7 +221,7 @@ ${wwwroot_dir}/*/log/*log {
     compress
     sharedscripts
     postrotate
-        [ ! -f ${apache24_location}/logs/httpd.pid ] || kill -USR1 \`cat ${apache24_location}/logs/httpd.pid\`
+        [ ! -f ${apache_location}/logs/httpd.pid ] || kill -USR1 \`cat ${apache_location}/logs/httpd.pid\`
     endscript
 }
 EOF
@@ -284,8 +284,8 @@ mod_xml2enc.so
 )
     # enable some modules by default
     for mod in ${httpd_mod_list[@]}; do
-        if [ -s "${apache24_location}/modules/${mod}" ]; then
-            sed -i -r "s/^#(.*${mod})/\1/" ${apache24_location}/conf/httpd.conf
+        if [ -s "${apache_location}/modules/${mod}" ]; then
+            sed -i -r "s/^#(.*${mod})/\1/" ${apache_location}/conf/httpd.conf
         fi
     done
     chown -R www:www ${wwwroot_dir}

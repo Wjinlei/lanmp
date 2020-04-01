@@ -27,7 +27,7 @@ Options:
 -h, --help  Print this help text and exit
 
 --install-nginx
---install-apache24
+--install-apache
 --install-mysql55
 --install-mysql56
 --install-mysql57
@@ -46,16 +46,16 @@ Options:
 --install-gotty
 "
             ;;
-        --install-apache24)
+        --install-apache)
             InstallPreSetting
-            include apache24
+            include apache
             if [ $# -ge 2 ]; then
                 wwwroot_dir=${2}/www
-                apache24_install_path_name=${2##*/}
-                apache24_location=${2}
+                apache_install_path_name=${2##*/}
+                apache_location=${2}
             fi
             [ $# -ge 3 ] && wwwroot_dir=${3}
-            install_apache24
+            install_apache
             ;;
         --install-nginx)
             InstallPreSetting
