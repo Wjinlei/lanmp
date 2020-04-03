@@ -145,7 +145,15 @@ EOF
 
 install_mysql55(){
     killall mysqld > /dev/null 2>&1
-    [ -d "${mysql_data_location}" ] && mv ${mysql_data_location} ${mysql_data_location}-$(date +%Y-%m-%d_%H:%M:%S).bak
+    mkdir -p ${backup_dir}
+    if [ -d "${mysql_data_location}" ]; then 
+        if [ -d "${backup_dir}/mysql_data" ]; then
+            mv ${backup_dir}/mysql_data ${backup_dir}/mysql_data-$(date +%Y-%m-%d_%H:%M:%S).bak
+        fi
+        mv ${mysql_data_location} ${backup_dir}
+    fi
+    rm -fr ${mysql55_location}
+    mkdir -p ${mysql55_location}
     _install_mysql_depend
     Is64bit && sys_bit=x86_64 || sys_bit=i686
     cd /tmp
