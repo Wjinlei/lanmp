@@ -72,7 +72,7 @@ _install_php_depend(){
             fi
         fi
     fi
-    CheckInstalled "_install_pcre" ${pcre_location}
+    _install_pcre
     _install_libiconv
     _install_re2c
     _success "Install dependencies packages for PHP completed..."
