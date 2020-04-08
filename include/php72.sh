@@ -254,9 +254,9 @@ _config_php(){
     fi
     php_default_charset=`grep "^default_charset" ${php72_location}/etc/php.ini |wc -l`
     if [[ ${php_default_charset} -eq 0 ]];then
-        echo 'default_charset = "utf-8"' >> ${php72_location}/etc/php.ini
+        echo 'default_charset = "UTF-8"' >> ${php72_location}/etc/php.ini
     else
-        sed -i 's/^default_charset.*/default_charset = "utf-8"/g' ${php72_location}/etc/php.ini
+        sed -i 's/^default_charset.*/default_charset = "UTF-8"/g' ${php72_location}/etc/php.ini
     fi
 
     extension_dir=$(${php72_location}/bin/php-config --extension-dir)
