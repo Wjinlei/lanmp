@@ -252,6 +252,12 @@ _config_php(){
         sed -i "s#mysqli.default_socket.*#mysqli.default_socket = ${sock_location}#" ${php71_location}/etc/php.ini
         sed -i "s#pdo_mysql.default_socket.*#pdo_mysql.default_socket = ${sock_location}#" ${php71_location}/etc/php.ini
     fi
+    php_default_charset=`grep "^default_charset" ${php71_location}/etc/php.ini |wc -l`
+    if [[ ${php_default_charset} -eq 0 ]];then
+        sed -i 's/^;default_charset.*/default_charset = "utf-8"/g' ${php71_location}/etc/php.ini
+    else
+        sed -i 's/^default_charset.*/default_charset = "utf-8"/g' ${php71_location}/etc/php.ini
+    fi
 
     extension_dir=$(${php71_location}/bin/php-config --extension-dir)
     cat > ${php71_location}/php.d/opcache.ini<<EOF
