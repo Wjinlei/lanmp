@@ -232,7 +232,7 @@ _config_php(){
     fi
     php_default_charset=`grep "^default_charset" ${php54_location}/etc/php.ini |wc -l`
     if [[ ${php_default_charset} -eq 0 ]];then
-        sed -i 's/^;default_charset.*/default_charset = "utf-8"/g' ${php54_location}/etc/php.ini
+        echo 'default_charset = "utf-8"' >> ${php54_location}/etc/php.ini
     else
         sed -i 's/^default_charset.*/default_charset = "utf-8"/g' ${php54_location}/etc/php.ini
     fi
