@@ -38,9 +38,7 @@ _install_mysql_depend(){
 }
 
 _config_mysql(){
-    chown -R mysql:mysql ${mysql80_location} ${mysql_data_location}
     sed -i "s:^basedir=.*:basedir=${mysql80_location}:g" ${mysql80_location}/support-files/mysql.server
-    sed -i "s:^datadir=.*:datadir=${mysql_data_location}:g" ${mysql80_location}/support-files/mysql.server
     _info "Starting MySQL..."
     ${mysql80_location}/support-files/mysql.server start > /dev/null 2>&1
     ${mysql80_location}/bin/mysql -uroot -hlocalhost -e "CREATE USER root@'127.0.0.1' IDENTIFIED BY \"${mysql_pass}\";"
@@ -83,25 +81,25 @@ _create_mysql_config(){
     esac
     [ -f "/etc/my.cnf" ] && mv /etc/my.cnf /etc/my.cnf-$(date +%Y-%m-%d_%H:%M:%S).bak
     [ -d "/etc/mysql" ] && mv /etc/mysql /etc/mysql-$(date +%Y-%m-%d_%H:%M:%S).bak
-    _info "Create /etc/my.cnf file..."
-    cat >/etc/my.cnf <<EOF
+    _info "Create ${mysql80_location}/my.cnf file..."
+    cat >${mysql80_location}/my.cnf <<EOF
 [mysql]
 port                           = ${mysql_port}
 socket                         = /tmp/mysql.sock
 
 [mysqld]
 basedir                        = ${mysql80_location}
-datadir                        = ${mysql_data_location}
+datadir                        = ${mysql80_location}/mysql80_data
 user                           = mysql
 port                           = 3306
 socket                         = /tmp/mysql.sock
 default-storage-engine         = InnoDB
-pid-file                       = ${mysql_data_location}/mysql.pid
+pid-file                       = ${mysql80_location}/mysql80_data/mysql.pid
 character-set-server           = utf8mb4
 collation-server               = utf8mb4_unicode_ci
 skip_name_resolve
 skip-external-locking
-log-error                      = ${mysql_data_location}/mysql-error.log
+log-error                      = ${mysql80_location}/mysql80_data/mysql-error.log
 
 # INNODB #
 innodb-log-files-in-group      = 2
@@ -141,11 +139,11 @@ EOF
 install_mysql80(){
     killall mysqld > /dev/null 2>&1
     mkdir -p ${backup_dir}
-    if [ -d "${mysql_data_location}" ]; then 
-        if [ -d "${backup_dir}/mysql_data" ]; then
-            mv ${backup_dir}/mysql_data ${backup_dir}/mysql_data-$(date +%Y-%m-%d_%H:%M:%S).bak
+    if [ -d "${mysql80_location}/mysql80_data" ]; then 
+        if [ -d "${backup_dir}/mysql80_data" ]; then
+            mv ${backup_dir}/mysql80_data ${backup_dir}/mysql80_data-$(date +%Y-%m-%d_%H:%M:%S).bak
         fi
-        mv ${mysql_data_location} ${backup_dir}
+        mv ${mysql80_location}/mysql80_data ${backup_dir}
     fi
     rm -fr ${mysql80_location}
     mkdir -p ${mysql80_location}
@@ -169,17 +167,17 @@ install_mysql80(){
     mv -f ${mysql80_filename}/* ${mysql80_location}
     _create_mysql_config
     _info "Init MySQL..."
-    echo "default_authentication_plugin  = mysql_native_password" >> /etc/my.cnf
-    ${mysql80_location}/bin/mysqld --initialize-insecure --basedir=${mysql80_location} --datadir=${mysql_data_location} --user=mysql
+    echo "default_authentication_plugin  = mysql_native_password" >> ${mysql80_location}/my.cnf
+    ${mysql80_location}/bin/mysqld --initialize-insecure --basedir=${mysql80_location} --datadir=${mysql80_location}/mysql80_data --user=mysql
     _config_mysql
     _info "Restart MySQL..."
     ${mysql80_location}/support-files/mysql.server restart >/dev/null 2>&1
     cat >> ${prefix}/install.result <<EOF
 Install Time: $(date +%Y-%m-%d_%H:%M:%S)
 MySQL80 Install Path:${mysql80_location}
-MySQL80 Data Path:${mysql_data_location}
+MySQL80 Data Path:${mysql80_location}/mysql80_data
 MySQL80 Root PassWord:${mysql_pass}
-MySQL Config File: /etc/my.cnf
+MySQL Config File: ${mysql80_location}/my.cnf
 
 EOF
     _success "Install ${mysql80_filename} completed..."

@@ -72,44 +72,36 @@ Options:
             InstallPreSetting
             include mysql55
             if [ $# -ge 2 ]; then
-                mysql_data_location=${2}/mysql_data
                 mysql55_location=${2}
             fi
             [ $# -ge 3 ] && mysql_pass=${3}
-            [ $# -ge 4 ] && mysql_data_location=${4}
             install_mysql55
             ;;
         --install-mysql56)
             InstallPreSetting
             include mysql56
             if [ $# -ge 2 ]; then
-                mysql_data_location=${2}/mysql_data
                 mysql56_location=${2}
             fi
             [ $# -ge 3 ] && mysql_pass=${3}
-            [ $# -ge 4 ] && mysql_data_location=${4}
             install_mysql56
             ;;
         --install-mysql57)
             InstallPreSetting
             include mysql57
             if [ $# -ge 2 ]; then
-                mysql_data_location=${2}/mysql_data
                 mysql57_location=${2}
             fi
             [ $# -ge 3 ] && mysql_pass=${3}
-            [ $# -ge 4 ] && mysql_data_location=${4}
             install_mysql57
             ;;
         --install-mysql80)
             InstallPreSetting
             include mysql80
             if [ $# -ge 2 ]; then
-                mysql_data_location=${2}/mysql_data
                 mysql80_location=${2}
             fi
             [ $# -ge 3 ] && mysql_pass=${3}
-            [ $# -ge 4 ] && mysql_data_location=${4}
             install_mysql80
             ;;
         --install-php53)

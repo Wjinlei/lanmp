@@ -164,7 +164,6 @@ gotty_location=${prefix}/bin
 
 # Other
 wwwroot_dir=${prefix}/www
-mysql_data_location=${prefix}/mysql_data
 mysql_pass=$(cat /dev/urandom | head -1 | md5sum | head -c 16)
 mysql_port=3306
 redis_port=6379

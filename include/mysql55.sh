@@ -38,9 +38,7 @@ _install_mysql_depend(){
 }
 
 _config_mysql(){
-    chown -R mysql:mysql ${mysql55_location} ${mysql_data_location}
     sed -i "s:^basedir=.*:basedir=${mysql55_location}:g" ${mysql55_location}/support-files/mysql.server
-    sed -i "s:^datadir=.*:datadir=${mysql_data_location}:g" ${mysql55_location}/support-files/mysql.server
     _info "Starting MySQL..."
     ${mysql55_location}/support-files/mysql.server start > /dev/null 2>&1
     ${mysql55_location}/bin/mysql -e "GRANT ALL PRIVILEGES ON *.* to root@'127.0.0.1' IDENTIFIED BY \"${mysql_pass}\" WITH GRANT OPTION;"
@@ -88,25 +86,25 @@ _create_mysql_config(){
     esac
     [ -f "/etc/my.cnf" ] && mv /etc/my.cnf /etc/my.cnf-$(date +%Y-%m-%d_%H:%M:%S).bak
     [ -d "/etc/mysql" ] && mv /etc/mysql /etc/mysql-$(date +%Y-%m-%d_%H:%M:%S).bak
-    _info "Create /etc/my.cnf file..."
-    cat >/etc/my.cnf <<EOF
+    _info "Create ${mysql55_location}/my.cnf file..."
+    cat >${mysql55_location}/my.cnf <<EOF
 [mysql]
 port                           = ${mysql_port}
 socket                         = /tmp/mysql.sock
 
 [mysqld]
 basedir                        = ${mysql55_location}
-datadir                        = ${mysql_data_location}
+datadir                        = ${mysql55_location}/mysql55_data
 user                           = mysql
 port                           = 3306
 socket                         = /tmp/mysql.sock
 default-storage-engine         = InnoDB
-pid-file                       = ${mysql_data_location}/mysql.pid
+pid-file                       = ${mysql55_location}/mysql55_data/mysql.pid
 character-set-server           = utf8mb4
 collation-server               = utf8mb4_unicode_ci
 skip_name_resolve
 skip-external-locking
-log-error                      = ${mysql_data_location}/mysql-error.log
+log-error                      = ${mysql55_location}/mysql55_data/mysql-error.log
 
 # INNODB #
 innodb-log-files-in-group      = 2
@@ -146,11 +144,11 @@ EOF
 install_mysql55(){
     killall mysqld > /dev/null 2>&1
     mkdir -p ${backup_dir}
-    if [ -d "${mysql_data_location}" ]; then 
-        if [ -d "${backup_dir}/mysql_data" ]; then
-            mv ${backup_dir}/mysql_data ${backup_dir}/mysql_data-$(date +%Y-%m-%d_%H:%M:%S).bak
+    if [ -d "${mysql55_location}/mysql55_data" ]; then 
+        if [ -d "${backup_dir}/mysql55_data" ]; then
+            mv ${backup_dir}/mysql55_data ${backup_dir}/mysql55_data-$(date +%Y-%m-%d_%H:%M:%S).bak
         fi
-        mv ${mysql_data_location} ${backup_dir}
+        mv ${mysql55_location}/mysql55_data ${backup_dir}
     fi
     rm -fr ${mysql55_location}
     mkdir -p ${mysql55_location}
@@ -174,16 +172,16 @@ install_mysql55(){
     mv -f ${mysql55_filename}/* ${mysql55_location}
     _create_mysql_config
     _info "Init MySQL..."
-    ${mysql55_location}/scripts/mysql_install_db --basedir=${mysql55_location} --datadir=${mysql_data_location} --user=mysql
+    ${mysql55_location}/scripts/mysql_install_db --basedir=${mysql55_location} --datadir=${mysql55_location}/mysql55_data --user=mysql
     _config_mysql
     _info "Restart MySQL..."
     ${mysql55_location}/support-files/mysql.server restart >/dev/null 2>&1
     cat >> ${prefix}/install.result <<EOF
 Install Time: $(date +%Y-%m-%d_%H:%M:%S)
 MySQL55 Install Path:${mysql55_location}
-MySQL55 Data Path:${mysql_data_location}
+MySQL55 Data Path:${mysql55_location}/mysql55_data
 MySQL55 Root PassWord:${mysql_pass}
-MySQL Config File: /etc/my.cnf
+MySQL Config File: ${mysql55_location}/my.cnf
 
 EOF
     _success "Install ${mysql55_filename} completed..."
