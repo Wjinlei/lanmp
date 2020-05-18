@@ -151,8 +151,8 @@ install_mysql56(){
         mv ${mysql56_location}/mysql56_data ${backup_dir}
     fi
     rm -fr ${mysql56_location}
-    mkdir -p ${mysql56_location}
     _install_mysql_depend
+    chown -R mysql:mysql ${mysql56_location}
     Is64bit && sys_bit=x86_64 || sys_bit=i686
     cd /tmp
     if [ "${sys_bit}" == "x86_64" ]; then
