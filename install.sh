@@ -42,7 +42,7 @@ Options:
 --install-php73
 --install-redis
 --install-pureftpd
---install-pma49
+--install-pma
 --install-gotty
 "
             ;;
@@ -194,11 +194,11 @@ Options:
             fi
             install_redis
             ;;
-        --install-pma49)
+        --install-pma)
             if [ $# -ge 2 ]; then
                 InstallPreSetting
-                include pma49
-                install_pma49 ${2}
+                include pma
+                install_pma ${2}
             else
                 echo "Missing parameters,Please specify the installation path" && exit 1
             fi
