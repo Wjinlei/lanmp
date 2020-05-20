@@ -293,12 +293,12 @@ mod_xml2enc.so
     cat > ${apache_location}/conf/vhost/phpMyAdmin.conf <<EOF
 <VirtualHost *:999>
     ServerAdmin webmaster@example.com
-    DocumentRoot /hwslinuxmaster/wwwroot/phpMyAdmin
+    DocumentRoot /hwslinuxmaster/wwwroot/default/pma
     ServerName phpMyAdmin.999
     ServerAlias localhost
     #errorDocument 404 /404.html
-    ErrorLog "/hwslinuxmaster/wwwroot/phpMyAdmin/phpMyAdmin-error.log"
-    CustomLog "/hwslinuxmaster/wwwroot/phpMyAdmin/phpMyAdmin-access.log" combined
+    ErrorLog "/hwslinuxmaster/wwwroot/default/pma/pma-error.log"
+    CustomLog "/hwslinuxmaster/wwwroot/default/pma/pma-access.log" combined
 
     #DENY FILES
     <Files ~ (\.user.ini|\.htaccess|\.git|\.svn|\.project|LICENSE|README.md)\$>
@@ -312,7 +312,7 @@ mod_xml2enc.so
     </FilesMatch>
 
     #PATH
-    <Directory /hwslinuxmaster/wwwroot/phpMyAdmin>
+    <Directory /hwslinuxmaster/wwwroot/default/pma>
         SetOutputFilter DEFLATE
         Options FollowSymLinks
         AllowOverride All

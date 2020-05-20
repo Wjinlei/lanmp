@@ -171,14 +171,14 @@ EOF
 server {
     listen 999;
     server_name localhost;
-    root /hwslinuxmaster/wwwroot/phpMyAdmin;
+    root /hwslinuxmaster/wwwroot/default/pma;
     index index.php default.php index.html index.htm default.html default.htm;
-    error_log "/hwslinuxmaster/wwwroot/phpMyAdmin/phpMyAdmin-error.log";
-    access_log "/hwslinuxmaster/wwwroot/phpMyAdmin/phpMyAdmin-access.log" combined;
+    error_log "/hwslinuxmaster/wwwroot/default/pma/pma-error.log";
+    access_log "/hwslinuxmaster/wwwroot/default/pma/pma-access.log" combined;
 
     location ~ \.php\$ {
         fastcgi_pass unix:/tmp/php-5.6.40-default.sock;
-        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
         include fastcgi_params;
     }
 }
