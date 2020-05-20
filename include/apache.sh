@@ -323,8 +323,8 @@ mod_xml2enc.so
 </VirtualHost>
 EOF
     sed -i '/^Listen 80/a\Listen 999' httpd.conf
-    mkdir -p ${wwwroot_dir}/phpMyAdmin
-    cat > ${wwwroot_dir}/phpMyAdmin/index.html <<EOF
+    mkdir -p ${wwwroot_dir}/default/pma
+    cat > ${wwwroot_dir}/default/pma/index.html <<EOF
 <h1>尚未安装phpMyAdmin，请先返回安装<h1>
 EOF
     chown -R www:www ${wwwroot_dir}
