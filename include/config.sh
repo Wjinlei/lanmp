@@ -152,7 +152,7 @@ libzip_filename="libzip-1.3.2"
 libzip_download_url="https://libzip.org/download/libzip-1.3.2.tar.gz"
 
 # phpmyadmin
-phpmyadmin_filename="phpMyAdmin-4.6.6-all-languages.tar.gz"
+phpmyadmin_filename="phpMyAdmin-4.6.6-all-languages"
 phpmyadmin_download_url="https://files.phpmyadmin.net/phpMyAdmin/4.6.6/phpMyAdmin-4.6.6-all-languages.tar.gz"
 
 # grotty
