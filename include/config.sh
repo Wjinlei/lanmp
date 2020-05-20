@@ -152,8 +152,8 @@ libzip_filename="libzip-1.3.2"
 libzip_download_url="https://libzip.org/download/libzip-1.3.2.tar.gz"
 
 # phpmyadmin
-phpmyadmin_filename="phpMyAdmin-4.0.10.20-all-languages"
-phpmyadmin_download_url="https://files.phpmyadmin.net/phpMyAdmin/4.0.10.20/phpMyAdmin-4.0.10.20-all-languages.tar.gz"
+phpmyadmin_filename="phpMyAdmin-4.4.15.10-all-languages"
+phpmyadmin_download_url="https://files.phpmyadmin.net/phpMyAdmin/4.4.15.10/phpMyAdmin-4.4.15.10-all-languages.tar.gz"
 
 # grotty
 gotty_x86_64_filename="gotty_linux_amd64"

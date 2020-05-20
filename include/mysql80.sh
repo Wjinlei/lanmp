@@ -41,10 +41,11 @@ _config_mysql(){
     sed -i "s:^basedir=.*:basedir=${mysql80_location}:g" ${mysql80_location}/support-files/mysql.server
     _info "Starting MySQL..."
     ${mysql80_location}/support-files/mysql.server start > /dev/null 2>&1
-    ${mysql80_location}/bin/mysql -uroot -hlocalhost -e "CREATE USER root@'127.0.0.1' IDENTIFIED BY \"${mysql_pass}\";"
-    ${mysql80_location}/bin/mysql -uroot -hlocalhost -e "GRANT ALL PRIVILEGES ON *.* to root@'127.0.0.1' WITH GRANT OPTION;"
-    ${mysql80_location}/bin/mysql -uroot -hlocalhost -e "GRANT ALL PRIVILEGES ON *.* to root@'localhost' WITH GRANT OPTION;"
-    ${mysql80_location}/bin/mysql -uroot -hlocalhost -e "ALTER USER root@'localhost' IDENTIFIED BY \"${mysql_pass}\";"
+    ${mysql80_location}/bin/mysql -uroot -hlocalhost -e "CREATE USER root@'127.0.0.1' IDENTIFIED WITH mysql_native_password BY \"${mysql_pass}\";"
+    ${mysql80_location}/bin/mysql -uroot -hlocalhost -e "ALTER USER root@'localhost' IDENTIFIED WITH mysql_native_password BY \"${mysql_pass}\";"
+    ${mysql80_location}/bin/mysql -uroot -p${mysql_pass} -hlocalhost -e "GRANT ALL PRIVILEGES ON *.* to root@'127.0.0.1' WITH GRANT OPTION;"
+    ${mysql80_location}/bin/mysql -uroot -p${mysql_pass} -hlocalhost -e "GRANT ALL PRIVILEGES ON *.* to root@'localhost' WITH GRANT OPTION;"
+    ${mysql80_location}/bin/mysql -uroot -p${mysql_pass} -hlocalhost -e "FLUSH PRIVILEGES;"
 }
 
 
@@ -100,6 +101,7 @@ collation-server               = utf8mb4_unicode_ci
 skip_name_resolve
 skip-external-locking
 log-error                      = ${mysql80_location}/mysql80_data/mysql-error.log
+default_authentication_plugin  = mysql_native_password
 
 # INNODB #
 innodb-log-files-in-group      = 2
@@ -167,7 +169,6 @@ install_mysql80(){
     mv -f ${mysql80_filename}/* ${mysql80_location}
     _create_mysql_config
     _info "Init MySQL..."
-    echo "default_authentication_plugin  = mysql_native_password" >> ${mysql80_location}/my.cnf
     ${mysql80_location}/bin/mysqld --initialize-insecure --basedir=${mysql80_location} --datadir=${mysql80_location}/mysql80_data --user=mysql
     _config_mysql
     _info "Restart MySQL..."
