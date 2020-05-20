@@ -288,5 +288,45 @@ mod_xml2enc.so
             sed -i -r "s/^#(.*${mod})/\1/" ${apache_location}/conf/httpd.conf
         fi
     done
+
+    # 写入phpMyAdmin配置文件
+    cat > ${apache_location}/conf/vhost/phpMyAdmin.conf <<EOF
+<VirtualHost *:999>
+    ServerAdmin webmaster@example.com
+    DocumentRoot /hwslinuxmaster/wwwroot/phpMyAdmin
+    ServerName phpMyAdmin.999
+    ServerAlias localhost
+    #errorDocument 404 /404.html
+    ErrorLog "/hwslinuxmaster/wwwroot/phpMyAdmin/phpMyAdmin-error.log"
+    CustomLog "/hwslinuxmaster/wwwroot/phpMyAdmin/phpMyAdmin-access.log" combined
+
+    #DENY FILES
+    <Files ~ (\.user.ini|\.htaccess|\.git|\.svn|\.project|LICENSE|README.md)\$>
+        Order allow,deny
+        Deny from all
+    </Files>
+
+    #PHP
+    <FilesMatch \.php\$>
+        SetHandler "proxy:unix:/tmp/php-5.6.40-default.sock|fcgi://localhost"
+    </FilesMatch>
+
+    #PATH
+    <Directory /hwslinuxmaster/wwwroot/phpMyAdmin>
+        SetOutputFilter DEFLATE
+        Options FollowSymLinks
+        AllowOverride All
+        Order Deny,Allow
+        Require all granted
+        DirectoryIndex index.php default.php index.html index.htm default.html default.htm
+    </Directory>
+</VirtualHost>
+EOF
+    sed -i '/^Listen 80/a\Listen 999' httpd.conf
+    mkdir -p ${wwwroot_dir}/phpMyAdmin
+    cat > ${wwwroot_dir}/phpMyAdmin/index.html <<EOF
+<h1>尚未安装phpMyAdmin，请先返回安装<h1>
+EOF
     chown -R www:www ${wwwroot_dir}
+    chown -R www:www ${apache_location}
 }

@@ -166,5 +166,27 @@ ${wwwroot_dir}/*/log/*log {
     endscript
 }
 EOF
+
+    cat > ${nginx_location}/etc/vhost/phpMyAdmin.conf <<EOF
+server {
+    listen 999;
+    server_name localhost;
+    root /hwslinuxmaster/wwwroot/phpMyAdmin;
+    index index.php default.php index.html index.htm default.html default.htm;
+    error_log "/hwslinuxmaster/wwwroot/phpMyAdmin/phpMyAdmin-error.log";
+    access_log "/hwslinuxmaster/wwwroot/phpMyAdmin/phpMyAdmin-access.log" combined;
+
+    location ~ \.php\$ {
+        fastcgi_pass unix:/tmp/php-5.6.40-default.sock;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+}
+EOF
+    mkdir -p ${wwwroot_dir}/phpMyAdmin
+    cat > ${wwwroot_dir}/phpMyAdmin/index.html <<EOF
+<h1>尚未安装phpMyAdmin，请先返回安装<h1>
+EOF
     chown -R www:www ${wwwroot_dir}
+    chown -R www:www ${nginx_location}
 }
