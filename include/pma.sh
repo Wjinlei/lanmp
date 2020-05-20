@@ -8,11 +8,11 @@ install_pma(){
     else
         if [ ! -d "${1}/phpMyAdmin" ]; then
             cd /tmp
-            _info "${phpmyadmin49_filename} install start..."
-            DownloadFile "${phpmyadmin49_filename}.tar.gz" "${phpmyadmin49_download_url}"
-            rm -fr ${phpmyadmin49_filename}
-            tar zxf ${phpmyadmin49_filename}.tar.gz
-            mv ${phpmyadmin49_filename} ${1}/phpMyAdmin
+            _info "${phpmyadmin_filename} install start..."
+            DownloadFile "${phpmyadmin_filename}.tar.gz" "${phpmyadmin_download_url}"
+            rm -fr ${phpmyadmin_filename}
+            tar zxf ${phpmyadmin_filename}.tar.gz
+            mv ${phpmyadmin_filename} ${1}/phpMyAdmin
             wget --no-check-certificate -cv -t3 -T60 "https://d.hws.com/free/hwslinuxmaster/conf/phpmyadmin-conf.tar.gz"
             rm -f /tmp/config.inc.php
             tar zxf phpmyadmin-conf.tar.gz
@@ -21,7 +21,7 @@ install_pma(){
             local tmpUser=$(ls -ld ${1}|awk '{print $3}')
             local tmpGroup=$(ls -ld ${1}|awk '{print $4}')
             chown -R ${tmpUser}:${tmpGroup} ${1}/phpMyAdmin
-            _success "${phpmyadmin49_filename} install completed..."
+            _success "${phpmyadmin_filename} install completed..."
             rm -f /tmp/config.inc.php
         else
             echo "${1}/phpMyAdmin Directory already exists" && exit 1
