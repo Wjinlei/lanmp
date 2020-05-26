@@ -94,6 +94,7 @@ _install_nghttp2(){
 
 install_apache(){ 
     killall httpd > /dev/null 2>&1
+    killall nginx > /dev/null 2>&1
     mkdir -p ${backup_dir}
     if [ -d "${apache_location}" ]; then 
         if [ -d "${backup_dir}/${apache_install_path_name}" ]; then
@@ -322,7 +323,7 @@ mod_xml2enc.so
     </Directory>
 </VirtualHost>
 EOF
-    sed -i '/^Listen 80/a\Listen 999' httpd.conf
+    sed -i '/^Listen 80/a\Listen 999' ${apache_location}/conf/httpd.conf
     mkdir -p ${wwwroot_dir}/default/pma
     cat > ${wwwroot_dir}/default/pma/index.html <<EOF
 <h1>尚未安装phpMyAdmin，请先返回安装<h1>

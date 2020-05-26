@@ -21,6 +21,7 @@ _install_nginx_depend(){
 
 install_nginx(){
     killall nginx > /dev/null 2>&1
+    killall httpd > /dev/null 2>&1
     mkdir -p ${backup_dir}
     if [ -d "${nginx_location}" ]; then 
         if [ -d "${backup_dir}/${nginx_install_path_name}" ]; then
