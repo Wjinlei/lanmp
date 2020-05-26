@@ -70,6 +70,9 @@ install_nginx(){
     CheckError "./configure ${nginx_configure_args}"
     CheckError "parallel_make"
     CheckError "make install"
+    mkdir -p ${nginx_location}/var/{log,run,lock,tmp}
+    mkdir -p ${nginx_location}/var/tmp/{client,proxy,fastcgi,uwsgi}
+    mkdir -p ${nginx_location}/etc/vhost
     if [ -d "${backup_dir}/${nginx_install_path_name}" ]; then
         if [ -d "${backup_dir}/${nginx_install_path_name}/etc" ]; then
             rm -fr ${nginx_location}/etc
@@ -79,6 +82,7 @@ install_nginx(){
         _info "Config ${nginx_filename}"
         _config_nginx
     fi
+    chown -R www:www ${nginx_location}
     _info "Start ${nginx_filename}"
     ${nginx_location}/sbin/nginx -t
     ${nginx_location}/sbin/nginx >/dev/null 2>&1
@@ -95,9 +99,6 @@ EOF
 }
 
 _config_nginx(){
-    mkdir -p ${nginx_location}/var/{log,run,lock,tmp}
-    mkdir -p ${nginx_location}/var/tmp/{client,proxy,fastcgi,uwsgi}
-    mkdir -p ${nginx_location}/etc/vhost
     [ -f "${nginx_location}/etc/nginx.conf" ] && mv ${nginx_location}/etc/nginx.conf ${nginx_location}/etc/nginx.conf-$(date +%Y-%m-%d_%H:%M:%S).bak
     cat > ${nginx_location}/etc/nginx.conf <<EOF
 worker_processes 2;
@@ -188,5 +189,4 @@ EOF
 <h1>尚未安装phpMyAdmin，请先返回安装<h1>
 EOF
     chown -R www:www ${wwwroot_dir}
-    chown -R www:www ${nginx_location}
 }
