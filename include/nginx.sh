@@ -74,15 +74,15 @@ install_nginx(){
     mkdir -p ${nginx_location}/var/{log,run,lock,tmp}
     mkdir -p ${nginx_location}/var/tmp/{client,proxy,fastcgi,uwsgi}
     mkdir -p ${nginx_location}/etc/vhost
-    if [ -d "${backup_dir}/${nginx_install_path_name}" ]; then
-        if [ -d "${backup_dir}/${nginx_install_path_name}/etc" ]; then
-            rm -fr ${nginx_location}/etc
-            cp -fr ${backup_dir}/${nginx_install_path_name}/etc ${nginx_location}
-        fi
-    else
+    #if [ -d "${backup_dir}/${nginx_install_path_name}" ]; then
+        #if [ -d "${backup_dir}/${nginx_install_path_name}/etc" ]; then
+            #rm -fr ${nginx_location}/etc
+            #cp -fr ${backup_dir}/${nginx_install_path_name}/etc ${nginx_location}
+        #fi
+    #else
         _info "Config ${nginx_filename}"
         _config_nginx
-    fi
+    #fi
     chown -R www:www ${nginx_location}
     _info "Start ${nginx_filename}"
     ${nginx_location}/sbin/nginx -t

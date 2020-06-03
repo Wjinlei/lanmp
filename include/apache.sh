@@ -137,15 +137,15 @@ install_apache(){
     CheckError "parallel_make"
     CheckError "make install"
     unset LDFLAGS
-    if [ -d "${backup_dir}/${apache_install_path_name}" ]; then
-        if [ -d "${backup_dir}/${apache_install_path_name}/conf" ]; then
-            rm -fr ${apache_location}/conf
-            cp -fr ${backup_dir}/${apache_install_path_name}/conf ${apache_location}
-        fi
-    else
+    #if [ -d "${backup_dir}/${apache_install_path_name}" ]; then
+        #if [ -d "${backup_dir}/${apache_install_path_name}/conf" ]; then
+            #rm -fr ${apache_location}/conf
+            #cp -fr ${backup_dir}/${apache_install_path_name}/conf ${apache_location}
+        #fi
+    #else
         _info "Config ${apache_filename}"
         _config_apache
-    fi
+    #fi
     ${apache_location}/bin/httpd -t
     _info "Start ${apache_filename}"
     ${apache_location}/bin/apachectl restart > /dev/null 2>&1
