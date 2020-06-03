@@ -53,16 +53,16 @@ install_pureftpd(){
     CheckError "./configure ${pureftpd_configure_args}"
     CheckError "parallel_make"
     CheckError "make install"
-    if [ -d "${backup_dir}/${pureftpd_install_path_name}" ]; then
-        if [ -d "${backup_dir}/${pureftpd_install_path_name}/etc" ]; then
-            rm -fr ${pureftpd_location}/etc
-            cp -fr ${backup_dir}/${pureftpd_install_path_name}/etc ${pureftpd_location}
-        fi
-    else
+    #if [ -d "${backup_dir}/${pureftpd_install_path_name}" ]; then
+        #if [ -d "${backup_dir}/${pureftpd_install_path_name}/etc" ]; then
+            #rm -fr ${pureftpd_location}/etc
+            #cp -fr ${backup_dir}/${pureftpd_install_path_name}/etc ${pureftpd_location}
+        #fi
+    #else
         _info "Config ${pureftpd_filename}"
         _create_pureftpd_config
         _config_pureftpd
-    fi
+    #fi
     mkdir -p /etc/ssl/private
     openssl req -x509 -nodes -subj /C=CN/ST=Sichuan/L=Chengdu/O=HWS-LINUXMASTER/OU=HWS/CN=$(GetIp)/emailAddress=admin@hws.com -days 3560 -newkey rsa:1024 -keyout /etc/ssl/private/pure-ftpd.pem -out /etc/ssl/private/pure-ftpd.pem
     if [ -f '/etc/ssl/private/pure-ftpd.pem' ];then

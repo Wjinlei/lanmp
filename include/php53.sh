@@ -354,23 +354,23 @@ install_php53(){
     sed -i '/^BUILD_/ s/\$(CC)/\$(CXX)/g' Makefile
     CheckError "parallel_make ZEND_EXTRA_LIBS='-liconv'"
     CheckError "make install"
-    if [ -d "${backup_dir}/${php53_install_path_name}" ]; then
-        if [ -d "${backup_dir}/${php53_install_path_name}/etc" ]; then
-            rm -fr ${php53_location}/etc
-            cp -fr ${backup_dir}/${php53_install_path_name}/etc ${php53_location}
-        fi
-        if [ -d "${backup_dir}/${php53_install_path_name}/php.d" ]; then
-            rm -fr ${php53_location}/php.d
-            cp -fr ${backup_dir}/${php53_install_path_name}/php.d ${php53_location}
-        fi
-        if [ -d "${backup_dir}/${php53_install_path_name}/lib" ]; then
-            rm -fr ${php53_location}/lib
-            cp -fr ${backup_dir}/${php53_install_path_name}/lib ${php53_location}
-        fi
-    else
+    #if [ -d "${backup_dir}/${php53_install_path_name}" ]; then
+        #if [ -d "${backup_dir}/${php53_install_path_name}/etc" ]; then
+            #rm -fr ${php53_location}/etc
+            #cp -fr ${backup_dir}/${php53_install_path_name}/etc ${php53_location}
+        #fi
+        #if [ -d "${backup_dir}/${php53_install_path_name}/php.d" ]; then
+            #rm -fr ${php53_location}/php.d
+            #cp -fr ${backup_dir}/${php53_install_path_name}/php.d ${php53_location}
+        #fi
+        #if [ -d "${backup_dir}/${php53_install_path_name}/lib" ]; then
+            #rm -fr ${php53_location}/lib
+            #cp -fr ${backup_dir}/${php53_install_path_name}/lib ${php53_location}
+        #fi
+    #else
         _info "Config ${php53_filename}..."
         _config_php
-    fi
+    #fi
     cat >> ${prefix}/install.result <<EOF
 php53 Install Path:${php53_location}
 

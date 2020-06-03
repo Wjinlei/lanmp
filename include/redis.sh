@@ -23,12 +23,12 @@ install_redis(){
         mkdir -p ${redis_location}/var/{log,run}
         cp src/{redis-benchmark,redis-check-aof,redis-check-rdb,redis-cli,redis-sentinel,redis-server} ${redis_location}/bin/
 
-        if [ -d "${backup_dir}/${redis_install_path_name}" ]; then
-            if [ -d "${backup_dir}/${redis_install_path_name}/etc" ]; then
-                rm -fr ${redis_location}/etc
-                cp -fr ${backup_dir}/${redis_install_path_name}/etc ${redis_location}
-            fi
-        else
+        #if [ -d "${backup_dir}/${redis_install_path_name}" ]; then
+            #if [ -d "${backup_dir}/${redis_install_path_name}/etc" ]; then
+                #rm -fr ${redis_location}/etc
+                #cp -fr ${backup_dir}/${redis_install_path_name}/etc ${redis_location}
+            #fi
+        #else
             _info "Config ${redis_filename}"
             cp redis.conf ${redis_location}/etc/
             sed -i "s@pidfile.*@pidfile ${redis_location}/var/run/redis.pid@" ${redis_location}/etc/redis.conf
@@ -38,7 +38,7 @@ install_redis(){
             sed -i "s@port 6379@port ${redis_port}@" ${redis_location}/etc/redis.conf
             sed -i "s@^# bind 127.0.0.1@bind 127.0.0.1@" ${redis_location}/etc/redis.conf
             [ -z "$(grep ^maxmemory ${redis_location}/etc/redis.conf)" ] && sed -i "s@maxmemory <bytes>@maxmemory <bytes>\nmaxmemory $(expr ${Mem} / 8)000000@" ${redis_location}/etc/redis.conf
-        fi
+        #fi
         ${redis_location}/bin/redis-server ${redis_location}/etc/redis.conf
         cat >> ${prefix}/install.result <<EOF
 Redis Install Path:${redis_location}

@@ -385,23 +385,23 @@ install_php72(){
     CheckError "./configure ${php_configure_args}"
     CheckError "parallel_make ZEND_EXTRA_LIBS='-liconv'"
     CheckError "make install"
-    if [ -d "${backup_dir}/${php72_install_path_name}" ]; then
-        if [ -d "${backup_dir}/${php72_install_path_name}/etc" ]; then
-            rm -fr ${php72_location}/etc
-            cp -fr ${backup_dir}/${php72_install_path_name}/etc ${php72_location}
-        fi
-        if [ -d "${backup_dir}/${php72_install_path_name}/php.d" ]; then
-            rm -fr ${php72_location}/php.d
-            cp -fr ${backup_dir}/${php72_install_path_name}/php.d ${php72_location}
-        fi
-        if [ -d "${backup_dir}/${php72_install_path_name}/lib" ]; then
-            rm -fr ${php72_location}/lib
-            cp -fr ${backup_dir}/${php72_install_path_name}/lib ${php72_location}
-        fi
-    else
+    #if [ -d "${backup_dir}/${php72_install_path_name}" ]; then
+        #if [ -d "${backup_dir}/${php72_install_path_name}/etc" ]; then
+            #rm -fr ${php72_location}/etc
+            #cp -fr ${backup_dir}/${php72_install_path_name}/etc ${php72_location}
+        #fi
+        #if [ -d "${backup_dir}/${php72_install_path_name}/php.d" ]; then
+            #rm -fr ${php72_location}/php.d
+            #cp -fr ${backup_dir}/${php72_install_path_name}/php.d ${php72_location}
+        #fi
+        #if [ -d "${backup_dir}/${php72_install_path_name}/lib" ]; then
+            #rm -fr ${php72_location}/lib
+            #cp -fr ${backup_dir}/${php72_install_path_name}/lib ${php72_location}
+        #fi
+    #else
         _info "Config ${php72_filename}..."
         _config_php
-    fi
+    #fi
     cat >> ${prefix}/install.result <<EOF
 php72 Install Path:${php72_location}
 
