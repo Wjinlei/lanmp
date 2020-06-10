@@ -145,11 +145,10 @@ install_mysql80(){
         if [ -d "${backup_dir}/mysql80_data" ]; then
             mv ${backup_dir}/mysql80_data ${backup_dir}/mysql80_data-$(date +%Y-%m-%d_%H:%M:%S).bak
         fi
-        mv ${mysql80_location}/mysql80_data ${backup_dir}
+        mv -f ${mysql80_location}/mysql80_data ${backup_dir}
+        rm -fr ${mysql80_location}
     fi
-    rm -fr ${mysql80_location}
     _install_mysql_depend
-    chown -R mysql:mysql ${mysql80_location}
     Is64bit && sys_bit=x86_64 || sys_bit=i686
     cd /tmp
     if [ "${sys_bit}" == "x86_64" ]; then
@@ -168,6 +167,7 @@ install_mysql80(){
     _info "Moving ${mysql80_filename} files..."
     mv -f ${mysql80_filename}/* ${mysql80_location}
     _create_mysql_config
+    chown -R mysql:mysql ${mysql80_location}
     _info "Init MySQL..."
     ${mysql80_location}/bin/mysqld --initialize-insecure --basedir=${mysql80_location} --datadir=${mysql80_location}/mysql80_data --user=mysql
     _config_mysql

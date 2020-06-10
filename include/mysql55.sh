@@ -148,11 +148,10 @@ install_mysql55(){
         if [ -d "${backup_dir}/mysql55_data" ]; then
             mv ${backup_dir}/mysql55_data ${backup_dir}/mysql55_data-$(date +%Y-%m-%d_%H:%M:%S).bak
         fi
-        mv ${mysql55_location}/mysql55_data ${backup_dir}
+        mv -f ${mysql55_location}/mysql55_data ${backup_dir}
+        rm -fr ${mysql55_location}
     fi
-    rm -fr ${mysql55_location}
     _install_mysql_depend
-    chown -R mysql:mysql ${mysql55_location}
     Is64bit && sys_bit=x86_64 || sys_bit=i686
     cd /tmp
     if [ "${sys_bit}" == "x86_64" ]; then
@@ -171,6 +170,7 @@ install_mysql55(){
     _info "Moving ${mysql55_filename} files..."
     mv -f ${mysql55_filename}/* ${mysql55_location}
     _create_mysql_config
+    chown -R mysql:mysql ${mysql55_location}
     _info "Init MySQL..."
     ${mysql55_location}/scripts/mysql_install_db --basedir=${mysql55_location} --datadir=${mysql55_location}/mysql55_data --user=mysql
     _config_mysql

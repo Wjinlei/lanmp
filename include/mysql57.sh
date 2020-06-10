@@ -148,11 +148,10 @@ install_mysql57(){
         if [ -d "${backup_dir}/mysql57_data" ]; then
             mv ${backup_dir}/mysql57_data ${backup_dir}/mysql57_data-$(date +%Y-%m-%d_%H:%M:%S).bak
         fi
-        mv ${mysql57_location}/mysql57_data ${backup_dir}
+        mv -f ${mysql57_location}/mysql57_data ${backup_dir}
+        rm -fr ${mysql57_location}
     fi
-    rm -fr ${mysql57_location}
     _install_mysql_depend
-    chown -R mysql:mysql ${mysql57_location}
     Is64bit && sys_bit=x86_64 || sys_bit=i686
     cd /tmp
     if [ "${sys_bit}" == "x86_64" ]; then
@@ -171,6 +170,7 @@ install_mysql57(){
     _info "Moving ${mysql57_filename} files..."
     mv -f ${mysql57_filename}/* ${mysql57_location}
     _create_mysql_config
+    chown -R mysql:mysql ${mysql57_location}
     _info "Init MySQL..."
     ${mysql57_location}/bin/mysqld --initialize-insecure --basedir=${mysql57_location} --datadir=${mysql57_location}/mysql57_data --user=mysql
     _config_mysql

@@ -148,11 +148,10 @@ install_mysql56(){
         if [ -d "${backup_dir}/mysql56_data" ]; then
             mv ${backup_dir}/mysql56_data ${backup_dir}/mysql56_data-$(date +%Y-%m-%d_%H:%M:%S).bak
         fi
-        mv ${mysql56_location}/mysql56_data ${backup_dir}
+        mv -f ${mysql56_location}/mysql56_data ${backup_dir}
+        rm -fr ${mysql56_location}
     fi
-    rm -fr ${mysql56_location}
     _install_mysql_depend
-    chown -R mysql:mysql ${mysql56_location}
     Is64bit && sys_bit=x86_64 || sys_bit=i686
     cd /tmp
     if [ "${sys_bit}" == "x86_64" ]; then
@@ -171,6 +170,7 @@ install_mysql56(){
     _info "Moving ${mysql56_filename} files..."
     mv -f ${mysql56_filename}/* ${mysql56_location}
     _create_mysql_config
+    chown -R mysql:mysql ${mysql56_location}
     _info "Init MySQL..."
     ${mysql56_location}/scripts/mysql_install_db --basedir=${mysql56_location} --datadir=${mysql56_location}/mysql56_data --user=mysql
     _config_mysql
