@@ -172,6 +172,7 @@ _config_apache(){
     sed -i 's/^#ServerName www.example.com:80/ServerName 0.0.0.0:80/' ${apache_location}/conf/httpd.conf
     sed -i 's@^#Include conf/extra/httpd-info.conf@Include conf/extra/httpd-info.conf@' ${apache_location}/conf/httpd.conf
     sed -i 's@DirectoryIndex index.html@DirectoryIndex index.php default.php index.html index.htm default.html default.htm@' ${apache_location}/conf/httpd.conf
+    sed -i 's/Require all granted/Require all denied/g' ${apache_location}/conf/httpd.conf
     echo "ServerTokens ProductOnly" >> ${apache_location}/conf/httpd.conf
     echo "ProtocolsHonorOrder On" >> ${apache_location}/conf/httpd.conf
     echo "Protocols h2 http/1.1" >> ${apache_location}/conf/httpd.conf
