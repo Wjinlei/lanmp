@@ -242,6 +242,7 @@ _config_php(){
 [global]
     pid = ${php54_location}/var/run/default.pid
     error_log = ${php54_location}/var/log/default.log
+    security.limit_extensions = .php .php3 .php4 .php5 .php7
 [default]
     listen = /tmp/${php54_filename}-default.sock
     listen.owner = www

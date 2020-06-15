@@ -277,6 +277,7 @@ EOF
 [global]
     pid = ${php71_location}/var/run/default.pid
     error_log = ${php71_location}/var/log/default.log
+    security.limit_extensions = .php .php3 .php4 .php5 .php7
 [default]
     listen = /tmp/${php71_filename}-default.sock
     listen.owner = www
