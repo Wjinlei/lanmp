@@ -255,8 +255,8 @@ EOF
 [global]
     pid = ${php55_location}/var/run/default.pid
     error_log = ${php55_location}/var/log/default.log
-    security.limit_extensions = .php .php3 .php4 .php5 .php7
 [default]
+    security.limit_extensions = .php .php3 .php4 .php5 .php7
     listen = /tmp/${php55_filename}-default.sock
     listen.owner = www
     listen.group = www
