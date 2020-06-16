@@ -303,7 +303,7 @@ mod_xml2enc.so
     CustomLog "/hwslinuxmaster/wwwroot/default/pma/pma-access.log" combined
 
     #DENY FILES
-    <Files ~ (\.user.ini|\.htaccess|\.git|\.svn|\.project|LICENSE|README.md)\$>
+    <Files ~ (\.user.ini|\.sql|\.zip|\.gz|\.htaccess|\.git|\.svn|\.project|LICENSE|README.md)\$>
         Order allow,deny
         Deny from all
     </Files>

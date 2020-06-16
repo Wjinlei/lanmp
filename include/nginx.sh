@@ -178,6 +178,12 @@ server {
     error_log "/hwslinuxmaster/wwwroot/default/pma/pma-error.log";
     access_log "/hwslinuxmaster/wwwroot/default/pma/pma-access.log" combined;
 
+    #DENY FILES
+    location ~ ^/(\.user.ini|\.sql|\.zip|\.gz|\.htaccess|\.git|\.svn|\.project|LICENSE|README.md)
+    {
+        return 404;
+    }
+
     location ~ \.php\$ {
         fastcgi_pass unix:/tmp/php-5.6.40-default.sock;
         fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
