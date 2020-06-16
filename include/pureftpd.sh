@@ -136,7 +136,7 @@ AnonymousCanCreateDirs no
 MaxLoad 4
 
 # default 30000 50000
-PassivePortRange 55000 60000
+PassivePortRange 55000 56000
 
 # default yes
 AntiWarez yes
