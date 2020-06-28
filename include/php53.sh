@@ -218,23 +218,37 @@ _config_php(){
     # php.ini
     mkdir -p ${php53_location}/{etc,php.d}
     cp -f php.ini-production ${php53_location}/etc/php.ini
+
+    # disable_functions
     php_disable_functions=`grep "^disable_functions" ${php53_location}/etc/php.ini |wc -l`
     if [[ ${php_disable_functions} -eq 0 ]];then
         echo "disable_functions = system, passthru, exec, chroot, chgrp, chown, proc_get, shell_exec, popen, escapeshellarg, escapeshellcmd, proc_close, proc_open, dl, proc_get_status, ini_alter, ini_alter, ini_restore" >> ${php53_location}/etc/php.ini
     else
         sed -i '/^disable_functions/ s/.*/disable_functions = system, passthru, exec, chroot, chgrp, chown, proc_get, shell_exec, popen, escapeshellarg, escapeshellcmd, proc_close, proc_open, dl, proc_get_status, ini_alter, ini_alter, ini_restore/' ${php53_location}/etc/php.ini
     fi
+
+    # mysqld
     if [[ -d "${mysql_data_location}" ]]; then
         sock_location=/tmp/mysql.sock
         sed -i "s#mysql.default_socket.*#mysql.default_socket = ${sock_location}#" ${php53_location}/etc/php.ini
         sed -i "s#mysqli.default_socket.*#mysqli.default_socket = ${sock_location}#" ${php53_location}/etc/php.ini
         sed -i "s#pdo_mysql.default_socket.*#pdo_mysql.default_socket = ${sock_location}#" ${php53_location}/etc/php.ini
     fi
+
+    # default_charset
     php_default_charset=`grep "^default_charset" ${php53_location}/etc/php.ini |wc -l`
     if [[ ${php_default_charset} -eq 0 ]];then
         echo 'default_charset = "UTF-8"' >> ${php53_location}/etc/php.ini
     else
         sed -i 's/^default_charset.*/default_charset = "UTF-8"/g' ${php53_location}/etc/php.ini
+    fi
+
+    # short_open_tag
+    short_open_tag=`grep "^short_open_tag" ${php53_location}/etc/php.ini |wc -l`
+    if [[ ${short_open_tag} -eq 0 ]];then
+        echo 'short_open_tag = On' >> ${php53_location}/etc/php.ini
+    else
+        sed -i 's/^short_open_tag.*/short_open_tag = On/g' ${php53_location}/etc/php.ini
     fi
 
     # php-fpm

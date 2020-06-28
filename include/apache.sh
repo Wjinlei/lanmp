@@ -170,12 +170,13 @@ _config_apache(){
     sed -i 's/^Group.*/Group www/i' ${apache_location}/conf/httpd.conf
     sed -i 's/^ServerAdmin you@example.com/ServerAdmin admin@localhost/' ${apache_location}/conf/httpd.conf
     sed -i 's/^#ServerName www.example.com:80/ServerName 0.0.0.0:80/' ${apache_location}/conf/httpd.conf
+    sed -i 's@^#Include conf/extra/httpd-default.conf@Include conf/extra/httpd-default.conf@' ${apache_location}/conf/httpd.conf
     sed -i 's@^#Include conf/extra/httpd-info.conf@Include conf/extra/httpd-info.conf@' ${apache_location}/conf/httpd.conf
     sed -i 's@DirectoryIndex index.html@DirectoryIndex index.php default.php index.html index.htm default.html default.htm@' ${apache_location}/conf/httpd.conf
     sed -i 's/Require all granted/Require all denied/g' ${apache_location}/conf/httpd.conf
-    echo "ServerTokens ProductOnly" >> ${apache_location}/conf/httpd.conf
-    echo "ProtocolsHonorOrder On" >> ${apache_location}/conf/httpd.conf
-    echo "Protocols h2 http/1.1" >> ${apache_location}/conf/httpd.conf
+    #echo "ServerTokens ProductOnly" >> ${apache_location}/conf/httpd.conf
+    #echo "ProtocolsHonorOrder On" >> ${apache_location}/conf/httpd.conf
+    #echo "Protocols h2 http/1.1" >> ${apache_location}/conf/httpd.conf
     sed -i 's/Require host .example.com/Require host localhost/g' ${apache_location}/conf/extra/httpd-info.conf
     sed -i "s@AddType\(.*\)Z@AddType\1Z\n    AddType application/x-httpd-php .php .phtml\n    AddType application/x-httpd-php-source .phps@" ${apache_location}/conf/httpd.conf
     sed -i "s@^export LD_LIBRARY_PATH.*@export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:${openssl_location}/lib@" ${apache_location}/bin/envvars
