@@ -173,10 +173,10 @@ EOF
 server {
     listen 999;
     server_name localhost;
-    root /hwslinuxmaster/wwwroot/default/pma;
+    root /hwslinuxmaster/default/pma;
     index index.php default.php index.html index.htm default.html default.htm;
-    error_log "/hwslinuxmaster/wwwroot/default/pma/pma-error.log";
-    access_log "/hwslinuxmaster/wwwroot/default/pma/pma-access.log" combined;
+    error_log "/hwslinuxmaster/default/pma/pma-error.log";
+    access_log "/hwslinuxmaster/default/pma/pma-access.log" combined;
 
     #DENY FILES
     location ~ ^/(\.user.ini|\.sql|\.zip|\.gz|\.htaccess|\.git|\.svn|\.project|LICENSE|README.md)
@@ -191,9 +191,11 @@ server {
     }
 }
 EOF
-    mkdir -p ${wwwroot_dir}/default/pma
-    cat > ${wwwroot_dir}/default/pma/index.html <<EOF
+    mkdir -p ${prefix}/default/pma
+    cat > ${prefix}/default/pma/index.html <<EOF
 <h1>尚未安装phpMyAdmin，请先返回安装<h1>
 EOF
+    chown -R www:www ${prefix}/default
     chown -R www:www ${wwwroot_dir}
+    chown -R www:www ${nginx_location}
 }

@@ -294,14 +294,15 @@ mod_xml2enc.so
 
     # 写入phpMyAdmin配置文件
     cat > ${apache_location}/conf/vhost/phpMyAdmin.conf <<EOF
+Listen 999
 <VirtualHost *:999>
     ServerAdmin webmaster@example.com
-    DocumentRoot /hwslinuxmaster/wwwroot/default/pma
+    DocumentRoot /hwslinuxmaster/default/pma
     ServerName phpMyAdmin.999
     ServerAlias localhost
     #errorDocument 404 /404.html
-    ErrorLog "/hwslinuxmaster/wwwroot/default/pma/pma-error.log"
-    CustomLog "/hwslinuxmaster/wwwroot/default/pma/pma-access.log" combined
+    ErrorLog "/hwslinuxmaster/default/pma/pma-error.log"
+    CustomLog "/hwslinuxmaster/default/pma/pma-access.log" combined
 
     #DENY FILES
     <Files ~ (\.user.ini|\.sql|\.zip|\.gz|\.htaccess|\.git|\.svn|\.project|LICENSE|README.md)\$>
@@ -325,11 +326,12 @@ mod_xml2enc.so
     </Directory>
 </VirtualHost>
 EOF
-    sed -i '/^Listen 80/a\Listen 999' ${apache_location}/conf/httpd.conf
-    mkdir -p ${wwwroot_dir}/default/pma
-    cat > ${wwwroot_dir}/default/pma/index.html <<EOF
+    #sed -i '/^Listen 80/a\Listen 999' ${apache_location}/conf/httpd.conf
+    mkdir -p ${prefix}/default/pma
+    cat > ${prefix}/default/pma/index.html <<EOF
 <h1>尚未安装phpMyAdmin，请先返回安装<h1>
 EOF
+    chown -R www:www ${prefix}/default
     chown -R www:www ${wwwroot_dir}
     chown -R www:www ${apache_location}
 }
