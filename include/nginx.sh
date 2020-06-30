@@ -140,7 +140,35 @@ http {
 
     # hidden version
     server_tokens off;
+
+    server {
+       listen 999;
+       server_name localhost;
+       root /hwslinuxmaster/default/pma;
+       index index.php default.php index.html index.htm default.html default.htm;
+       error_log "/hwslinuxmaster/default/pma/pma-error.log";
+       access_log "/hwslinuxmaster/default/pma/pma-access.log" combined;
+
+       #DENY FILES
+       location ~ ^/(\.user.ini|\.sql|\.zip|\.gz|\.htaccess|\.git|\.svn|\.project|LICENSE|README.md)
+       {
+           return 404;
+       }
+
+       #PHP
+       location ~ \.php\$ {
+           fastcgi_pass unix:/tmp/php-5.6.40-default.sock;
+           fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
+           include fastcgi_params;
+       }
+    }
+
+    server {
+       listen 80 default;
+       return 403;
+    }
 }
+
 EOF
     cat > /etc/logrotate.d/hws_nginx_log <<EOF
 ${nginx_location}/logs/*log {
@@ -166,29 +194,6 @@ ${wwwroot_dir}/*/log/*log {
     postrotate
         [ ! -f ${nginx_location}/var/run/nginx.pid ] || kill -USR1 \`cat ${nginx_location}/var/run/nginx.pid\`
     endscript
-}
-EOF
-
-    cat > ${nginx_location}/etc/vhost/phpMyAdmin.conf <<EOF
-server {
-    listen 999;
-    server_name localhost;
-    root /hwslinuxmaster/default/pma;
-    index index.php default.php index.html index.htm default.html default.htm;
-    error_log "/hwslinuxmaster/default/pma/pma-error.log";
-    access_log "/hwslinuxmaster/default/pma/pma-access.log" combined;
-
-    #DENY FILES
-    location ~ ^/(\.user.ini|\.sql|\.zip|\.gz|\.htaccess|\.git|\.svn|\.project|LICENSE|README.md)
-    {
-        return 404;
-    }
-
-    location ~ \.php\$ {
-        fastcgi_pass unix:/tmp/php-5.6.40-default.sock;
-        fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
-        include fastcgi_params;
-    }
 }
 EOF
     mkdir -p ${prefix}/default/pma

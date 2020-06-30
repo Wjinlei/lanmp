@@ -180,9 +180,6 @@ _config_apache(){
     sed -i 's/Require host .example.com/Require host localhost/g' ${apache_location}/conf/extra/httpd-info.conf
     sed -i "s@AddType\(.*\)Z@AddType\1Z\n    AddType application/x-httpd-php .php .phtml\n    AddType application/x-httpd-php-source .phps@" ${apache_location}/conf/httpd.conf
     sed -i "s@^export LD_LIBRARY_PATH.*@export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:${openssl_location}/lib@" ${apache_location}/bin/envvars
-    cat > ${apache_location}/conf/extra/httpd-vhosts.conf <<EOF
-IncludeOptional ${apache_location}/conf/vhost/*.conf
-EOF
     mkdir -p ${apache_location}/conf/vhost/
     cat > ${apache_location}/conf/extra/httpd-ssl.conf <<EOF
 Listen 443
@@ -293,7 +290,7 @@ mod_xml2enc.so
     done
 
     # 写入phpMyAdmin配置文件
-    cat > ${apache_location}/conf/vhost/phpMyAdmin.conf <<EOF
+    cat > ${apache_location}/conf/extra/httpd-vhosts.conf <<EOF
 Listen 999
 <VirtualHost *:999>
     ServerAdmin webmaster@example.com
@@ -325,8 +322,16 @@ Listen 999
         DirectoryIndex index.php default.php index.html index.htm default.html default.htm
     </Directory>
 </VirtualHost>
+
+IncludeOptional ${apache_location}/conf/vhost/*.conf
+
+<VirtualHost *:80>
+    ServerAlias *
+    <Location />
+        Require all denied
+    </Location>
+</VirtualHost>
 EOF
-    #sed -i '/^Listen 80/a\Listen 999' ${apache_location}/conf/httpd.conf
     mkdir -p ${prefix}/default/pma
     cat > ${prefix}/default/pma/index.html <<EOF
 <h1>尚未安装phpMyAdmin，请先返回安装<h1>
