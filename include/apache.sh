@@ -313,12 +313,13 @@ Listen 999
     </FilesMatch>
 
     #PATH
-    <Directory /hwslinuxmaster/wwwroot/default/pma>
+    <Directory /hwslinuxmaster/default/pma>
         SetOutputFilter DEFLATE
         Options FollowSymLinks
         AllowOverride All
-        Order Deny,Allow
-        Require all granted
+        <RequireAll>
+            Require all granted
+        </RequireAll>
         DirectoryIndex index.php default.php index.html index.htm default.html default.htm
     </Directory>
 </VirtualHost>

@@ -147,7 +147,7 @@ http {
        root /hwslinuxmaster/default/pma;
        index index.php default.php index.html index.htm default.html default.htm;
        error_log "/hwslinuxmaster/default/pma/pma-error.log";
-       access_log "/hwslinuxmaster/default/pma/pma-access.log" combined;
+       access_log "/hwslinuxmaster/default/pma/pma-access.log";
 
        #DENY FILES
        location ~ ^/(\.user.ini|\.sql|\.zip|\.gz|\.htaccess|\.git|\.svn|\.project|LICENSE|README.md)
