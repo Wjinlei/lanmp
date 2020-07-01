@@ -14,6 +14,7 @@ install_pma(){
     rm -fr ${phpmyadmin_filename}
     tar zxf ${phpmyadmin_filename}.tar.gz
     mv ${phpmyadmin_filename} ${1}/pma
+    rm -fr ${1}/pma/setup
     wget --no-check-certificate -cv -t3 -T60 "https://d.hws.com/free/hwslinuxmaster/conf/phpmyadmin-conf.tar.gz"
     rm -f /tmp/config.inc.php
     tar zxf phpmyadmin-conf.tar.gz
