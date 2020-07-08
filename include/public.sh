@@ -115,6 +115,7 @@ _install_tools(){
     if [ "${PM}" = "yum" ];then
         InstallPack "yum -y install epel-release"
         if [[ $(rpm -q yum |grep el8) != "" ]]; then
+            dnf install 'dnf-command(config-manager)' -y
             dnf config-manager --enablerepo PowerTools
         fi
         yum_depends=(

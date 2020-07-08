@@ -17,6 +17,9 @@ pcre_download_url="https://ftp.pcre.org/pub/pcre/pcre-8.43.tar.gz"
 openssl_location=/usr/local/openssl111
 openssl_filename="openssl-1.1.1d"
 openssl_download_url="https://www.openssl.org/source/openssl-1.1.1d.tar.gz"
+openssl102_location=/usr/local/openssl102
+openssl102_filename="openssl-1.0.2u"
+openssl102_download_url="https://www.openssl.org/source/old/1.0.2/openssl-1.0.2u.tar.gz"
 
 # nghttp2
 nghttp2_location=/usr/local/nghttp2

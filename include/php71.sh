@@ -3,23 +3,15 @@ _install_php_depend(){
     if [ "${PM}" = "yum" ];then
         local yum_depends=(
             autoconf patch m4 bison bzip2-devel pam-devel gmp-devel libicu-devel
-            curl-devel pcre-devel libtool-libs libtool-ltdl-devel libwebp-devel libXpm-devel
+            pcre-devel libtool-libs libtool-ltdl-devel libwebp-devel libXpm-devel
             libvpx-devel libjpeg-devel libpng-devel freetype-devel oniguruma-devel
             aspell-devel enchant-devel readline-devel unixODBC-devel libtidy-devel
-            openldap-devel libxslt-devel net-snmp net-snmp-devel krb5-devel sqlite-devel
-            libiodbc-devel php-odbc zlib-devel libxml2-devel
+            libxslt-devel sqlite-devel libiodbc-devel php-odbc zlib-devel libxml2-devel
         )
         for depend in ${yum_depends[@]}
         do
             InstallPack "yum -y install ${depend}"
         done
-        if yum list | grep "libc-client-devel" > /dev/null 2>&1; then
-            InstallPack "yum -y install libc-client-devel"
-        elif yum list | grep "uw-imap-devel" > /dev/null 2>&1; then
-            InstallPack "yum -y install uw-imap-devel"
-        else
-            _error "There is no rpm package libc-client-devel or uw-imap-devel, please check it and try again."
-        fi
         _install_mhash
         _install_libmcrypt
         _install_mcrypt
@@ -27,11 +19,9 @@ _install_php_depend(){
     elif [ "${PM}" = "apt-get" ];then
         local apt_depends=(
             autoconf patch m4 bison libbz2-dev libgmp-dev libicu-dev libldb-dev libpam0g-dev
-            libldap-2.4-2 libldap2-dev libsasl2-dev libsasl2-modules-ldap libc-client2007e-dev libkrb5-dev
             autoconf2.13 pkg-config libxslt1-dev zlib1g-dev libpcre3-dev libtool unixodbc-dev libtidy-dev
             libjpeg-dev libpng-dev libfreetype6-dev libpspell-dev libmhash-dev libenchant-dev libmcrypt-dev
-            libcurl4-gnutls-dev libwebp-dev libxpm-dev libvpx-dev libreadline-dev snmp libsnmp-dev libzip-dev
-            libxml2-dev
+            libwebp-dev libxpm-dev libvpx-dev libreadline-dev libzip-dev libxml2-dev
         )
         for depend in ${apt_depends[@]}
         do
@@ -47,28 +37,11 @@ _install_php_depend(){
             elif [ -f /usr/include/x86_64-linux-gnu/gmp.h ]; then
                 ln -sf /usr/include/x86_64-linux-gnu/gmp.h /usr/include/
             fi
-
-            ln -sf /usr/lib/x86_64-linux-gnu/libldap* /usr/lib64/
-            ln -sf /usr/lib/x86_64-linux-gnu/liblber* /usr/lib64/
-
-            if [ -d /usr/include/x86_64-linux-gnu/curl ] && [ ! -d /usr/include/curl ]; then
-                ln -sf /usr/include/x86_64-linux-gnu/curl /usr/include/
-            fi
-
-            CreateLibLink libc-client.a
-            CreateLibLink libc-client.so
         else
             if [ -f /usr/include/gmp-i386.h ]; then
                 ln -sf /usr/include/gmp-i386.h /usr/include/
             elif [ -f /usr/include/i386-linux-gnu/gmp.h ]; then
                 ln -sf /usr/include/i386-linux-gnu/gmp.h /usr/include/
-            fi
-
-            ln -sf /usr/lib/i386-linux-gnu/libldap* /usr/lib/
-            ln -sf /usr/lib/i386-linux-gnu/liblber* /usr/lib/
-
-            if [ -d /usr/include/i386-linux-gnu/curl ] && [ ! -d /usr/include/curl ]; then
-                ln -sf /usr/include/i386-linux-gnu/curl /usr/include/
             fi
         fi
     fi
@@ -118,9 +91,9 @@ _install_openssl(){
     CheckError "make install"
     AddToEnv "${openssl_location}"
     CreateLib64Dir "${openssl_location}"
-    if ! grep -qE "^${openssl_location}/lib" /etc/ld.so.conf.d/*.conf; then
-        echo "${openssl_location}/lib" > /etc/ld.so.conf.d/openssl111.conf
-    fi
+    #if ! grep -qE "^${openssl_location}/lib" /etc/ld.so.conf.d/*.conf; then
+        #echo "${openssl_location}/lib" > /etc/ld.so.conf.d/openssl111.conf
+    #fi
     ldconfig
     _success "${openssl_filename} install completed..."
     rm -f /tmp/${openssl_filename}.tar.gz
@@ -339,13 +312,9 @@ install_php71(){
     php_configure_args="--prefix=${php71_location} \
     --with-config-file-path=${php71_location}/etc \
     --with-config-file-scan-dir=${php71_location}/php.d \
-    --with-imap \
-    --with-kerberos \
-    --with-imap-ssl \
     --with-libxml-dir \
     --with-pcre-dir=${pcre_location} \
     --with-openssl=${openssl_location} \
-    --with-snmp \
     ${with_libdir} \
     --with-mysqli=mysqlnd \
     --with-mysql-sock=/tmp/mysql.sock \
@@ -358,13 +327,10 @@ install_php71(){
     --with-freetype-dir \
     --with-zlib \
     --with-bz2 \
-    --with-curl=/usr \
     --with-gettext \
     --with-gmp \
     --with-mhash \
     --with-icu-dir=/usr \
-    --with-ldap \
-    --with-ldap-sasl \
     --with-libmbfl \
     --with-onig \
     --with-unixODBC \
