@@ -125,7 +125,7 @@ _install_tools(){
             gcc-c++
             make
             perl
-            ntpdate
+            #ntpdate
             wget
             net-tools
             openssl
@@ -146,7 +146,7 @@ _install_tools(){
             g++
             make
             perl
-            ntpdate
+            #ntpdate
             wget
             net-tools
             openssl
@@ -174,7 +174,7 @@ _install_tools(){
     _check_command_exist "wget"
     _check_command_exist "perl"
     _check_command_exist "netstat"
-    _check_command_exist "ntpdate"
+    #_check_command_exist "ntpdate"
     _check_command_exist "openssl"
     _check_command_exist "automake"
     _check_command_exist "killall"
@@ -198,7 +198,7 @@ _check_command_exist(){
     fi
 }
 
-_sync_time(){
+_sync_time_delete(){
     _info "Starting to sync time..."
     ntpdate -bv cn.pool.ntp.org
     rm -f /etc/localtime
@@ -325,5 +325,5 @@ InstallPreSetting(){
     _disable_selinux
     _get_package_manager
     _install_tools
-    _sync_time
+    #_sync_time
 }
