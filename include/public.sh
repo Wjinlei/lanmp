@@ -104,7 +104,7 @@ An error occurred,The Full Log is available at /tmp/install.log"
 }
 
 _disable_selinux(){
-    if [ -s /etc/selinux/config ] && grep 'SELINUX=enforcing' /etc/selinux/config; then
+    if [ -s /etc/selinux/config ] && grep -i 'SELINUX=enforcing' /etc/selinux/config; then
         sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
         setenforce 0
     fi
@@ -113,12 +113,9 @@ _disable_selinux(){
 _install_tools(){
     _info "Starting to install development tools..."
     if [ "${PM}" = "yum" ];then
-        if [[ $(rpm -q yum | grep el6) != "" ]]; then
-            InstallPack "yum -y install epel-release"
-        elif [[ $(rpm -q yum |grep el7) != "" ]]; then
-            InstallPack "yum -y install epel-release"
-        elif [[ $(rpm -q yum |grep el8) != "" ]]; then
-            InstallPack "yum -y install epel-release"
+        InstallPack "yum -y install epel-release"
+        if [[ $(rpm -q yum |grep el8) != "" ]]; then
+            dnf config-manager –enablerepo PowerTools
         fi
         yum_depends=(
             gcc
