@@ -112,10 +112,10 @@ _disable_selinux(){
 
 _install_tools(){
     _info "Starting to install development tools..."
-    export LC_ALL="C.UTF-8"
     if [ "${PM}" = "yum" ];then
         InstallPack "yum -y install epel-release"
         if [[ $(rpm -q yum |grep el8) != "" ]]; then
+            export LC_ALL="C.UTF-8"
             dnf install 'dnf-command(config-manager)' -y
             dnf config-manager --enable PowerTools
             #cat > /etc/yum.repos.d/powertools.repo<<EOF
