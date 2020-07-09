@@ -308,7 +308,6 @@ install_php54(){
     --with-mysql-sock=/tmp/mysql.sock \
     --with-pdo-mysql=mysqlnd \
     --with-gd \
-    --with-vpx-dir \
     --with-jpeg-dir \
     --with-png-dir \
     --with-xpm-dir \
