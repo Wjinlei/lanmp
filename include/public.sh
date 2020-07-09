@@ -104,9 +104,12 @@ An error occurred,The Full Log is available at /tmp/install.log"
 }
 
 _disable_selinux(){
-    if [ -s /etc/selinux/config ] && grep -i 'SELINUX=enforcing' /etc/selinux/config; then
-        sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
-        setenforce 0
+    if [ -s /etc/selinux/config ]; then
+        selinux=`grep "SELINUX=enforcing" /etc/selinux/config |wc -l`
+        if [[ ${selinux} -ne 0 ]];then
+            sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
+            setenforce 0
+        fi
     fi
 }
 
