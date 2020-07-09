@@ -112,11 +112,21 @@ _disable_selinux(){
 
 _install_tools(){
     _info "Starting to install development tools..."
+    export LC_ALL="C.UTF-8"
     if [ "${PM}" = "yum" ];then
         InstallPack "yum -y install epel-release"
         if [[ $(rpm -q yum |grep el8) != "" ]]; then
             dnf install 'dnf-command(config-manager)' -y
-            dnf config-manager --enablerepo PowerTools
+            dnf config-manager --enable PowerTools
+            #cat > /etc/yum.repos.d/powertools.repo<<EOF
+#[PowerTools]
+#name=CentOS-\$releasever - PowerTools
+#mirrorlist=http://mirrorlist.centos.org/?release=\$releasever&arch=\$basearch&repo=PowerTools&infra=\$infra
+##baseurl=http://mirror.centos.org/\$contentdir/\$releasever/PowerTools/\$basearch/os/
+#gpgcheck=1
+#enabled=1
+#gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-centosofficial
+#EOF
         fi
         yum_depends=(
             gcc
