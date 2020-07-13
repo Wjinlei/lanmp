@@ -7,6 +7,7 @@ _install_php_depend(){
             libvpx-devel libjpeg-devel libpng-devel freetype-devel oniguruma-devel
             aspell-devel enchant-devel readline-devel unixODBC-devel libtidy-devel
             libxslt-devel sqlite-devel libiodbc-devel php-odbc zlib-devel libxml2-devel
+            curl-devel
         )
         for depend in ${yum_depends[@]}
         do
@@ -21,7 +22,7 @@ _install_php_depend(){
             autoconf patch m4 bison libbz2-dev libgmp-dev libicu-dev libldb-dev libpam0g-dev
             autoconf2.13 pkg-config libxslt1-dev zlib1g-dev libpcre3-dev libtool unixodbc-dev libtidy-dev
             libjpeg-dev libpng-dev libfreetype6-dev libpspell-dev libmhash-dev libenchant-dev libmcrypt-dev
-            libwebp-dev libxpm-dev libvpx-dev libreadline-dev libzip-dev libxml2-dev
+            libwebp-dev libxpm-dev libvpx-dev libreadline-dev libzip-dev libxml2-dev libcurl4-gnutls-dev
         )
         for depend in ${apt_depends[@]}
         do
@@ -37,11 +38,17 @@ _install_php_depend(){
             elif [ -f /usr/include/x86_64-linux-gnu/gmp.h ]; then
                 ln -sf /usr/include/x86_64-linux-gnu/gmp.h /usr/include/
             fi
+            if [ -d /usr/include/x86_64-linux-gnu/curl ] && [ ! -d /usr/include/curl ]; then
+                ln -sf /usr/include/x86_64-linux-gnu/curl /usr/include/
+            fi
         else
             if [ -f /usr/include/gmp-i386.h ]; then
                 ln -sf /usr/include/gmp-i386.h /usr/include/
             elif [ -f /usr/include/i386-linux-gnu/gmp.h ]; then
                 ln -sf /usr/include/i386-linux-gnu/gmp.h /usr/include/
+            fi
+            if [ -d /usr/include/i386-linux-gnu/curl ] && [ ! -d /usr/include/curl ]; then
+                ln -sf /usr/include/i386-linux-gnu/curl /usr/include/
             fi
         fi
     fi
@@ -327,6 +334,7 @@ install_php73(){
     --with-freetype-dir \
     --with-zlib \
     --with-bz2 \
+    --with-curl=/usr \
     --with-gettext \
     --with-gmp \
     --with-mhash \
