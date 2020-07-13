@@ -21,6 +21,11 @@ openssl102_location=/usr/local/openssl102
 openssl102_filename="openssl-1.0.2u"
 openssl102_download_url="https://www.openssl.org/source/old/1.0.2/openssl-1.0.2u.tar.gz"
 
+#curl
+curl_location=/usr/local/curl
+curl_filename="curl-7.29.0"
+curl_download_url="https://curl.haxx.se/download/curl-7.29.0.tar.gz"
+
 # nghttp2
 nghttp2_location=/usr/local/nghttp2
 nghttp2_filename="nghttp2-1.40.0"

@@ -52,6 +52,7 @@ _install_php_depend(){
             fi
         fi
     fi
+    _install_curl
     _install_pcre
     _install_openssl
     _install_libiconv
@@ -63,6 +64,27 @@ _install_php_depend(){
     fi
     id -u www >/dev/null 2>&1
     [ $? -ne 0 ] && useradd -M -U www -r -d /dev/null -s /sbin/nologin
+}
+
+_install_curl(){
+    cd /tmp
+    _info "${curl_filename} install start..."
+    rm -fr ${curl_filename}
+    DownloadFile "${curl_filename}.tar.gz" "${curl_download_url}"
+    tar zxf ${curl_filename}.tar.gz
+    cd ${curl_filename}
+    CheckError "./configure --prefix=${curl_location}"
+    CheckError "parallel_make"
+    CheckError "make install"
+    AddToEnv "${curl_location}"
+    CreateLib64Dir "${curl_location}"
+    #if ! grep -qE "^${curl_location}/lib" /etc/ld.so.conf.d/*.conf; then
+        #echo "${curl_location}/lib" > /etc/ld.so.conf.d/curl.conf
+    #fi
+    ldconfig
+    _success "${curl_filename} install completed..."
+    rm -f /tmp/${curl_filename}.tar.gz
+    rm -fr /tmp/${curl_filename}
 }
 
 _install_pcre(){
@@ -321,7 +343,7 @@ install_php54(){
     --with-freetype-dir \
     --with-zlib \
     --with-bz2 \
-    --with-curl=/usr \
+    --with-curl=${curl_location} \
     --with-gettext \
     --with-gmp \
     --with-mhash \
