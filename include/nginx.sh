@@ -114,6 +114,7 @@ http {
     default_type application/octet-stream;
     sendfile on;
     keepalive_timeout 65;
+    server_names_hash_bucket_size 512;
 
     # include virtual host config
     include vhost/*.conf;
