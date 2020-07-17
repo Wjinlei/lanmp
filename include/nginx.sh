@@ -115,10 +115,10 @@ http {
     include mime.types;
     default_type application/octet-stream;
     server_names_hash_bucket_size 512;
-    client_header_buffer_size 32k;
-    large_client_header_buffers 4 32k;
     client_max_body_size 50m;
     client_header_buffer_size 32k;
+    client_body_buffer_size 128k;
+    large_client_header_buffers 4 32k;
 
     sendfile   on;
     tcp_nopush on;
@@ -148,8 +148,6 @@ http {
     gzip_vary on;
 
     # http_proxy
-    client_max_body_size 10m;
-    client_body_buffer_size 128k;
     proxy_connect_timeout 75;
     proxy_send_timeout 75;
     proxy_read_timeout 75;
@@ -159,8 +157,8 @@ http {
     proxy_temp_file_write_size 64k;
 
     server_tokens off;
-    limit_conn_zone $binary_remote_addr zone=perip:10m;
-    limit_conn_zone $server_name zone=perserver:10m;
+    limit_conn_zone \$binary_remote_addr zone=perip:10m;
+    limit_conn_zone \$server_name zone=perserver:10m;
 
     server {
        listen 999;
