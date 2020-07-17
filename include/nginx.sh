@@ -102,22 +102,41 @@ EOF
 _config_nginx(){
     [ -f "${nginx_location}/etc/nginx.conf" ] && mv ${nginx_location}/etc/nginx.conf ${nginx_location}/etc/nginx.conf-$(date +%Y-%m-%d_%H:%M:%S).bak
     cat > ${nginx_location}/etc/nginx.conf <<EOF
-worker_processes 2;
+worker_processes auto;
+worker_rlimit_nofile 51200;
 
 events {
     use epoll;
-    worker_connections 2048;
+    worker_connections 51200;
+    multi_accept on;
 }
 
 http {
     include mime.types;
     default_type application/octet-stream;
-    sendfile on;
-    keepalive_timeout 65;
     server_names_hash_bucket_size 512;
+    client_header_buffer_size 32k;
+    large_client_header_buffers 4 32k;
+    client_max_body_size 50m;
+    client_header_buffer_size 32k;
+
+    sendfile   on;
+    tcp_nopush on;
+    tcp_nodelay on;
+    keepalive_timeout 60;
 
     # include virtual host config
     include vhost/*.conf;
+
+    # fastcgi
+    fastcgi_connect_timeout 300;
+    fastcgi_send_timeout 300;
+    fastcgi_read_timeout 300;
+    fastcgi_buffer_size 64k;
+    fastcgi_buffers 4 64k;
+    fastcgi_busy_buffers_size 128k;
+    fastcgi_temp_file_write_size 256k;
+    fastcgi_intercept_errors on;
 
     # gzip
     gzip on;
@@ -139,8 +158,9 @@ http {
     proxy_busy_buffers_size 64k;
     proxy_temp_file_write_size 64k;
 
-    # hidden version
     server_tokens off;
+    limit_conn_zone $binary_remote_addr zone=perip:10m;
+    limit_conn_zone $server_name zone=perserver:10m;
 
     server {
        listen 999;
