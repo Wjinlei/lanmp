@@ -51,11 +51,11 @@ _install_php_depend(){
                 ln -sf /usr/include/i386-linux-gnu/gmp.h /usr/include/
             fi
 
-            if [ -f /usr/lib/x86_64-linux-gnu/libXpm.a ] && [ ! -f /usr/lib/libXpm.a ]; then
-                ln -sf /usr/lib/x86_64-linux-gnu/libXpm.a /usr/lib
+            if [ -f /usr/lib/i386-linux-gnu/libXpm.a ] && [ ! -f /usr/lib/libXpm.a ]; then
+                ln -sf /usr/lib/i386-linux-gnu/libXpm.a /usr/lib
             fi
-            if [ -f /usr/lib/x86_64-linux-gnu/libXpm.so ] && [ ! -f /usr/lib/libXpm.so ]; then
-                ln -sf /usr/lib/x86_64-linux-gnu/libXpm.so /usr/lib
+            if [ -f /usr/lib/i386-linux-gnu/libXpm.so ] && [ ! -f /usr/lib/libXpm.so ]; then
+                ln -sf /usr/lib/i386-linux-gnu/libXpm.so /usr/lib
             fi
         fi
     fi
