@@ -178,11 +178,15 @@ _install_tools(){
     fi
     if Is64bit; then
         if ! grep -qE "^/usr/lib/x86_64-linux-gnu" /etc/ld.so.conf.d/*.conf; then
-            echo "/usr/lib/x86_64-linux-gnu" > /etc/ld.so.conf.d/linuxgnu.conf
+            echo "/lib/x86_64-linux-gnu" > /etc/ld.so.conf.d/x86_64-linux-gnu.conf
+            echo "/usr/lib/x86_64-linux-gnu" >> /etc/ld.so.conf.d/x86_64-linux-gnu.conf
+            echo "/usr/local/lib/x86_64-linux-gnu" >> /etc/ld.so.conf.d/x86_64-linux-gnu.conf
         fi
     else
         if ! grep -qE "^/usr/lib/i386-linux-gnu" /etc/ld.so.conf.d/*.conf; then
-            echo "/usr/lib/i386-linux-gnu" > /etc/ld.so.conf.d/linuxgnu.conf
+            echo "/lib/i386-linux-gnu" > /etc/ld.so.conf.d/i386-linux-gnu.conf
+            echo "/usr/lib/i386-linux-gnu" >> /etc/ld.so.conf.d/i386-linux-gnu.conf
+            echo "/usr/local/lib/i386-linux-gnu" >> /etc/ld.so.conf.d/i386-linux-gnu.conf
         fi
     fi
     ldconfig
