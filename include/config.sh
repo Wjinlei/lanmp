@@ -26,6 +26,21 @@ curl_location=/usr/local/curl
 curl_filename="curl-7.29.0"
 curl_download_url="https://curl.haxx.se/download/curl-7.29.0.tar.gz"
 
+#icu4c
+icu4c_location=/usr/local/icu4c
+icu4c_filename="icu"
+icu4c_download_url="https://github.com/unicode-org/icu/releases/download/release-60-3/icu4c-60_3-src.tgz"
+
+#libxml2
+libxml2_localtion=/usr/local/libxml2
+libxml2_filename="libxml2-2.9.4"
+libxml2_download_url="ftp://xmlsoft.org/libxml2/libxml2-2.9.4.tar.gz"
+
+#freetype2
+freetype_location=/usr/local/freetype2
+freetype_filename="freetype-2.8.1"
+freetype_download_url="https://download.savannah.gnu.org/releases/freetype/freetype-2.8.1.tar.gz"
+
 # nghttp2
 nghttp2_location=/usr/local/nghttp2
 nghttp2_filename="nghttp2-1.40.0"

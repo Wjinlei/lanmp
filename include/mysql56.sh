@@ -1,7 +1,7 @@
 _install_mysql_depend(){
     _info "Starting to install dependencies packages for MySQL..."
     if [ "${PM}" = "yum" ];then
-        local yum_depends=(libncurses* ncurses-devel cmake m4 bison libaio libaio-devel numactl-devel libevent)
+        local yum_depends=(ncurses-libs ncurses-devel cmake m4 bison libaio libaio-devel numactl-devel libevent)
         for depend in ${yum_depends[@]}
         do
             InstallPack "yum -y install ${depend}"
@@ -22,7 +22,7 @@ _install_mysql_depend(){
             InstallPack "yum -y install perl-Data-Dumper"
         fi
     elif [ "${PM}" = "apt-get" ];then
-        local apt_depends=(libncurses5-dev cmake m4 bison libaio1 libaio-dev numactl)
+        local apt_depends=(libncurses5-dev libncurses5 cmake m4 bison libaio1 libaio-dev numactl)
         for depend in ${apt_depends[@]}
         do
             InstallPack "apt-get -y install ${depend}"

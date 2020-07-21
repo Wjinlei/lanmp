@@ -2,11 +2,12 @@ _install_php_depend(){
     _info "Starting to install dependencies packages for PHP..."
     if [ "${PM}" = "yum" ];then
         local yum_depends=(
-            autoconf patch m4 bison bzip2-devel pam-devel gmp-devel libicu-devel
-            pcre-devel libtool-libs libtool-ltdl-devel libwebp-devel libXpm-devel
-            libvpx-devel libjpeg-devel libpng-devel freetype-devel oniguruma-devel
-            aspell-devel enchant-devel readline-devel unixODBC-devel libtidy-devel
-            libxslt-devel sqlite-devel libiodbc-devel php-odbc zlib-devel libxml2-devel
+            autoconf patch m4 bison bzip2-devel pam-devel gmp-devel
+            pcre-devel libtool-libs libtool-ltdl-devel libwebp-devel
+            libvpx-devel libjpeg-devel libpng-deve oniguruma-devel
+            aspell-devel enchant-devel readline-devel unixODBC-devel
+            libxslt-devel sqlite-devel libiodbc-devel php-odbc zlib-devel
+            libXpm-devel libtidy-devel
         )
         for depend in ${yum_depends[@]}
         do
@@ -18,10 +19,11 @@ _install_php_depend(){
         _install_libzip
     elif [ "${PM}" = "apt-get" ];then
         local apt_depends=(
-            autoconf patch m4 bison libbz2-dev libgmp-dev libicu-dev libldb-dev libpam0g-dev
-            autoconf2.13 pkg-config libxslt1-dev zlib1g-dev libpcre3-dev libtool unixodbc-dev libtidy-dev
-            libjpeg-dev libpng-dev libfreetype6-dev libpspell-dev libmhash-dev libenchant-dev libmcrypt-dev
-            libwebp-dev libxpm-dev libvpx-dev libreadline-dev libzip-dev libxml2-dev
+            autoconf patch m4 bison libbz2-dev libgmp-dev libldb-dev libpam0g-dev
+            autoconf2.13 pkg-config libxslt1-dev zlib1g-dev libpcre3-dev libtool
+            libjpeg-dev libpng-dev libpspell-dev libmhash-dev libenchant-dev
+            libwebp-dev libxpm-dev libvpx-dev libreadline-dev libzip-dev libmcrypt-dev
+            unixodbc-dev libtidy-dev
         )
         for depend in ${apt_depends[@]}
         do
@@ -49,6 +51,9 @@ _install_php_depend(){
     _install_pcre
     _install_libiconv
     _install_re2c
+    _install_freetype
+    _install_icu4c
+    _install_libxml2
     _install_curl
     _success "Install dependencies packages for PHP completed..."
     # Fixed unixODBC issue
@@ -57,6 +62,70 @@ _install_php_depend(){
     fi
     id -u www >/dev/null 2>&1
     [ $? -ne 0 ] && useradd -M -U www -r -d /dev/null -s /sbin/nologin
+}
+
+_install_freetype() {
+    cd /tmp
+    _info "${freetype_filename} install start..."
+    rm -fr ${freetype_filename}
+    DownloadFile "${freetype_filename}.tar.gz" "${freetype_download_url}"
+    tar zxf ${freetype_filename}.tar.gz
+    cd ${freetype_filename}
+    CheckError "./configure --prefix=${freetype_location}"
+    CheckError "parallel_make"
+    CheckError "make install"
+    AddToEnv "${freetype_location}"
+    CreateLib64Dir "${freetype_location}"
+    #if ! grep -qE "^${curl_location}/lib" /etc/ld.so.conf.d/*.conf; then
+        #echo "${curl_location}/lib" > /etc/ld.so.conf.d/curl.conf
+    #fi
+    ldconfig
+    _success "${freetype_filename} install completed..."
+    rm -f /tmp/${freetype_filename}.tar.gz
+    rm -fr /tmp/${freetype_filename}
+
+}
+
+_install_libxml2() {
+    cd /tmp
+    _info "${libxml2_filename} install start..."
+    rm -fr ${libxml2_filename}
+    DownloadFile "${libxml2_filename}.tar.gz" "${libxml2_download_url}"
+    tar zxf ${libxml2_filename}.tar.gz
+    cd ${libxml2_filename}
+    CheckError "./configure --prefix=${libxml2_localtion} --with-icu=${icu4c_location}"
+    CheckError "parallel_make"
+    CheckError "make install"
+    AddToEnv "${libxml2_localtion}"
+    CreateLib64Dir "${libxml2_localtion}"
+    #if ! grep -qE "^${curl_location}/lib" /etc/ld.so.conf.d/*.conf; then
+        #echo "${curl_location}/lib" > /etc/ld.so.conf.d/curl.conf
+    #fi
+    ldconfig
+    _success "${libxml2_filename} install completed..."
+    rm -f /tmp/${libxml2_filename}.tar.gz
+    rm -fr /tmp/${libxml2_filename}
+}
+
+_install_icu4c() {
+    cd /tmp
+    _info "${icu4c_filename} install start..."
+    rm -fr ${icu4c_filename}
+    DownloadFile "icu4c-60_3-src.tgz" "${icu4c_download_url}"
+    tar zxf icu4c-60_3-src.tgz
+    cd ${icu4c_filename}/source
+    CheckError "./configure --prefix=${icu4c_location}"
+    CheckError "parallel_make"
+    CheckError "make install"
+    AddToEnv "${icu4c_location}"
+    CreateLib64Dir "${icu4c_location}"
+    if ! grep -qE "^${icu4c_location}/lib" /etc/ld.so.conf.d/*.conf; then
+        echo "${icu4c_location}/lib" > /etc/ld.so.conf.d/icu4c.conf
+    fi
+    ldconfig
+    _success "${icu4c_filename} install completed..."
+    rm -f /tmp/icu4c-60_3-src.tgz
+    rm -fr /tmp/${icu4c_filename}
 }
 
 _install_curl(){
@@ -331,15 +400,11 @@ install_php72(){
     tar zxf ${php72_filename}.tar.gz
     cd ${php72_filename}
     _info "Install ${php72_filename} ..."
-    sed -i "s/freetype-config/pkg-config/g" ./configure
-    sed -i "s/freetype-config/pkg-config/g" ./ext/gd/config.m4
-    sed -i "s/FREETYPE2_CONFIG --cflags/FREETYPE2_CONFIG freetype2 --cflags/g" ./configure
-    sed -i "s/FREETYPE2_CONFIG --libs/FREETYPE2_CONFIG freetype2 --cflags/g" ./configure
     Is64bit && with_libdir="--with-libdir=lib64" || with_libdir=""
     php_configure_args="--prefix=${php72_location} \
     --with-config-file-path=${php72_location}/etc \
     --with-config-file-scan-dir=${php72_location}/php.d \
-    --with-libxml-dir \
+    --with-libxml-dir=${libxml2_localtion} \
     --with-pcre-dir=${pcre_location} \
     --with-openssl=${openssl_location} \
     ${with_libdir} \
@@ -351,14 +416,14 @@ install_php72(){
     --with-jpeg-dir \
     --with-png-dir \
     --with-xpm-dir \
-    --with-freetype-dir \
+    --with-freetype-dir=${freetype_location} \
     --with-zlib \
     --with-bz2 \
     --with-curl=${curl_location} \
     --with-gettext \
     --with-gmp \
     --with-mhash \
-    --with-icu-dir=/usr \
+    --with-icu-dir=${icu4c_location} \
     --with-libmbfl \
     --with-onig \
     --with-unixODBC \
