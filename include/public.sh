@@ -176,6 +176,15 @@ _install_tools(){
     if ! grep -qE "^/usr/local/lib" /etc/ld.so.conf.d/*.conf; then
         echo "/usr/local/lib" > /etc/ld.so.conf.d/locallib.conf
     fi
+    if Is64bit; then
+        if ! grep -qE "^/usr/lib/x86_64-linux-gnu" /etc/ld.so.conf.d/*.conf; then
+            echo "/usr/lib/x86_64-linux-gnu" > /etc/ld.so.conf.d/linuxgnu.conf
+        fi
+    else
+        if ! grep -qE "^/usr/lib/i386-linux-gnu" /etc/ld.so.conf.d/*.conf; then
+            echo "/usr/lib/i386-linux-gnu" > /etc/ld.so.conf.d/linuxgnu.conf
+        fi
+    fi
     ldconfig
     _info "Install development tools completed..."
 

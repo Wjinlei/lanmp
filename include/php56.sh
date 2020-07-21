@@ -345,6 +345,10 @@ install_php56(){
     tar zxf ${php56_filename}.tar.gz
     cd ${php56_filename}
     _info "Install ${php56_filename} ..."
+    sed -i "s/freetype-config/pkg-config/g" ./configure
+    sed -i "s/freetype-config/pkg-config/g" ./ext/gd/config.m4
+    sed -i "s/FREETYPE2_CONFIG --cflags/FREETYPE2_CONFIG freetype2 --cflags/g" ./configure
+    sed -i "s/FREETYPE2_CONFIG --libs/FREETYPE2_CONFIG freetype2 --cflags/g" ./configure
     Is64bit && with_libdir="--with-libdir=lib64" || with_libdir=""
     php_configure_args="--prefix=${php56_location} \
     --with-config-file-path=${php56_location}/etc \
