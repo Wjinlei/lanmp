@@ -51,8 +51,8 @@ _install_icu4c() {
     cd /tmp
     _info "${icu4c_filename} install start..."
     rm -fr ${icu4c_filename}
-    DownloadFile "icu4c-60_3-src.tgz" "${icu4c_download_url}"
-    tar zxf icu4c-60_3-src.tgz
+    DownloadFile "icu4c-50_2-src.tgz" "${icu4c_download_url}"
+    tar zxf icu4c-50_2-src.tgz
     cd ${icu4c_filename}/source
     CheckError "./configure --prefix=${icu4c_location}"
     CheckError "parallel_make"
@@ -64,7 +64,7 @@ _install_icu4c() {
     fi
     ldconfig
     _success "${icu4c_filename} install completed..."
-    rm -f /tmp/icu4c-60_3-src.tgz
+    rm -f /tmp/icu4c-50_2-src.tgz
     rm -fr /tmp/${icu4c_filename}
 }
 
