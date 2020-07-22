@@ -26,6 +26,27 @@ _install_apache_depend(){
     _success "Install dependencies packages for Apache completed..."
 }
 
+_install_icu4c() {
+    cd /tmp
+    _info "${icu4c_filename} install start..."
+    rm -fr ${icu4c_dirname}
+    DownloadFile "${icu4c_filename}.tgz" "${icu4c_download_url}"
+    tar zxf ${icu4c_filename}.tgz
+    cd ${icu4c_dirname}/source
+    CheckError "./configure --prefix=${icu4c_location}"
+    CheckError "parallel_make"
+    CheckError "make install"
+    AddToEnv "${icu4c_location}"
+    CreateLib64Dir "${icu4c_location}"
+    if ! grep -qE "^${icu4c_location}/lib" /etc/ld.so.conf.d/*.conf; then
+        echo "${icu4c_location}/lib" > /etc/ld.so.conf.d/icu4c.conf
+    fi
+    ldconfig
+    _success "${icu4c_filename} install completed..."
+    rm -f /tmp/${icu4c_filename}.tgz
+    rm -fr /tmp/${icu4c_dirname}
+}
+
 _install_libxml2() {
     cd /tmp
     _info "${libxml2_filename} install start..."
@@ -38,34 +59,10 @@ _install_libxml2() {
     CheckError "make install"
     AddToEnv "${libxml2_localtion}"
     CreateLib64Dir "${libxml2_localtion}"
-    #if ! grep -qE "^${curl_location}/lib" /etc/ld.so.conf.d/*.conf; then
-        #echo "${curl_location}/lib" > /etc/ld.so.conf.d/curl.conf
-    #fi
     ldconfig
     _success "${libxml2_filename} install completed..."
     rm -f /tmp/${libxml2_filename}.tar.gz
     rm -fr /tmp/${libxml2_filename}
-}
-
-_install_icu4c() {
-    cd /tmp
-    _info "${icu4c_filename} install start..."
-    rm -fr ${icu4c_filename}
-    DownloadFile "icu4c-50_2-src.tgz" "${icu4c_download_url}"
-    tar zxf icu4c-50_2-src.tgz
-    cd ${icu4c_filename}/source
-    CheckError "./configure --prefix=${icu4c_location}"
-    CheckError "parallel_make"
-    CheckError "make install"
-    AddToEnv "${icu4c_location}"
-    CreateLib64Dir "${icu4c_location}"
-    if ! grep -qE "^${icu4c_location}/lib" /etc/ld.so.conf.d/*.conf; then
-        echo "${icu4c_location}/lib" > /etc/ld.so.conf.d/icu4c.conf
-    fi
-    ldconfig
-    _success "${icu4c_filename} install completed..."
-    rm -f /tmp/icu4c-50_2-src.tgz
-    rm -fr /tmp/${icu4c_filename}
 }
 
 _install_curl(){
@@ -75,15 +72,11 @@ _install_curl(){
     DownloadFile "${curl_filename}.tar.gz" "${curl_download_url}"
     tar zxf ${curl_filename}.tar.gz
     cd ${curl_filename}
-    unset CFLAGS
     CheckError "./configure --prefix=${curl_location} --with-ssl=${openssl_location}"
     CheckError "parallel_make"
     CheckError "make install"
     AddToEnv "${curl_location}"
     CreateLib64Dir "${curl_location}"
-    #if ! grep -qE "^${curl_location}/lib" /etc/ld.so.conf.d/*.conf; then
-        #echo "${curl_location}/lib" > /etc/ld.so.conf.d/curl.conf
-    #fi
     ldconfig
     _success "${curl_filename} install completed..."
     rm -f /tmp/${curl_filename}.tar.gz
@@ -123,9 +116,6 @@ _install_openssl(){
     CheckError "make install"
     AddToEnv "${openssl_location}"
     CreateLib64Dir "${openssl_location}"
-    #if ! grep -qE "^${openssl_location}/lib" /etc/ld.so.conf.d/*.conf; then
-        #echo "${openssl_location}/lib" > /etc/ld.so.conf.d/openssl111.conf
-    #fi
     ldconfig
     _success "${openssl_filename} install completed..."
     rm -f /tmp/${openssl_filename}.tar.gz

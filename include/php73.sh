@@ -7,7 +7,7 @@ _install_php_depend(){
             libvpx-devel libjpeg-devel libpng-devel oniguruma-devel
             aspell-devel enchant-devel readline-devel unixODBC-devel
             libxslt-devel sqlite-devel libiodbc-devel php-odbc zlib-devel
-            libXpm-devel libtidy-devel python2-devel
+            libXpm-devel libtidy-devel freetype-devel python2-devel
         )
         for depend in ${yum_depends[@]}
         do
@@ -19,11 +19,12 @@ _install_php_depend(){
         _install_libzip
     elif [ "${PM}" = "apt-get" ];then
         local apt_depends=(
-            autoconf patch m4 bison libbz2-dev libgmp-dev libldb-dev libpam0g-dev
-            autoconf2.13 pkg-config libxslt1-dev zlib1g-dev libpcre3-dev libtool
-            libjpeg-dev libpng-dev libpspell-dev libmhash-dev libenchant-dev
-            libwebp-dev libxpm-dev libvpx-dev libreadline-dev libzip-dev libmcrypt-dev
-            unixodbc-dev libtidy-dev python-dev
+            autoconf patch m4 bison libbz2-dev libgmp-dev libldb-dev
+            libpam0g-dev autoconf2.13 pkg-config libxslt1-dev zlib1g-dev
+            libpcre3-dev libtool libjpeg-dev libpng-dev libpspell-dev
+            libmhash-dev libenchant-dev libwebp-dev libxpm-dev libvpx-dev
+            libreadline-dev libzip-dev libmcrypt-dev unixodbc-dev
+            libtidy-dev python-dev
         )
         for depend in ${apt_depends[@]}
         do
@@ -46,12 +47,12 @@ _install_php_depend(){
                 ln -sf /usr/include/i386-linux-gnu/gmp.h /usr/include/
             fi
         fi
+        _install_freetype
     fi
     _install_openssl
     _install_pcre
     _install_libiconv
     _install_re2c
-    _install_freetype
     _install_icu4c
     _install_libxml2
     _install_curl
@@ -71,19 +72,37 @@ _install_freetype() {
     DownloadFile "${freetype_filename}.tar.gz" "${freetype_download_url}"
     tar zxf ${freetype_filename}.tar.gz
     cd ${freetype_filename}
-    CheckError "./configure --prefix=${freetype_location}"
+    CheckError "./configure --prefix=/usr"
     CheckError "parallel_make"
     CheckError "make install"
     AddToEnv "${freetype_location}"
     CreateLib64Dir "${freetype_location}"
-    #if ! grep -qE "^${curl_location}/lib" /etc/ld.so.conf.d/*.conf; then
-        #echo "${curl_location}/lib" > /etc/ld.so.conf.d/curl.conf
-    #fi
     ldconfig
     _success "${freetype_filename} install completed..."
     rm -f /tmp/${freetype_filename}.tar.gz
     rm -fr /tmp/${freetype_filename}
 
+}
+
+_install_icu4c() {
+    cd /tmp
+    _info "${icu4c_filename} install start..."
+    rm -fr ${icu4c_dirname}
+    DownloadFile "${icu4c_filename}.tgz" "${icu4c_download_url}"
+    tar zxf ${icu4c_filename}.tgz
+    cd ${icu4c_dirname}/source
+    CheckError "./configure --prefix=${icu4c_location}"
+    CheckError "parallel_make"
+    CheckError "make install"
+    AddToEnv "${icu4c_location}"
+    CreateLib64Dir "${icu4c_location}"
+    if ! grep -qE "^${icu4c_location}/lib" /etc/ld.so.conf.d/*.conf; then
+        echo "${icu4c_location}/lib" > /etc/ld.so.conf.d/icu4c.conf
+    fi
+    ldconfig
+    _success "${icu4c_filename} install completed..."
+    rm -f /tmp/${icu4c_filename}.tgz
+    rm -fr /tmp/${icu4c_dirname}
 }
 
 _install_libxml2() {
@@ -98,34 +117,10 @@ _install_libxml2() {
     CheckError "make install"
     AddToEnv "${libxml2_localtion}"
     CreateLib64Dir "${libxml2_localtion}"
-    #if ! grep -qE "^${curl_location}/lib" /etc/ld.so.conf.d/*.conf; then
-        #echo "${curl_location}/lib" > /etc/ld.so.conf.d/curl.conf
-    #fi
     ldconfig
     _success "${libxml2_filename} install completed..."
     rm -f /tmp/${libxml2_filename}.tar.gz
     rm -fr /tmp/${libxml2_filename}
-}
-
-_install_icu4c() {
-    cd /tmp
-    _info "${icu4c_filename} install start..."
-    rm -fr ${icu4c_filename}
-    DownloadFile "icu4c-50_2-src.tgz" "${icu4c_download_url}"
-    tar zxf icu4c-50_2-src.tgz
-    cd ${icu4c_filename}/source
-    CheckError "./configure --prefix=${icu4c_location}"
-    CheckError "parallel_make"
-    CheckError "make install"
-    AddToEnv "${icu4c_location}"
-    CreateLib64Dir "${icu4c_location}"
-    if ! grep -qE "^${icu4c_location}/lib" /etc/ld.so.conf.d/*.conf; then
-        echo "${icu4c_location}/lib" > /etc/ld.so.conf.d/icu4c.conf
-    fi
-    ldconfig
-    _success "${icu4c_filename} install completed..."
-    rm -f /tmp/icu4c-50_2-src.tgz
-    rm -fr /tmp/${icu4c_filename}
 }
 
 _install_curl(){
@@ -135,15 +130,11 @@ _install_curl(){
     DownloadFile "${curl_filename}.tar.gz" "${curl_download_url}"
     tar zxf ${curl_filename}.tar.gz
     cd ${curl_filename}
-    unset CFLAGS
     CheckError "./configure --prefix=${curl_location} --with-ssl=${openssl_location}"
     CheckError "parallel_make"
     CheckError "make install"
     AddToEnv "${curl_location}"
     CreateLib64Dir "${curl_location}"
-    #if ! grep -qE "^${curl_location}/lib" /etc/ld.so.conf.d/*.conf; then
-        #echo "${curl_location}/lib" > /etc/ld.so.conf.d/curl.conf
-    #fi
     ldconfig
     _success "${curl_filename} install completed..."
     rm -f /tmp/${curl_filename}.tar.gz
@@ -183,9 +174,6 @@ _install_openssl(){
     CheckError "make install"
     AddToEnv "${openssl_location}"
     CreateLib64Dir "${openssl_location}"
-    #if ! grep -qE "^${openssl_location}/lib" /etc/ld.so.conf.d/*.conf; then
-        #echo "${openssl_location}/lib" > /etc/ld.so.conf.d/openssl111.conf
-    #fi
     ldconfig
     _success "${openssl_filename} install completed..."
     rm -f /tmp/${openssl_filename}.tar.gz
@@ -416,7 +404,7 @@ install_php73(){
     --with-jpeg-dir \
     --with-png-dir \
     --with-xpm-dir \
-    --with-freetype-dir=${freetype_location} \
+    --with-freetype-dir \
     --with-zlib \
     --with-bz2 \
     --with-curl=${curl_location} \

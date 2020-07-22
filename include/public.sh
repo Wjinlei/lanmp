@@ -287,9 +287,8 @@ AddToEnv(){
     if [ -d "${location}/lib" ]; then
         export LD_LIBRARY_PATH="${location}/lib:${LD_LIBRARY_PATH}"
     fi
-    if [ -d "${location}/include" ]; then 
+    if [ -d "${location}/include" ]; then
         export CPPFLAGS="-I${location}/include $CPPFLAGS"
-        export CFLAGS="-I${location}/include $CFLAGS"
     fi
 }
 

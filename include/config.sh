@@ -28,7 +28,8 @@ curl_download_url="https://curl.haxx.se/download/curl-7.29.0.tar.gz"
 
 #icu4c
 icu4c_location=/usr/local/icu4c
-icu4c_filename="icu"
+icu4c_dirname="icu"
+icu4c_filename="icu4c-50_2-src"
 icu4c_download_url="https://github.com/unicode-org/icu/releases/download/release-50-2/icu4c-50_2-src.tgz"
 
 #libxml2
