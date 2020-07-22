@@ -121,15 +121,6 @@ _install_tools(){
             dnf -y install 'dnf-command(config-manager)'
             dnf config-manager --enable PowerTools
             dnf -y install chrony >/dev/null 2>&1
-            #cat > /etc/yum.repos.d/powertools.repo<<EOF
-#[PowerTools]
-#name=CentOS-\$releasever - PowerTools
-#mirrorlist=http://mirrorlist.centos.org/?release=\$releasever&arch=\$basearch&repo=PowerTools&infra=\$infra
-##baseurl=http://mirror.centos.org/\$contentdir/\$releasever/PowerTools/\$basearch/os/
-#gpgcheck=1
-#enabled=1
-#gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-centosofficial
-#EOF
             _check_command_exist "chronyc"
         else
             yum -y install ntpdate >/dev/null 2>&1

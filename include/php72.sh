@@ -7,7 +7,7 @@ _install_php_depend(){
             libvpx-devel libjpeg-devel libpng-devel oniguruma-devel
             aspell-devel enchant-devel readline-devel unixODBC-devel
             libxslt-devel sqlite-devel libiodbc-devel php-odbc zlib-devel
-            libXpm-devel libtidy-devel
+            libXpm-devel libtidy-devel python-devel
         )
         for depend in ${yum_depends[@]}
         do
@@ -23,7 +23,7 @@ _install_php_depend(){
             autoconf2.13 pkg-config libxslt1-dev zlib1g-dev libpcre3-dev libtool
             libjpeg-dev libpng-dev libpspell-dev libmhash-dev libenchant-dev
             libwebp-dev libxpm-dev libvpx-dev libreadline-dev libzip-dev libmcrypt-dev
-            unixodbc-dev libtidy-dev
+            unixodbc-dev libtidy-dev python-dev
         )
         for depend in ${apt_depends[@]}
         do

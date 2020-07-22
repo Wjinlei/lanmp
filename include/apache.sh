@@ -1,13 +1,13 @@
 _install_apache_depend(){
     _info "Starting to install dependencies packages for Apache..."
     if [ "${PM}" = "yum" ];then
-        local yum_depends=(expat-devel zlib-devel)
+        local yum_depends=(python-devel expat-devel zlib-devel)
         for depend in ${yum_depends[@]}
         do
             InstallPack "yum -y install ${depend}"
         done
     elif [ "${PM}" = "apt-get" ];then
-        local apt_depends=(libexpat1-dev zlib1g-dev)
+        local apt_depends=(python-dev libexpat1-dev zlib1g-dev)
         for depend in ${apt_depends[@]}
         do
             InstallPack "apt-get -y install ${depend}"
