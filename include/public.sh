@@ -118,9 +118,9 @@ _install_tools(){
     if [ "${PM}" = "yum" ];then
         InstallPack "yum -y install epel-release"
         if [[ $(rpm -q yum |grep el8) != "" ]]; then
-            export LC_ALL="C.UTF-8"
-            dnf install 'dnf-command(config-manager)' -y
+            dnf -y install 'dnf-command(config-manager)'
             dnf config-manager --enable PowerTools
+            dnf -y install chrony >/dev/null 2>&1
             #cat > /etc/yum.repos.d/powertools.repo<<EOF
 #[PowerTools]
 #name=CentOS-\$releasever - PowerTools
@@ -130,6 +130,10 @@ _install_tools(){
 #enabled=1
 #gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-centosofficial
 #EOF
+            _check_command_exist "chronyc"
+        else
+            yum -y install ntpdate >/dev/null 2>&1
+            _check_command_exist "ntpdate"
         fi
         yum_depends=(
             gcc
@@ -157,7 +161,7 @@ _install_tools(){
             g++
             make
             perl
-            #ntpdate
+            ntpdate
             wget
             net-tools
             openssl
@@ -172,6 +176,7 @@ _install_tools(){
         do
             InstallPack "apt-get -y install ${depend}"
         done
+        _check_command_exist "ntpdate"
     fi
     if ! grep -qE "^/usr/local/lib" /etc/ld.so.conf.d/*.conf; then
         echo "/usr/local/lib" > /etc/ld.so.conf.d/locallib.conf
@@ -198,7 +203,6 @@ _install_tools(){
     _check_command_exist "wget"
     _check_command_exist "perl"
     _check_command_exist "netstat"
-    #_check_command_exist "ntpdate"
     _check_command_exist "openssl"
     _check_command_exist "automake"
     _check_command_exist "killall"
@@ -222,11 +226,17 @@ _check_command_exist(){
     fi
 }
 
-_sync_time_delete(){
-    _info "Starting to sync time..."
-    ntpdate -bv cn.pool.ntp.org
+_set_timezone() {
+    _info "Starting set to timezone..."
     rm -f /etc/localtime
     ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+    _success "Set timezone completed..."
+}
+
+_sync_time() {
+    _info "Starting to sync time..."
+    ntpdate -bv cn.pool.ntp.org >/dev/null 2>&1
+    chronyc -a makestep >/dev/null 2>&1
     _success "Sync time completed..."
 
     StartDate=$(date "+%Y-%m-%d %H:%M:%S")
@@ -348,6 +358,7 @@ InstallPreSetting(){
     _check_ram
     _disable_selinux
     _get_package_manager
+    _set_timezone
     _install_tools
-    #_sync_time
+    _sync_time
 }
