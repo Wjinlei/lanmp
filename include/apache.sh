@@ -1,13 +1,13 @@
 _install_apache_depend(){
     _info "Starting to install dependencies packages for Apache..."
     if [ "${PM}" = "yum" ];then
-        local yum_depends=(libxml2-devel expat-devel zlib-devel)
+        local yum_depends=(expat-devel zlib-devel)
         for depend in ${yum_depends[@]}
         do
             InstallPack "yum -y install ${depend}"
         done
     elif [ "${PM}" = "apt-get" ];then
-        local apt_depends=(libxml2-dev libexpat1-dev zlib1g-dev)
+        local apt_depends=(libexpat1-dev zlib1g-dev)
         for depend in ${apt_depends[@]}
         do
             InstallPack "apt-get -y install ${depend}"
@@ -16,11 +16,78 @@ _install_apache_depend(){
     CheckInstalled "_install_pcre" ${pcre_location}
     CheckInstalled "_install_openssl" ${openssl_location}
     _install_nghttp2
+    _install_icu4c
+    _install_libxml2
+    _install_curl
 
     id -u www >/dev/null 2>&1
     [ $? -ne 0 ] && useradd -M -U www -r -d /dev/null -s /sbin/nologin
     mkdir -p ${wwwroot_dir}
     _success "Install dependencies packages for Apache completed..."
+}
+
+_install_libxml2() {
+    cd /tmp
+    _info "${libxml2_filename} install start..."
+    rm -fr ${libxml2_filename}
+    DownloadFile "${libxml2_filename}.tar.gz" "${libxml2_download_url}"
+    tar zxf ${libxml2_filename}.tar.gz
+    cd ${libxml2_filename}
+    CheckError "./configure --prefix=${libxml2_localtion} --with-icu=${icu4c_location}"
+    CheckError "parallel_make"
+    CheckError "make install"
+    AddToEnv "${libxml2_localtion}"
+    CreateLib64Dir "${libxml2_localtion}"
+    #if ! grep -qE "^${curl_location}/lib" /etc/ld.so.conf.d/*.conf; then
+        #echo "${curl_location}/lib" > /etc/ld.so.conf.d/curl.conf
+    #fi
+    ldconfig
+    _success "${libxml2_filename} install completed..."
+    rm -f /tmp/${libxml2_filename}.tar.gz
+    rm -fr /tmp/${libxml2_filename}
+}
+
+_install_icu4c() {
+    cd /tmp
+    _info "${icu4c_filename} install start..."
+    rm -fr ${icu4c_filename}
+    DownloadFile "icu4c-60_3-src.tgz" "${icu4c_download_url}"
+    tar zxf icu4c-60_3-src.tgz
+    cd ${icu4c_filename}/source
+    CheckError "./configure --prefix=${icu4c_location}"
+    CheckError "parallel_make"
+    CheckError "make install"
+    AddToEnv "${icu4c_location}"
+    CreateLib64Dir "${icu4c_location}"
+    if ! grep -qE "^${icu4c_location}/lib" /etc/ld.so.conf.d/*.conf; then
+        echo "${icu4c_location}/lib" > /etc/ld.so.conf.d/icu4c.conf
+    fi
+    ldconfig
+    _success "${icu4c_filename} install completed..."
+    rm -f /tmp/icu4c-60_3-src.tgz
+    rm -fr /tmp/${icu4c_filename}
+}
+
+_install_curl(){
+    cd /tmp
+    _info "${curl_filename} install start..."
+    rm -fr ${curl_filename}
+    DownloadFile "${curl_filename}.tar.gz" "${curl_download_url}"
+    tar zxf ${curl_filename}.tar.gz
+    cd ${curl_filename}
+    unset CFLAGS
+    CheckError "./configure --prefix=${curl_location} --with-ssl=${openssl_location}"
+    CheckError "parallel_make"
+    CheckError "make install"
+    AddToEnv "${curl_location}"
+    CreateLib64Dir "${curl_location}"
+    #if ! grep -qE "^${curl_location}/lib" /etc/ld.so.conf.d/*.conf; then
+        #echo "${curl_location}/lib" > /etc/ld.so.conf.d/curl.conf
+    #fi
+    ldconfig
+    _success "${curl_filename} install completed..."
+    rm -f /tmp/${curl_filename}.tar.gz
+    rm -fr /tmp/${curl_filename}
 }
 
 _install_pcre(){
@@ -128,6 +195,8 @@ install_apache(){
     --with-pcre=${pcre_location} \
     --with-ssl=${openssl_location} \
     --with-nghttp2=${nghttp2_location} \
+    --with-libxml2=${libxml2_localtion} \
+    --with-curl=${curl_location} \
     --with-mpm=event \
     --with-included-apr \
     --enable-modules=reallyall \
