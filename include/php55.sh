@@ -4,7 +4,7 @@ _install_php_depend(){
         local yum_depends=(
             autoconf patch m4 bison bzip2-devel pam-devel gmp-devel
             pcre-devel libtool-libs libtool-ltdl-devel libwebp-devel
-            libvpx-devel libjpeg-devel libpng-deve oniguruma-devel
+            libvpx-devel libjpeg-devel libpng-devel oniguruma-devel
             aspell-devel enchant-devel readline-devel unixODBC-devel
             libxslt-devel sqlite-devel libiodbc-devel php-odbc zlib-devel
             libXpm-devel libtidy-devel
