@@ -141,6 +141,8 @@ _install_tools(){
             zip
             unzip
             bzip2
+            xz
+            tar
         )
         for depend in ${yum_depends[@]}
         do
@@ -162,6 +164,8 @@ _install_tools(){
             zip
             unzip
             bzip2
+            xz
+            tar
         )
         for depend in ${apt_depends[@]}
         do
@@ -199,6 +203,8 @@ _install_tools(){
     _check_command_exist "killall"
     _check_command_exist "zip"
     _check_command_exist "unzip"
+    _check_command_exist "xz"
+    _check_command_exist "tar"
 }
 
 
