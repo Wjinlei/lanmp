@@ -164,7 +164,7 @@ _install_tools(){
             zip
             unzip
             bzip2
-            xz
+            xz-utils
             tar
         )
         for depend in ${apt_depends[@]}

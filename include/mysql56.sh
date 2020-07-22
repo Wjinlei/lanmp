@@ -1,7 +1,7 @@
 _install_mysql_depend(){
     _info "Starting to install dependencies packages for MySQL..."
     if [ "${PM}" = "yum" ];then
-        local yum_depends=(ncurses-libs ncurses-devel cmake m4 bison libaio libaio-devel numactl-devel libevent)
+        local yum_depends=(ncurses*-libs ncurses-devel cmake m4 bison libaio libaio-devel numactl-devel libevent)
         for depend in ${yum_depends[@]}
         do
             InstallPack "yum -y install ${depend}"

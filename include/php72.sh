@@ -7,7 +7,7 @@ _install_php_depend(){
             libvpx-devel libjpeg-devel libpng-devel oniguruma-devel
             aspell-devel enchant-devel readline-devel unixODBC-devel
             libxslt-devel sqlite-devel libiodbc-devel php-odbc zlib-devel
-            libXpm-devel libtidy-devel python-devel
+            libXpm-devel libtidy-devel python2-devel
         )
         for depend in ${yum_depends[@]}
         do
