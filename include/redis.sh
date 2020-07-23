@@ -1,5 +1,5 @@
 install_redis(){
-    pkill -9 redis-server > /dev/null 2>&1
+    pkill -9 redis-server >/dev/null 2>&1
     mkdir -p ${backup_dir}
     if [ -d "${redis_location}" ]; then 
         if [ -d "${backup_dir}/${redis_install_path_name}" ]; then

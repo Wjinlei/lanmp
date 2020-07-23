@@ -19,7 +19,7 @@ _install_pureftpd_depends(){
 }
 
 install_pureftpd(){
-    pkill -9 pure-ftpd > /dev/null 2>&1
+    pkill -9 pure-ftpd >/dev/null 2>&1
     mkdir -p ${backup_dir}
     if [ -d "${pureftpd_location}" ]; then 
         if [ -d "${backup_dir}/${pureftpd_install_path_name}" ]; then

@@ -150,8 +150,8 @@ _install_nghttp2(){
 
 
 install_apache(){
-    pkill -9 httpd > /dev/null 2>&1
-    pkill -9 nginx > /dev/null 2>&1
+    pkill -9 httpd >/dev/null 2>&1
+    pkill -9 nginx >/dev/null 2>&1
     mkdir -p ${backup_dir}
     if [ -d "${apache_location}" ]; then
         if [ -d "${backup_dir}/${apache_install_path_name}" ]; then

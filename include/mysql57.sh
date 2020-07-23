@@ -142,7 +142,7 @@ EOF
 }
 
 install_mysql57(){
-    pkill -9 mysqld > /dev/null 2>&1
+    pkill -9 mysqld >/dev/null 2>&1
     mkdir -p ${backup_dir}
     if [ -d "${mysql57_location}/mysql57_data" ]; then 
         if [ -d "${backup_dir}/mysql57_data" ]; then
