@@ -117,27 +117,18 @@ _install_tools(){
     _info "Starting to install development tools..."
     if [ "${PM}" = "yum" ];then
         InstallPack "yum -y install epel-release"
-        if [[ $(rpm -q yum |grep el8) != "" ]]; then
-            dnf -y install 'dnf-command(config-manager)'
-            dnf config-manager --enable PowerTools
-            dnf -y install chrony >/dev/null 2>&1
-            _check_command_exist "chronyc"
-        else
-            yum -y install ntpdate >/dev/null 2>&1
-            _check_command_exist "ntpdate"
-        fi
         yum_depends=(
             gcc
             gcc-c++
             make
             perl
-            #ntpdate
             wget
             net-tools
             openssl
             zlib
             automake
             psmisc
+            procps
             zip
             unzip
             bzip2
@@ -148,19 +139,22 @@ _install_tools(){
         do
             InstallPack "yum -y install ${depend}"
         done
+        dnf -y install dnf-plugins-core >/dev/null 2>&1 && dnf config-manager --enable PowerTools >/dev/null 2>&1
+        dnf -y install chrony >/dev/null 2>&1
+        yum -y install ntpdate >/dev/null 2>&1
     elif [ "${PM}" = "apt-get" ];then
         apt_depends=(
             gcc
             g++
             make
             perl
-            ntpdate
             wget
             net-tools
             openssl
             zlib1g
             automake
             psmisc
+            procps
             zip
             unzip
             bzip2
@@ -171,7 +165,7 @@ _install_tools(){
         do
             InstallPack "apt-get -y install ${depend}"
         done
-        _check_command_exist "ntpdate"
+        apt-get -y install ntpdate >/dev/null 2>&1
     fi
     if ! grep -qE "^/usr/local/lib" /etc/ld.so.conf.d/*.conf; then
         echo "/usr/local/lib" > /etc/ld.so.conf.d/locallib.conf
