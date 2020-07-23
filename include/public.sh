@@ -138,6 +138,7 @@ _install_tools(){
             zlib
             automake
             psmisc
+            procps-ng
             zip
             unzip
             bzip2
@@ -161,6 +162,7 @@ _install_tools(){
             zlib1g
             automake
             psmisc
+            procps
             zip
             unzip
             bzip2
@@ -201,6 +203,7 @@ _install_tools(){
     _check_command_exist "openssl"
     _check_command_exist "automake"
     _check_command_exist "killall"
+    _check_command_exist "pkill"
     _check_command_exist "zip"
     _check_command_exist "unzip"
     _check_command_exist "xz"

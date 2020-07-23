@@ -139,7 +139,7 @@ EOF
 }
 
 install_mysql80(){
-    killall mysqld > /dev/null 2>&1
+    pkill -9 mysqld > /dev/null 2>&1
     mkdir -p ${backup_dir}
     if [ -d "${mysql80_location}/mysql80_data" ]; then 
         if [ -d "${backup_dir}/mysql80_data" ]; then

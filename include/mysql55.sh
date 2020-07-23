@@ -142,7 +142,7 @@ EOF
 }
 
 install_mysql55(){
-    killall mysqld > /dev/null 2>&1
+    pkill -9 mysqld > /dev/null 2>&1
     mkdir -p ${backup_dir}
     if [ -d "${mysql55_location}/mysql55_data" ]; then 
         if [ -d "${backup_dir}/mysql55_data" ]; then

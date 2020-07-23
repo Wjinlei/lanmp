@@ -149,17 +149,17 @@ _install_nghttp2(){
 }
 
 
-install_apache(){ 
-    killall httpd > /dev/null 2>&1
-    killall nginx > /dev/null 2>&1
+install_apache(){
+    pkill -9 httpd > /dev/null 2>&1
+    pkill -9 nginx > /dev/null 2>&1
     mkdir -p ${backup_dir}
-    if [ -d "${apache_location}" ]; then 
+    if [ -d "${apache_location}" ]; then
         if [ -d "${backup_dir}/${apache_install_path_name}" ]; then
             mv ${backup_dir}/${apache_install_path_name} ${backup_dir}/${apache_install_path_name}-$(date +%Y-%m-%d_%H:%M:%S).bak
         fi
         mv ${apache_location} ${backup_dir}
     fi
-    _install_apache_depend 
+    _install_apache_depend
     cd /tmp
     _info "Downloading and Extracting ${apache_filename} files..."
     DownloadFile "${apache_filename}.tar.gz" ${apache_download_url}
