@@ -340,6 +340,14 @@ _config_php(){
         sed -i 's/^short_open_tag.*/short_open_tag = On/g' ${php56_location}/etc/php.ini
     fi
 
+    # always_populate_raw_post_data = -1
+    always_populate_raw_post_data=`grep "^always_populate_raw_post_data" ${php56_location}/etc/php.ini |wc -l`
+    if [[ ${always_populate_raw_post_data} -eq 0 ]];then
+        echo 'always_populate_raw_post_data = -1' >> ${php56_location}/etc/php.ini
+    else
+        sed -i 's/^always_populate_raw_post_data.*/always_populate_raw_post_data = -1/g' ${php56_location}/etc/php.ini
+    fi
+
     extension_dir=$(${php56_location}/bin/php-config --extension-dir)
     cat > ${php56_location}/php.d/opcache.ini<<EOF
 [opcache]
