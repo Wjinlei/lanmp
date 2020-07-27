@@ -317,8 +317,13 @@ _config_php(){
     sed -i 's/expose_php =.*/expose_php = Off/g' ${php70_location}/etc/php.ini
     sed -i 's/;cgi.fix_pathinfo=.*/cgi.fix_pathinfo=1/g' ${php70_location}/etc/php.ini
     sed -i 's/max_execution_time =.*/max_execution_time = 300/g' ${php70_location}/etc/php.ini
-    sed -i 's#;curl.cainfo =.*#curl.cainfo = /etc/pki/tls/certs/ca-bundle.crt#g' ${php70_location}/etc/php.ini
-    sed -i 's#;openssl.cafile=.*#openssl.cafile=/etc/pki/tls/certs/ca-bundle.crt#g' ${php70_location}/etc/php.ini
+    if [ -f /etc/pki/tls/certs/ca-bundle.crt ]; then
+        sed -i 's#;curl.cainfo =.*#curl.cainfo = /etc/pki/tls/certs/ca-bundle.crt#g' ${php70_location}/etc/php.ini
+        sed -i 's#;openssl.cafile=.*#openssl.cafile=/etc/pki/tls/certs/ca-bundle.crt#g' ${php70_location}/etc/php.ini
+    elif [ -f /etc/ssl/certs/ca-certificates.crt ]; then
+        sed -i 's#;curl.cainfo =.*#curl.cainfo = /etc/ssl/certs/ca-certificates.crt#g' ${php70_location}/etc/php.ini
+        sed -i 's#;openssl.cafile=.*#openssl.cafile=/etc/ssl/certs/ca-certificates.crt#g' ${php70_location}/etc/php.ini
+    fi
     sed -i '/disable_functions =.*/disable_functions = passthru,exec,system,chroot,chgrp,chown,shell_exec,popen,proc_open,pcntl_exec,ini_alter,ini_restore,dl,openlog,syslog,popepassthru,pcntl_alarm,pcntl_fork,pcntl_waitpid,pcntl_wait,pcntl_wifexited,pcntl_wifstopped,pcntl_wifsignaled,pcntl_wifcontinued,pcntl_wexitstatus,pcntl_wtermsig,pcntl_wstopsig,pcntl_signal,pcntl_signal_dispatch,pcntl_get_last_error,pcntl_strerror,pcntl_sigprocmask,pcntl_sigwaitinfo,pcntl_sigtimedwait,pcntl_exec,pcntl_getpriority,pcntl_setpriority,imap_open,apache_setenv/g' ${php70_location}/etc/php.ini
 
     extension_dir=$(${php70_location}/bin/php-config --extension-dir)
