@@ -308,45 +308,18 @@ _config_php(){
     mkdir -p ${php72_location}/{etc,php.d}
     cp -f php.ini-production ${php72_location}/etc/php.ini
 
-    # disable_functions
-    php_disable_functions=`grep "^disable_functions" ${php72_location}/etc/php.ini |wc -l`
-    if [[ ${php_disable_functions} -eq 0 ]];then
-        echo "disable_functions = passthru,exec,system,chroot,chgrp,chown,shell_exec,popen,proc_open,pcntl_exec,ini_alter,ini_restore,dl,openlog,syslog,popepassthru,pcntl_alarm,pcntl_fork,pcntl_waitpid,pcntl_wait,pcntl_wifexited,pcntl_wifstopped,pcntl_wifsignaled,pcntl_wifcontinued,pcntl_wexitstatus,pcntl_wtermsig,pcntl_wstopsig,pcntl_signal,pcntl_signal_dispatch,pcntl_get_last_error,pcntl_strerror,pcntl_sigprocmask,pcntl_sigwaitinfo,pcntl_sigtimedwait,pcntl_exec,pcntl_getpriority,pcntl_setpriority,imap_open,apache_setenv" >> ${php72_location}/etc/php.ini
-    else
-        sed -i '/^disable_functions/ s/.*/disable_functions = passthru,exec,system,chroot,chgrp,chown,shell_exec,popen,proc_open,pcntl_exec,ini_alter,ini_restore,dl,openlog,syslog,popepassthru,pcntl_alarm,pcntl_fork,pcntl_waitpid,pcntl_wait,pcntl_wifexited,pcntl_wifstopped,pcntl_wifsignaled,pcntl_wifcontinued,pcntl_wexitstatus,pcntl_wtermsig,pcntl_wstopsig,pcntl_signal,pcntl_signal_dispatch,pcntl_get_last_error,pcntl_strerror,pcntl_sigprocmask,pcntl_sigwaitinfo,pcntl_sigtimedwait,pcntl_exec,pcntl_getpriority,pcntl_setpriority,imap_open,apache_setenv/' ${php72_location}/etc/php.ini
-    fi
-
-    # mysqld
-    if [[ -d "${mysql_data_location}" ]]; then
-        sock_location=/tmp/mysql.sock
-        sed -i "s#mysql.default_socket.*#mysql.default_socket = ${sock_location}#" ${php72_location}/etc/php.ini
-        sed -i "s#mysqli.default_socket.*#mysqli.default_socket = ${sock_location}#" ${php72_location}/etc/php.ini
-        sed -i "s#pdo_mysql.default_socket.*#pdo_mysql.default_socket = ${sock_location}#" ${php72_location}/etc/php.ini
-    fi
-
-    # default_charset
-    php_default_charset=`grep "^default_charset" ${php72_location}/etc/php.ini |wc -l`
-    if [[ ${php_default_charset} -eq 0 ]];then
-        echo 'default_charset = "UTF-8"' >> ${php72_location}/etc/php.ini
-    else
-        sed -i 's/^default_charset.*/default_charset = "UTF-8"/g' ${php72_location}/etc/php.ini
-    fi
-
-    # short_open_tag
-    short_open_tag=`grep "^short_open_tag" ${php72_location}/etc/php.ini |wc -l`
-    if [[ ${short_open_tag} -eq 0 ]];then
-        echo 'short_open_tag = On' >> ${php72_location}/etc/php.ini
-    else
-        sed -i 's/^short_open_tag.*/short_open_tag = On/g' ${php72_location}/etc/php.ini
-    fi
-
-    # always_populate_raw_post_data = -1
-    always_populate_raw_post_data=`grep "^always_populate_raw_post_data" ${php72_location}/etc/php.ini |wc -l`
-    if [[ ${always_populate_raw_post_data} -eq 0 ]];then
-        echo 'always_populate_raw_post_data = -1' >> ${php72_location}/etc/php.ini
-    else
-        sed -i 's/^always_populate_raw_post_data.*/always_populate_raw_post_data = -1/g' ${php72_location}/etc/php.ini
-    fi
+    sed -i 's/default_charset =.*/default_charset = "UTF-8"/g' ${php72_location}/etc/php.ini
+    sed -i 's/;always_populate_raw_post_data =.*/always_populate_raw_post_data = -1/g' ${php72_location}/etc/php.ini
+    sed -i 's/post_max_size =.*/post_max_size = 100M/g' ${php72_location}/etc/php.ini
+    sed -i 's/upload_max_filesize =.*/upload_max_filesize = 100M/g' ${php72_location}/etc/php.ini
+    sed -i 's/;date.timezone =.*/date.timezone = PRC/g' ${php72_location}/etc/php.ini
+    sed -i 's/short_open_tag =.*/short_open_tag = On/g' ${php72_location}/etc/php.ini
+    sed -i 's/expose_php =.*/expose_php = Off/g' ${php72_location}/etc/php.ini
+    sed -i 's/;cgi.fix_pathinfo=.*/cgi.fix_pathinfo=1/g' ${php72_location}/etc/php.ini
+    sed -i 's/max_execution_time =.*/max_execution_time = 300/g' ${php72_location}/etc/php.ini
+    sed -i 's#;curl.cainfo =.*#curl.cainfo = /etc/pki/tls/certs/ca-bundle.crt#g' ${php72_location}/etc/php.ini
+    sed -i 's#;openssl.cafile=.*#openssl.cafile=/etc/pki/tls/certs/ca-bundle.crt#g' ${php72_location}/etc/php.ini
+    sed -i '/disable_functions =.*/disable_functions = passthru,exec,system,chroot,chgrp,chown,shell_exec,popen,proc_open,pcntl_exec,ini_alter,ini_restore,dl,openlog,syslog,popepassthru,pcntl_alarm,pcntl_fork,pcntl_waitpid,pcntl_wait,pcntl_wifexited,pcntl_wifstopped,pcntl_wifsignaled,pcntl_wifcontinued,pcntl_wexitstatus,pcntl_wtermsig,pcntl_wstopsig,pcntl_signal,pcntl_signal_dispatch,pcntl_get_last_error,pcntl_strerror,pcntl_sigprocmask,pcntl_sigwaitinfo,pcntl_sigtimedwait,pcntl_exec,pcntl_getpriority,pcntl_setpriority,imap_open,apache_setenv/g' ${php72_location}/etc/php.ini
 
     extension_dir=$(${php72_location}/bin/php-config --extension-dir)
     cat > ${php72_location}/php.d/opcache.ini<<EOF
