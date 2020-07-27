@@ -161,6 +161,7 @@ _install_tools(){
             xz-utils
             tar
         )
+        apt-get update > /dev/null 2>&1
         for depend in ${apt_depends[@]}
         do
             InstallPack "apt-get -y install ${depend}"
