@@ -1,9 +1,9 @@
 load_config(){
 # Install prefix
-prefix=/hwslinuxmaster
+prefix=/linuxmaster
 
 # download Url
-download_root_url="https://d.hws.com/free/hwslinuxmaster/soft/"
+download_root_url="https://d.hws.com/linux/master/soft/"
 
 # parallel compile option,1:enable,0:disable
 parallel_compile=1

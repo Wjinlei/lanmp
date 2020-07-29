@@ -353,12 +353,12 @@ mod_xml2enc.so
 Listen 999
 <VirtualHost *:999>
     ServerAdmin webmaster@example.com
-    DocumentRoot /hwslinuxmaster/default/pma
+    DocumentRoot ${prefix}/default/pma
     ServerName phpMyAdmin.999
     ServerAlias localhost
     #errorDocument 404 /404.html
-    ErrorLog "/hwslinuxmaster/default/pma/pma-error.log"
-    CustomLog "/hwslinuxmaster/default/pma/pma-access.log" combined
+    ErrorLog "${prefix}/default/pma/pma-error.log"
+    CustomLog "${prefix}/default/pma/pma-access.log" combined
 
     #DENY FILES
     <Files ~ (\.user.ini|\.sql|\.zip|\.gz|\.htaccess|\.git|\.svn|\.project|LICENSE|README.md)\$>
@@ -372,7 +372,7 @@ Listen 999
     </FilesMatch>
 
     #PATH
-    <Directory /hwslinuxmaster/default/pma>
+    <Directory ${prefix}/default/pma>
         SetOutputFilter DEFLATE
         Options FollowSymLinks
         AllowOverride All

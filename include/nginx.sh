@@ -163,10 +163,10 @@ http {
     server {
        listen 999;
        server_name localhost;
-       root /hwslinuxmaster/default/pma;
+       root ${prefix}/default/pma;
        index index.php default.php index.html index.htm default.html default.htm;
-       error_log "/hwslinuxmaster/default/pma/pma-error.log";
-       access_log "/hwslinuxmaster/default/pma/pma-access.log";
+       error_log "${prefix}/default/pma/pma-error.log";
+       access_log "${prefix}/default/pma/pma-access.log";
 
        #DENY FILES
        location ~ ^/(\.user.ini|\.sql|\.zip|\.gz|\.htaccess|\.git|\.svn|\.project|LICENSE|README.md)

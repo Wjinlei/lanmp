@@ -51,13 +51,13 @@ L(Linux) + A(Apache) + N(Nginx) + M(MySQL) + P(PHP) 安装脚本<br/>
 ./install.sh --help
 
 example:
-# 安装apache到默认位置(/hwslinuxmaster)
+# 安装apache到默认位置(/linuxmaster)
 ./install.sh --install-apache
 
 # 安装apache到/www/apache目录
 ./install.sh --install-apache /www/apache
 
-PS:参数以空格分隔,第一个参数表示要执行的功能,第二参数表示要安装的位置,如果指定,则默认安装到/hwslinuxmaster
+PS:参数以空格分隔,第一个参数表示要执行的功能,第二参数表示要安装的位置,如果指定,则默认安装到/linuxmaster
 
 
 # 用于给php安装扩展(目前只支持安装php-redis扩展,更多扩展安装功能开发中...)
@@ -69,7 +69,7 @@ PS:参数以空格分隔,第一个参数表示要执行的功能,第二个参数
 
 
 写在最后:
-环境安装后,会固定生成/hwslinuxmaster/install.result文件,里面记录了软件的相关信息
-/hwslinuxmaster 目录可以自己根据自身情况选择删除
+环境安装后,会固定生成/linuxmaster/install.result文件,里面记录了软件的相关信息
+/linuxmaster 目录可以自己根据自身情况选择删除
 软件位置可以重复安装,重复安装不会造成配置丢失,脚本会自动备份配置并还原
 ```
