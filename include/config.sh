@@ -1,6 +1,6 @@
 load_config(){
 # Install prefix
-prefix=/linuxmaster
+prefix=/hwsmaster
 
 # download Url
 download_root_url="https://d.hws.com/linux/master/soft/"
