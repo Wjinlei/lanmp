@@ -201,7 +201,6 @@ _install_tools(){
     _check_command_exist "unzip"
     _check_command_exist "xz"
     _check_command_exist "tar"
-    _check_command_exist "service"
 }
 
 
