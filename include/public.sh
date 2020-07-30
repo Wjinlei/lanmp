@@ -142,7 +142,6 @@ _install_tools(){
         dnf -y install dnf-plugins-core >/dev/null 2>&1 && dnf config-manager --enable PowerTools >/dev/null 2>&1
         dnf -y install chrony >/dev/null 2>&1
         yum -y install ntpdate >/dev/null 2>&1
-        yum -y install initscripts >/dev/null 2>&1
     elif [ "${PM}" = "apt-get" ];then
         apt_depends=(
             gcc
@@ -163,15 +162,11 @@ _install_tools(){
             tar
         )
         apt-get update > /dev/null 2>&1
-        sed -i 's/UTC=.*/UTC=no/g' /etc/default/rcS >/dev/null 2>&1
-        timedatectl set-local-rtc 1 --adjust-system-clock >/dev/null 2>&1
         for depend in ${apt_depends[@]}
         do
             InstallPack "apt-get -y install ${depend}"
         done
         apt-get -y install ntpdate >/dev/null 2>&1
-        apt-get -y install initscripts >/dev/null 2>&1
-        apt-get -y install sysvinit-utils >/dev/null 2>&1
     fi
     if ! grep -qE "^/usr/local/lib" /etc/ld.so.conf.d/*.conf; then
         echo "/usr/local/lib" > /etc/ld.so.conf.d/locallib.conf
