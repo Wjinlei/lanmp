@@ -163,6 +163,8 @@ _install_tools(){
             tar
         )
         apt-get update > /dev/null 2>&1
+        sed -i 's/UTC=.*/UTC=no/g' /etc/default/rcS >/dev/null 2>&1
+        timedatectl set-local-rtc 1 --adjust-system-clock >/dev/null 2>&1
         for depend in ${apt_depends[@]}
         do
             InstallPack "apt-get -y install ${depend}"
