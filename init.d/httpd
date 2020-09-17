@@ -18,6 +18,7 @@ NAME=httpd
 PID_FILE=$prefix/logs/$NAME.pid
 BIN=$prefix/bin/$NAME
 CONFIG_FILE=$prefix/conf/$NAME.conf
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:{openssl_location_lib}
 
 start()
 {

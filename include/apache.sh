@@ -210,6 +210,7 @@ install_apache(){
     wget --no-check-certificate -cv -t3 -T60 -O /etc/init.d/httpd ${download_sysv_url}/httpd
     if [ "$?" == 0 ]; then
         sed -i "s|^prefix={apache_location}$|prefix=${apache_location}|i" /etc/init.d/httpd
+        sed -i "s|{openssl_location_lib}|${openssl_location}/lib|i" /etc/init.d/httpd
         chmod +x /etc/init.d/httpd
         chkconfig --add httpd > /dev/null 2>&1
         update-rc.d -f httpd defaults > /dev/null 2>&1
