@@ -172,10 +172,9 @@ install_mysql56(){
     _create_mysql_config
     chown -R mysql:mysql ${mysql56_location}
     _info "Init MySQL..."
-    ${mysql56_location}/scripts/mysql_install_db --basedir=${mysql56_location} --datadir=${mysql56_location}/mysql56_data --user=mysql
-    if [ "$?" != 0 ]; then
-        exit 1
-    fi
+    CheckError "${mysql56_location}/scripts/mysql_install_db \
+        --basedir=${mysql56_location} \
+        --datadir=${mysql56_location}/mysql56_data --user=mysql"
     _config_mysql
 
     cp -f ${mysql56_location}/support-files/mysql.server /etc/init.d/mysql56
