@@ -169,13 +169,16 @@ install_mysql80(){
     _create_mysql_config
     chown -R mysql:mysql ${mysql80_location}
     _info "Init MySQL..."
-    CheckError "${mysql80_location}/bin/mysqld --initialize-insecure --basedir=${mysql80_location} --datadir=${mysql80_location}/mysql80_data --user=mysql"
+    ${mysql80_location}/bin/mysqld --initialize-insecure --basedir=${mysql80_location} --datadir=${mysql80_location}/mysql80_data --user=mysql
+    if [ "$?" != 0 ]; then
+        exit 1
+    fi
     _config_mysql
 
     cp -f ${mysql80_location}/support-files/mysql.server /etc/init.d/mysql80
     chkconfig --add mysql80 > /dev/null 2>&1
     update-rc.d -f mysql80 defaults > /dev/null 2>&1
-    service mysql80 restart
+    service mysql80 restart > /dev/null 2>&1
 
     cat >> ${prefix}/install.result <<EOF
 Install Time: $(date +%Y-%m-%d_%H:%M:%S)

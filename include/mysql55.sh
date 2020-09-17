@@ -172,13 +172,16 @@ install_mysql55(){
     _create_mysql_config
     chown -R mysql:mysql ${mysql55_location}
     _info "Init MySQL..."
-    CheckError "${mysql55_location}/scripts/mysql_install_db --basedir=${mysql55_location} --datadir=${mysql55_location}/mysql55_data --user=mysql"
+    ${mysql55_location}/scripts/mysql_install_db --basedir=${mysql55_location} --datadir=${mysql55_location}/mysql55_data --user=mysql
+    if [ "$?" != 0 ]; then
+        exit 1
+    fi
     _config_mysql
 
     cp -f ${mysql55_location}/support-files/mysql.server /etc/init.d/mysql55
     chkconfig --add mysql55 > /dev/null 2>&1
     update-rc.d -f mysql55 defaults > /dev/null 2>&1
-    service mysql55 restart
+    service mysql55 restart > /dev/null 2>&1
 
     cat >> ${prefix}/install.result <<EOF
 Install Time: $(date +%Y-%m-%d_%H:%M:%S)

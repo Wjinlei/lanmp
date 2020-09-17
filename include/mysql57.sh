@@ -172,13 +172,16 @@ install_mysql57(){
     _create_mysql_config
     chown -R mysql:mysql ${mysql57_location}
     _info "Init MySQL..."
-    CheckError "${mysql57_location}/bin/mysqld --initialize-insecure --basedir=${mysql57_location} --datadir=${mysql57_location}/mysql57_data --user=mysql"
+    ${mysql57_location}/bin/mysqld --initialize-insecure --basedir=${mysql57_location} --datadir=${mysql57_location}/mysql57_data --user=mysql
+    if [ "$?" != 0 ]; then
+        exit 1
+    fi
     _config_mysql
 
     cp -f ${mysql57_location}/support-files/mysql.server /etc/init.d/mysql57
     chkconfig --add mysql57 > /dev/null 2>&1
     update-rc.d -f mysql57 defaults > /dev/null 2>&1
-    service mysql57 restart
+    service mysql57 restart > /dev/null 2>&1
 
     cat >> ${prefix}/install.result <<EOF
 Install Time: $(date +%Y-%m-%d_%H:%M:%S)
