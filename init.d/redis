@@ -12,7 +12,7 @@
 # Description:       redis service script
 ### END INIT INFO
 
-prefix=/hwsmaster/server/Redis
+prefix={redis_location}
 
 NAME=redis-server
 BIN=$prefix/bin/$NAME

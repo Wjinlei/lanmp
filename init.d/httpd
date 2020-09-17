@@ -12,7 +12,7 @@
 # Description:       apache service script
 ### END INIT INFO
 
-prefix=/hwsmaster/server/Apache
+prefix={apache_location}
 
 NAME=httpd
 PID_FILE=$prefix/logs/$NAME.pid

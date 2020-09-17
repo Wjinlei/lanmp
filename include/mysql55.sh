@@ -38,7 +38,7 @@ _install_mysql_depend(){
 }
 
 _config_mysql(){
-    sed -i "s:^basedir=.*:basedir=${mysql55_location}:g" ${mysql55_location}/support-files/mysql.server
+    sed -i "s|^basedir=.*|basedir=${mysql55_location}|g" ${mysql55_location}/support-files/mysql.server
     _info "Starting MySQL..."
     ${mysql55_location}/support-files/mysql.server start > /dev/null 2>&1
     ${mysql55_location}/bin/mysql -e "GRANT ALL PRIVILEGES ON *.* to root@'127.0.0.1' IDENTIFIED BY \"${mysql_pass}\" WITH GRANT OPTION;"
@@ -174,8 +174,12 @@ install_mysql55(){
     _info "Init MySQL..."
     ${mysql55_location}/scripts/mysql_install_db --basedir=${mysql55_location} --datadir=${mysql55_location}/mysql55_data --user=mysql
     _config_mysql
-    _info "Restart MySQL..."
-    ${mysql55_location}/support-files/mysql.server restart >/dev/null 2>&1
+
+    cp -f ${mysql55_location}/support-files/mysql.server /etc/init.d/mysql55
+    chkconfig --add mysql55 > /dev/null 2>&1
+    update-rc.d -f mysql55 defaults > /dev/null 2>&1
+    service mysql55 restart
+
     cat >> ${prefix}/install.result <<EOF
 Install Time: $(date +%Y-%m-%d_%H:%M:%S)
 MySQL55 Install Path:${mysql55_location}

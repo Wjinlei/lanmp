@@ -84,9 +84,20 @@ install_nginx(){
         _config_nginx
     #fi
     chown -R www:www ${nginx_location}
-    _info "Start ${nginx_filename}"
-    ${nginx_location}/sbin/nginx -t
-    ${nginx_location}/sbin/nginx >/dev/null 2>&1
+
+    # 下载服务脚本
+    wget --no-check-certificate -cv -t3 -T60 -O /etc/init.d/nginx ${download_sysv_url}/nginx
+    if [ "$?" == 0 ]; then
+        sed -i "s|^prefix={nginx_location}$|prefix=${nginx_location}|i" /etc/init.d/nginx
+        chmod +x /etc/init.d/nginx
+        chkconfig --add nginx > /dev/null 2>&1
+        update-rc.d -f nginx defaults > /dev/null 2>&1
+        service nginx start
+    else
+        _info "Start ${nginx_filename}"
+        ${nginx_location}/sbin/nginx
+    fi
+
     _success "${nginx_filename} install completed..."
     cat >> ${prefix}/install.result <<EOF
 Install Time: $(date +%Y-%m-%d_%H:%M:%S)

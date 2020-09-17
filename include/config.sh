@@ -4,6 +4,7 @@ prefix=/hwsmaster
 
 # download Url
 download_root_url="https://d.hws.com/linux/master/soft/"
+download_sysv_url="https://d.hws.com/linux/master/script/init.d/"
 
 # parallel compile option,1:enable,0:disable
 parallel_compile=1

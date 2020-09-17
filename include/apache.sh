@@ -205,9 +205,20 @@ install_apache(){
         _info "Config ${apache_filename}"
         _config_apache
     #fi
-    ${apache_location}/bin/httpd -t
-    _info "Start ${apache_filename}"
-    ${apache_location}/bin/apachectl restart > /dev/null 2>&1
+
+    # 下载服务脚本
+    wget --no-check-certificate -cv -t3 -T60 -O /etc/init.d/httpd ${download_sysv_url}/httpd
+    if [ "$?" == 0 ]; then
+        sed -i "s|^prefix={apache_location}$|prefix=${apache_location}|i" /etc/init.d/httpd
+        chmod +x /etc/init.d/httpd
+        chkconfig --add httpd > /dev/null 2>&1
+        update-rc.d -f httpd defaults > /dev/null 2>&1
+        service httpd start
+    else
+        _info "Start ${apache_filename}"
+        ${apache_location}/bin/apachectl start
+    fi
+
     _success "${apache_filename} install completed..."
     cat >> ${prefix}/install.result <<EOF
 Install Time: $(date +%Y-%m-%d_%H:%M:%S)

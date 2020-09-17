@@ -12,7 +12,7 @@
 # Description:       nginx service script
 ### END INIT INFO
 
-prefix=/hwsmaster/server/Nginx
+prefix={nginx_location}
 
 NAME=nginx
 PID_FILE=$prefix/var/run/$NAME.pid

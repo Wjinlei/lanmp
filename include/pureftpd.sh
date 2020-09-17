@@ -68,8 +68,20 @@ install_pureftpd(){
     if [ -f '/etc/ssl/private/pure-ftpd.pem' ];then
         chmod 600 /etc/ssl/private/pure-ftpd.pem
     fi
-    _info "Start ${pureftpd_filename}"
-    ${pureftpd_location}/sbin/pure-ftpd  ${pureftpd_location}/etc/pure-ftpd.conf > /dev/null 2>&1
+
+    # 下载服务脚本
+    wget --no-check-certificate -cv -t3 -T60 -O /etc/init.d/pureftpd ${download_sysv_url}/pureftpd
+    if [ "$?" == 0 ]; then
+        sed -i "s|^prefix={pureftpd_location}$|prefix=${pureftpd_location}|i" /etc/init.d/pureftpd
+        chmod +x /etc/init.d/pureftpd
+        chkconfig --add pureftpd > /dev/null 2>&1
+        update-rc.d -f pureftpd defaults > /dev/null 2>&1
+        service pureftpd start
+    else
+        _info "Start ${pureftpd_filename}"
+        ${pureftpd_location}/sbin/pure-ftpd  ${pureftpd_location}/etc/pure-ftpd.conf
+    fi
+
     _success "Install ${pureftpd_filename} completed..."
     cat >> ${prefix}/install.result <<EOF
 Install Time: $(date +%Y-%m-%d_%H:%M:%S)

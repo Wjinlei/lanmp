@@ -12,7 +12,7 @@
 # Description:       pure-ftpd service script
 ### END INIT INFO
 
-prefix=/hwsmaster/server/PureFTPd
+prefix={pureftpd_location}
 
 NAME=pure-ftpd
 BIN=$prefix/sbin/$NAME

@@ -361,7 +361,19 @@ EOF
 EOF
     mkdir -p ${php55_location}/var/run
     mkdir -p ${php55_location}/var/log
-    ${php55_location}/sbin/php-fpm -y ${php55_location}/etc/default.conf >/dev/null 2>&1
+
+    # 下载服务脚本
+    wget --no-check-certificate -cv -t3 -T60 -O /etc/init.d/php55 ${download_sysv_url}/php-fpm
+    if [ "$?" == 0 ]; then
+        sed -i "s|^prefix={php-fpm_location}$|prefix=${php55_location}|i" /etc/init.d/php55
+        chmod +x /etc/init.d/php55
+        chkconfig --add php55 > /dev/null 2>&1
+        update-rc.d -f php55 defaults > /dev/null 2>&1
+        service php55 start
+    else
+        _info "Start ${php55_filename}"
+        ${php55_location}/sbin/php-fpm -y ${php55_location}/etc/default.conf
+    fi
 
     _warn "Please add the following two lines to your httpd.conf"
     echo AddType application/x-httpd-php .php .phtml

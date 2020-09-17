@@ -12,7 +12,7 @@
 # Description:       php-fpm service script
 ### END INIT INFO
 
-prefix=/hwsmaster/server/PHP5_4_45
+prefix={php-fpm_location}
 
 NAME=php-fpm
 BIN=$prefix/sbin/$NAME

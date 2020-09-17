@@ -38,7 +38,7 @@ _install_mysql_depend(){
 }
 
 _config_mysql(){
-    sed -i "s:^basedir=.*:basedir=${mysql56_location}:g" ${mysql56_location}/support-files/mysql.server
+    sed -i "s|^basedir=.*|basedir=${mysql56_location}|g" ${mysql56_location}/support-files/mysql.server
     _info "Starting MySQL..."
     ${mysql56_location}/support-files/mysql.server start > /dev/null 2>&1
     ${mysql56_location}/bin/mysql -e "GRANT ALL PRIVILEGES ON *.* to root@'127.0.0.1' IDENTIFIED BY \"${mysql_pass}\" WITH GRANT OPTION;"
@@ -174,8 +174,12 @@ install_mysql56(){
     _info "Init MySQL..."
     ${mysql56_location}/scripts/mysql_install_db --basedir=${mysql56_location} --datadir=${mysql56_location}/mysql56_data --user=mysql
     _config_mysql
-    _info "Restart MySQL..."
-    ${mysql56_location}/support-files/mysql.server restart >/dev/null 2>&1
+
+    cp -f ${mysql56_location}/support-files/mysql.server /etc/init.d/mysql56
+    chkconfig --add mysql56 > /dev/null 2>&1
+    update-rc.d -f mysql56 defaults > /dev/null 2>&1
+    service mysql56 restart
+
     cat >> ${prefix}/install.result <<EOF
 Install Time: $(date +%Y-%m-%d_%H:%M:%S)
 MySQL56 Install Path:${mysql56_location}
