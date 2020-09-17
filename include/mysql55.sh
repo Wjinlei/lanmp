@@ -173,6 +173,10 @@ install_mysql55(){
     chown -R mysql:mysql ${mysql55_location}
     _info "Init MySQL..."
     ${mysql55_location}/scripts/mysql_install_db --basedir=${mysql55_location} --datadir=${mysql55_location}/mysql55_data --user=mysql
+    if [ "$?" != 0 ]; then
+        echo "Install $mysql55_filename failed!"
+        exit 1
+    fi
     _config_mysql
 
     cp -f ${mysql55_location}/support-files/mysql.server /etc/init.d/mysql55

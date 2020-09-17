@@ -170,6 +170,10 @@ install_mysql80(){
     chown -R mysql:mysql ${mysql80_location}
     _info "Init MySQL..."
     ${mysql80_location}/bin/mysqld --initialize-insecure --basedir=${mysql80_location} --datadir=${mysql80_location}/mysql80_data --user=mysql
+    if [ "$?" != 0 ]; then
+        echo "Install $mysql80_filename failed!"
+        exit 1
+    fi
     _config_mysql
 
     cp -f ${mysql80_location}/support-files/mysql.server /etc/init.d/mysql80
