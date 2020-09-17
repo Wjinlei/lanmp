@@ -1,0 +1,137 @@
+#!/bin/bash
+# chkconfig: 2345 55 25
+# description: apache service script
+
+### BEGIN INIT INFO
+# Provides:          apache
+# Required-Start:    $all
+# Required-Stop:     $all
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: apache
+# Description:       apache service script
+### END INIT INFO
+
+prefix=/hwsmaster/server/Apache
+
+NAME=httpd
+PID_FILE=$prefix/logs/$NAME.pid
+BIN=$prefix/bin/$NAME
+CONFIG_FILE=$prefix/conf/$NAME.conf
+
+start()
+{
+    echo -n "Starting $NAME..."
+    if [ -f $PID_FILE ];then
+        mPID=`cat $PID_FILE`
+        isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
+        if [ "$isRunning" != '' ];then
+            echo "$NAME (pid `pidof $NAME`) already running."
+            exit 1
+        fi
+    fi
+    $BIN -k start
+    if [ "$?" != 0 ] ; then
+        echo " failed"
+        exit 1
+    else
+        echo " done"
+    fi
+}
+
+stop()
+{
+    echo -n "Stoping $NAME... "
+    if [ -f $PID_FILE ];then
+        mPID=`cat $PID_FILE`
+        isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
+        if [ "$isRunning" = '' ];then
+            echo "$NAME is not running."
+            exit 1
+        fi
+    else
+        echo "PID file found, $NAME is not running ?"
+        exit 1
+    fi
+    $BIN -k stop
+    if [ "$?" != 0 ] ; then
+        echo " failed"
+        exit 1
+    else
+        echo " done"
+    fi
+}
+
+restart(){
+    echo -n "Restarting $NAME..."
+    $BIN -k restart
+    if [ "$?" != 0 ] ; then
+        echo " failed"
+        exit 1
+    else
+        echo " done"
+    fi
+}
+
+reload() {
+    echo -n "Reload service $NAME... "
+    if [ -f $PID_FILE ];then
+        mPID=`cat $PID_FILE`
+        isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
+        if [ "$isRunning" != '' ];then
+            $BIN -k graceful
+            echo " done"
+        else
+            echo "$NAME is not running, can't reload."
+            exit 1
+        fi
+    else
+        echo "$NAME is not running, can't reload."
+        exit 1
+    fi
+}
+
+status(){
+    if [ -f $PID_FILE ];then
+        mPID=`cat $PID_FILE`
+        isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
+        if [ "$isRunning" != '' ];then
+            echo "$NAME (pid `pidof $NAME`) already running."
+            exit 1
+        else
+            echo "$NAME is stopped"
+            exit 0
+        fi
+    else
+        echo "$NAME is stopped"
+        exit 0
+    fi
+}
+
+configtest() {
+    echo "Test $NAME configure files... "
+    $BIN -t
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+        restart
+        ;;
+    status)
+        status
+        ;;
+    reload)
+        reload
+        ;;
+    test)
+        configtest
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|restart|reload|status|test}"
+esac
