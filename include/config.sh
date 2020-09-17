@@ -179,13 +179,6 @@ libzip_download_url="https://libzip.org/download/libzip-1.3.2.tar.gz"
 phpmyadmin_filename="phpMyAdmin-4.6.6-all-languages"
 phpmyadmin_download_url="https://files.phpmyadmin.net/phpMyAdmin/4.6.6/phpMyAdmin-4.6.6-all-languages.tar.gz"
 
-# grotty
-gotty_x86_64_filename="gotty_linux_amd64"
-gotty_x86_64_download_url="https://github.com/yudai/gotty/releases/download/v1.0.1/gotty_linux_amd64.tar.gz"
-gotty_i686_filename="gotty_linux_386"
-gotty_i686_download_url="https://github.com/yudai/gotty/releases/download/v1.0.1/gotty_linux_386.tar.gz"
-gotty_location=${prefix}/bin
-
 # Other
 wwwroot_dir=${prefix}/www
 mysql_pass=$(cat /dev/urandom | head -1 | md5sum | head -c 16)

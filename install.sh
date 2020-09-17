@@ -43,7 +43,6 @@ Options:
 --install-redis
 --install-pureftpd
 --install-pma
---install-gotty
 "
             ;;
         --install-apache)
@@ -202,13 +201,6 @@ Options:
             else
                 echo "Missing parameters,Please specify the installation path" && exit 1
             fi
-            ;;
-        --install-gotty)
-            include gotty
-            if [ $# -ge 2 ]; then
-                gotty_location=${2}
-            fi
-            install_gotty
             ;;
         *)
             echo "Missing parameters,Please Usage: $0 -h, Show Help" && exit 1
