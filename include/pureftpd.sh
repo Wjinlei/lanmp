@@ -19,14 +19,15 @@ _install_pureftpd_depends(){
 }
 
 install_pureftpd(){
-    pkill -9 pure-ftpd >/dev/null 2>&1
-    mkdir -p ${backup_dir}
-    if [ -d "${pureftpd_location}" ]; then 
-        if [ -d "${backup_dir}/${pureftpd_install_path_name}" ]; then
-            mv ${backup_dir}/${pureftpd_install_path_name} ${backup_dir}/${pureftpd_install_path_name}-$(date +%Y-%m-%d_%H:%M:%S).bak
-        fi
-        mv ${pureftpd_location} ${backup_dir}
+    if [ $# -lt 2 ]; then
+        echo "[ERROR]: Missing parameters: [pureftpd_location]"
+        exit 1
     fi
+    pureftpd_location=${1}
+    service pureftpd stop >/dev/null 2>&1
+    mkdir -p ${backup_dir}
+    mv -f ${pureftpd_location} ${backup_dir}/pureftpd-$(date +%Y-%m-%d_%H:%M:%S).bak
+
     _install_pureftpd_depends
     cd /tmp
     _info "Downloading and Extracting ${pureftpd_filename} files..."

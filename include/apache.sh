@@ -54,11 +54,11 @@ _install_libxml2() {
     DownloadFile "${libxml2_filename}.tar.gz" "${libxml2_download_url}"
     tar zxf ${libxml2_filename}.tar.gz
     cd ${libxml2_filename}
-    CheckError "./configure --prefix=${libxml2_localtion} --with-icu=${icu4c_location}"
+    CheckError "./configure --prefix=${libxml2_location} --with-icu=${icu4c_location}"
     CheckError "parallel_make"
     CheckError "make install"
-    AddToEnv "${libxml2_localtion}"
-    CreateLib64Dir "${libxml2_localtion}"
+    AddToEnv "${libxml2_location}"
+    CreateLib64Dir "${libxml2_location}"
     ldconfig
     _success "${libxml2_filename} install completed..."
     rm -f /tmp/${libxml2_filename}.tar.gz
@@ -150,15 +150,16 @@ _install_nghttp2(){
 
 
 install_apache(){
-    pkill -9 httpd >/dev/null 2>&1
-    pkill -9 nginx >/dev/null 2>&1
-    mkdir -p ${backup_dir}
-    if [ -d "${apache_location}" ]; then
-        if [ -d "${backup_dir}/${apache_install_path_name}" ]; then
-            mv ${backup_dir}/${apache_install_path_name} ${backup_dir}/${apache_install_path_name}-$(date +%Y-%m-%d_%H:%M:%S).bak
-        fi
-        mv ${apache_location} ${backup_dir}
+    if [ $# -lt 2 ]; then
+        echo "[ERROR]: Missing parameters: [apache_location] [wwwroot_dir]"
+        exit 1
     fi
+    apache_location=${1}
+    wwwroot_dir=${2}
+    service httpd stop > /dev/null 2>&1
+    mkdir -p ${backup_dir}
+    mv -f ${apache_location} ${backup_dir}/apache-$(date +%Y-%m-%d_%H:%M:%S).bak
+
     _install_apache_depend
     cd /tmp
     _info "Downloading and Extracting ${apache_filename} files..."
@@ -185,7 +186,7 @@ install_apache(){
     --with-pcre=${pcre_location} \
     --with-ssl=${openssl_location} \
     --with-nghttp2=${nghttp2_location} \
-    --with-libxml2=${libxml2_localtion} \
+    --with-libxml2=${libxml2_location} \
     --with-curl=${curl_location} \
     --with-mpm=event \
     --with-included-apr \
@@ -196,15 +197,8 @@ install_apache(){
     CheckError "parallel_make"
     CheckError "make install"
     unset LDFLAGS
-    #if [ -d "${backup_dir}/${apache_install_path_name}" ]; then
-        #if [ -d "${backup_dir}/${apache_install_path_name}/conf" ]; then
-            #rm -fr ${apache_location}/conf
-            #cp -fr ${backup_dir}/${apache_install_path_name}/conf ${apache_location}
-        #fi
-    #else
-        _info "Config ${apache_filename}"
-        _config_apache
-    #fi
+    _info "Config ${apache_filename}"
+    _config_apache
 
     # 下载服务脚本
     wget --no-check-certificate -cv -t3 -T60 -O /etc/init.d/httpd ${download_sysv_url}/httpd

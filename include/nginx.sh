@@ -20,15 +20,16 @@ _install_nginx_depend(){
 }
 
 install_nginx(){
-    pkill -9 nginx >/dev/null 2>&1
-    pkill -9 httpd >/dev/null 2>&1
-    mkdir -p ${backup_dir}
-    if [ -d "${nginx_location}" ]; then 
-        if [ -d "${backup_dir}/${nginx_install_path_name}" ]; then
-            mv ${backup_dir}/${nginx_install_path_name} ${backup_dir}/${nginx_install_path_name}-$(date +%Y-%m-%d_%H:%M:%S).bak
-        fi
-        mv ${nginx_location} ${backup_dir}
+    if [ $# -lt 2 ]; then
+        echo "[ERROR]: Missing parameters: [nginx_location] [wwwroot_dir]"
+        exit 1
     fi
+    nginx_location=${1}
+    wwwroot_dir=${2}
+    service nginx stop > /dev/null 2>&1
+    mkdir -p ${backup_dir}
+    mv -f ${nginx_location} ${backup_dir}/nginx-$(date +%Y-%m-%d_%H:%M:%S).bak
+
     _install_nginx_depend
     cd /tmp
     _info "Downloading and Extracting ${pcre_filename} files..."
@@ -74,15 +75,8 @@ install_nginx(){
     mkdir -p ${nginx_location}/var/{log,run,lock,tmp}
     mkdir -p ${nginx_location}/var/tmp/{client,proxy,fastcgi,uwsgi}
     mkdir -p ${nginx_location}/etc/vhost
-    #if [ -d "${backup_dir}/${nginx_install_path_name}" ]; then
-        #if [ -d "${backup_dir}/${nginx_install_path_name}/etc" ]; then
-            #rm -fr ${nginx_location}/etc
-            #cp -fr ${backup_dir}/${nginx_install_path_name}/etc ${nginx_location}
-        #fi
-    #else
-        _info "Config ${nginx_filename}"
-        _config_nginx
-    #fi
+    _info "Config ${nginx_filename}"
+    _config_nginx
     chown -R www:www ${nginx_location}
 
     # 下载服务脚本

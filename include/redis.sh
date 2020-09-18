@@ -1,12 +1,13 @@
 install_redis(){
-    pkill -9 redis-server >/dev/null 2>&1
-    mkdir -p ${backup_dir}
-    if [ -d "${redis_location}" ]; then 
-        if [ -d "${backup_dir}/${redis_install_path_name}" ]; then
-            mv ${backup_dir}/${redis_install_path_name} ${backup_dir}/${redis_install_path_name}-$(date +%Y-%m-%d_%H:%M:%S).bak
-        fi
-        mv ${redis_location} ${backup_dir}
+    if [ $# -lt 2 ]; then
+        echo "[ERROR]: Missing parameters: [redis_location]"
+        exit 1
     fi
+    redis_location=${1}
+    service redis stop >/dev/null 2>&1
+    mkdir -p ${backup_dir}
+    mv -f ${redis_location} ${backup_dir}/redis-$(date +%Y-%m-%d_%H:%M:%S).bak
+
     local tram=$( free -m | awk '/Mem/ {print $2}' )
     local swap=$( free -m | awk '/Swap/ {print $2}' )
     local Mem=$(expr $tram + $swap)
@@ -22,23 +23,15 @@ install_redis(){
         mkdir -p ${redis_location}/{bin,etc,var}
         mkdir -p ${redis_location}/var/{log,run}
         cp src/{redis-benchmark,redis-check-aof,redis-check-rdb,redis-cli,redis-sentinel,redis-server} ${redis_location}/bin/
-
-        #if [ -d "${backup_dir}/${redis_install_path_name}" ]; then
-            #if [ -d "${backup_dir}/${redis_install_path_name}/etc" ]; then
-                #rm -fr ${redis_location}/etc
-                #cp -fr ${backup_dir}/${redis_install_path_name}/etc ${redis_location}
-            #fi
-        #else
-            _info "Config ${redis_filename}"
-            cp redis.conf ${redis_location}/etc/
-            sed -i "s@pidfile.*@pidfile ${redis_location}/var/run/redis.pid@" ${redis_location}/etc/redis.conf
-            sed -i "s@logfile.*@logfile ${redis_location}/var/log/redis.log@" ${redis_location}/etc/redis.conf
-            sed -i "s@^dir.*@dir ${redis_location}/var@" ${redis_location}/etc/redis.conf
-            sed -i 's@daemonize no@daemonize yes@' ${redis_location}/etc/redis.conf
-            sed -i "s@port 6379@port ${redis_port}@" ${redis_location}/etc/redis.conf
-            sed -i "s@^# bind 127.0.0.1@bind 127.0.0.1@" ${redis_location}/etc/redis.conf
-            [ -z "$(grep ^maxmemory ${redis_location}/etc/redis.conf)" ] && sed -i "s@maxmemory <bytes>@maxmemory <bytes>\nmaxmemory $(expr ${Mem} / 8)000000@" ${redis_location}/etc/redis.conf
-        #fi
+        _info "Config ${redis_filename}"
+        cp redis.conf ${redis_location}/etc/
+        sed -i "s@pidfile.*@pidfile ${redis_location}/var/run/redis.pid@" ${redis_location}/etc/redis.conf
+        sed -i "s@logfile.*@logfile ${redis_location}/var/log/redis.log@" ${redis_location}/etc/redis.conf
+        sed -i "s@^dir.*@dir ${redis_location}/var@" ${redis_location}/etc/redis.conf
+        sed -i 's@daemonize no@daemonize yes@' ${redis_location}/etc/redis.conf
+        sed -i "s@port 6379@port ${redis_port}@" ${redis_location}/etc/redis.conf
+        sed -i "s@^# bind 127.0.0.1@bind 127.0.0.1@" ${redis_location}/etc/redis.conf
+        [ -z "$(grep ^maxmemory ${redis_location}/etc/redis.conf)" ] && sed -i "s@maxmemory <bytes>@maxmemory <bytes>\nmaxmemory $(expr ${Mem} / 8)000000@" ${redis_location}/etc/redis.conf
 
         # 下载服务脚本
         wget --no-check-certificate -cv -t3 -T60 -O /etc/init.d/redis ${download_sysv_url}/redis

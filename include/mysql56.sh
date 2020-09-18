@@ -142,15 +142,16 @@ EOF
 }
 
 install_mysql56(){
-    pkill -9 mysqld >/dev/null 2>&1
-    mkdir -p ${backup_dir}
-    if [ -d "${mysql56_location}/mysql56_data" ]; then 
-        if [ -d "${backup_dir}/mysql56_data" ]; then
-            mv ${backup_dir}/mysql56_data ${backup_dir}/mysql56_data-$(date +%Y-%m-%d_%H:%M:%S).bak
-        fi
-        mv -f ${mysql56_location}/mysql56_data ${backup_dir}
-        rm -fr ${mysql56_location}
+    if [ $# -lt 2 ]; then
+        echo "[ERROR]: Missing parameters: [mysql_location] [password]"
+        exit 1
     fi
+    mysql56_location=${1}
+    mysql_pass=${2}
+    service mysql56 stop > /dev/null 2>&1
+    mkdir -p ${backup_dir}
+    mv -f ${mysql56_location} ${backup_dir}/mysql56-$(date +%Y-%m-%d_%H:%M:%S).bak
+
     _install_mysql_depend
     Is64bit && sys_bit=x86_64 || sys_bit=i686
     cd /tmp

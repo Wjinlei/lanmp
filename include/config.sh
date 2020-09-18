@@ -9,75 +9,20 @@ download_sysv_url="https://d.hws.com/linux/master/script/init.d/"
 # parallel compile option,1:enable,0:disable
 parallel_compile=1
 
-# pcre
-pcre_location=/usr/local/pcre
-pcre_filename="pcre-8.43"
-pcre_download_url="https://ftp.pcre.org/pub/pcre/pcre-8.43.tar.gz"
-
-# openssl
-openssl_location=/usr/local/openssl111
-openssl_filename="openssl-1.1.1d"
-openssl_download_url="https://www.openssl.org/source/openssl-1.1.1d.tar.gz"
-openssl102_location=/usr/local/openssl102
-openssl102_filename="openssl-1.0.2u"
-openssl102_download_url="https://www.openssl.org/source/old/1.0.2/openssl-1.0.2u.tar.gz"
-
-#curl
-curl_location=/usr/local/curl
-curl_filename="curl-7.29.0"
-curl_download_url="https://curl.haxx.se/download/curl-7.29.0.tar.gz"
-
-#icu4c
-icu4c_location=/usr/local/icu4c
-icu4c_dirname="icu"
-icu4c_filename="icu4c-50_2-src"
-icu4c_download_url="https://github.com/unicode-org/icu/releases/download/release-50-2/icu4c-50_2-src.tgz"
-
-#libxml2
-libxml2_localtion=/usr/local/libxml2
-libxml2_filename="libxml2-2.9.4"
-libxml2_download_url="ftp://xmlsoft.org/libxml2/libxml2-2.9.4.tar.gz"
-
-#freetype2
-freetype_location=/usr/local/freetype2
-freetype_filename="freetype-2.8.1"
-freetype_download_url="https://download.savannah.gnu.org/releases/freetype/freetype-2.8.1.tar.gz"
-
-# nghttp2
-nghttp2_location=/usr/local/nghttp2
-nghttp2_filename="nghttp2-1.40.0"
-nghttp2_download_url="https://github.com/nghttp2/nghttp2/releases/download/v1.40.0/nghttp2-1.40.0.tar.gz"
-
-# apr
-apr_filename="apr-1.7.0"
-apr_download_url="http://ftp.jaist.ac.jp/pub/apache//apr/apr-1.7.0.tar.gz"
-
-# apr-util
-apr_util_filename="apr-util-1.6.1"
-apr_util_download_url="http://ftp.jaist.ac.jp/pub/apache//apr/apr-util-1.6.1.tar.gz"
-
 # apache
-apache_install_path_name="apache"
-apache_location=${prefix}/server/${apache_install_path_name}
 apache_filename="httpd-2.4.41"
 apache_download_url="http://ftp.jaist.ac.jp/pub/apache//httpd/httpd-2.4.41.tar.gz"
 
 # nginx
-nginx_install_path_name="nginx"
-nginx_location=${prefix}/server/${nginx_install_path_name}
 nginx_filename="nginx-1.16.1"
 nginx_download_url="http://nginx.org/download/nginx-1.16.1.tar.gz"
 
 # pureftpd_filename
-pureftpd_install_path_name="pure-ftpd"
-pureftpd_location=${prefix}/server/${pureftpd_install_path_name}
 pureftpd_filename="pure-ftpd-1.0.49"
 pureftpd_download_url="https://download.pureftpd.org/pub/pure-ftpd/releases/pure-ftpd-1.0.49.tar.gz"
 
 # redis
-redis_install_path_name="redis-server"
 redis_filename="redis-5.0.6"
-redis_location=${prefix}/server/${redis_install_path_name}
 redis_download_url="http://download.redis.io/releases/redis-5.0.6.tar.gz"
 
 # php-redis
@@ -87,10 +32,6 @@ php_redis5_filename="redis-5.1.1"
 php_redis5_download_url="https://pecl.php.net/get/redis-5.1.1.tgz"
 
 # mysql
-mysql55_location=${prefix}/server/mysql55
-mysql56_location=${prefix}/server/mysql56
-mysql57_location=${prefix}/server/mysql57
-mysql80_location=${prefix}/server/mysql80
 mysql55_i686_filename="mysql-5.5.62-linux-glibc2.12-i686"
 mysql55_i686_download_url="https://cdn.mysql.com/Downloads/MySQL-5.5/${mysql55_i686_filename}.tar.gz"
 mysql55_x86_64_filename="mysql-5.5.62-linux-glibc2.12-x86_64"
@@ -109,26 +50,6 @@ mysql80_x86_64_filename="mysql-8.0.19-linux-glibc2.12-x86_64"
 mysql80_x86_64_download_url="https://cdn.mysql.com/Downloads/MySQL-8.0/${mysql80_x86_64_filename}.tar.xz"
 
 # php
-php52_install_path_name="php52"
-php53_install_path_name="php53"
-php54_install_path_name="php54"
-php55_install_path_name="php55"
-php56_install_path_name="php56"
-php70_install_path_name="php70"
-php71_install_path_name="php71"
-php72_install_path_name="php72"
-php73_install_path_name="php73"
-php74_install_path_name="php74"
-php52_location=${prefix}/server/php/${php52_install_path_name}
-php53_location=${prefix}/server/php/${php53_install_path_name}
-php54_location=${prefix}/server/php/${php54_install_path_name}
-php55_location=${prefix}/server/php/${php55_install_path_name}
-php56_location=${prefix}/server/php/${php56_install_path_name}
-php70_location=${prefix}/server/php/${php70_install_path_name}
-php71_location=${prefix}/server/php/${php71_install_path_name}
-php72_location=${prefix}/server/php/${php72_install_path_name}
-php73_location=${prefix}/server/php/${php73_install_path_name}
-php74_location=${prefix}/server/php/${php74_install_path_name}
 php52_filename="php-5.2.17"
 php52_download_url="http://museum.php.net/php5/php-5.2.17.tar.gz"
 php53_filename="php-5.3.29"
@@ -180,9 +101,55 @@ libzip_download_url="https://libzip.org/download/libzip-1.3.2.tar.gz"
 phpmyadmin_filename="phpMyAdmin-4.6.6-all-languages"
 phpmyadmin_download_url="https://files.phpmyadmin.net/phpMyAdmin/4.6.6/phpMyAdmin-4.6.6-all-languages.tar.gz"
 
+# depends
+# pcre
+pcre_location=/usr/local/pcre
+pcre_filename="pcre-8.43"
+pcre_download_url="https://ftp.pcre.org/pub/pcre/pcre-8.43.tar.gz"
+
+# openssl
+openssl_location=/usr/local/openssl111
+openssl_filename="openssl-1.1.1d"
+openssl_download_url="https://www.openssl.org/source/openssl-1.1.1d.tar.gz"
+openssl102_location=/usr/local/openssl102
+openssl102_filename="openssl-1.0.2u"
+openssl102_download_url="https://www.openssl.org/source/old/1.0.2/openssl-1.0.2u.tar.gz"
+
+#curl
+curl_location=/usr/local/curl
+curl_filename="curl-7.29.0"
+curl_download_url="https://curl.haxx.se/download/curl-7.29.0.tar.gz"
+
+#icu4c
+icu4c_location=/usr/local/icu4c
+icu4c_dirname="icu"
+icu4c_filename="icu4c-50_2-src"
+icu4c_download_url="https://github.com/unicode-org/icu/releases/download/release-50-2/icu4c-50_2-src.tgz"
+
+#libxml2
+libxml2_location=/usr/local/libxml2
+libxml2_filename="libxml2-2.9.4"
+libxml2_download_url="ftp://xmlsoft.org/libxml2/libxml2-2.9.4.tar.gz"
+
+#freetype2
+freetype_location=/usr/local/freetype2
+freetype_filename="freetype-2.8.1"
+freetype_download_url="https://download.savannah.gnu.org/releases/freetype/freetype-2.8.1.tar.gz"
+
+# nghttp2
+nghttp2_location=/usr/local/nghttp2
+nghttp2_filename="nghttp2-1.40.0"
+nghttp2_download_url="https://github.com/nghttp2/nghttp2/releases/download/v1.40.0/nghttp2-1.40.0.tar.gz"
+
+# apr
+apr_filename="apr-1.7.0"
+apr_download_url="http://ftp.jaist.ac.jp/pub/apache//apr/apr-1.7.0.tar.gz"
+
+# apr-util
+apr_util_filename="apr-util-1.6.1"
+apr_util_download_url="http://ftp.jaist.ac.jp/pub/apache//apr/apr-util-1.6.1.tar.gz"
+
 # Other
-wwwroot_dir=${prefix}/www
-mysql_pass=$(cat /dev/urandom | head -1 | md5sum | head -c 16)
 mysql_port=3306
 redis_port=6379
 pureftpd_port=21

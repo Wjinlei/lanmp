@@ -126,11 +126,11 @@ _install_libxml2() {
     DownloadFile "${libxml2_filename}.tar.gz" "${libxml2_download_url}"
     tar zxf ${libxml2_filename}.tar.gz
     cd ${libxml2_filename}
-    CheckError "./configure --prefix=${libxml2_localtion} --with-icu=${icu4c_location}"
+    CheckError "./configure --prefix=${libxml2_location} --with-icu=${icu4c_location}"
     CheckError "parallel_make"
     CheckError "make install"
-    AddToEnv "${libxml2_localtion}"
-    CreateLib64Dir "${libxml2_localtion}"
+    AddToEnv "${libxml2_location}"
+    CreateLib64Dir "${libxml2_location}"
     ldconfig
     _success "${libxml2_filename} install completed..."
     rm -f /tmp/${libxml2_filename}.tar.gz
@@ -381,17 +381,15 @@ EOF
 }
 
 install_php73(){
-    mkdir -p ${backup_dir}
-    if [ -d "${php73_location}" ]; then 
-        for pidfile in `ls ${php73_location}/var/run/`
-        do
-            kill -INT `cat ${php73_location}/var/run/${pidfile}`
-        done
-        if [ -d "${backup_dir}/${php73_install_path_name}" ]; then
-            mv ${backup_dir}/${php73_install_path_name} ${backup_dir}/${php73_install_path_name}-$(date +%Y-%m-%d_%H:%M:%S).bak
-        fi
-        mv ${php73_location} ${backup_dir}
+    if [ $# -lt 2 ]; then
+        echo "[ERROR]: Missing parameters: [php_location]"
+        exit 1
     fi
+    php73_location=${1}
+    service php73 stop >/dev/null 2>&1
+    mkdir -p ${backup_dir}
+    mv -f ${php73_location} ${backup_dir}/php73-$(date +%Y-%m-%d_%H:%M:%S).bak
+
     _install_php_depend
     cd /tmp
     _info "Downloading and Extracting ${php73_filename} files..."
@@ -404,7 +402,7 @@ install_php73(){
     php_configure_args="--prefix=${php73_location} \
     --with-config-file-path=${php73_location}/etc \
     --with-config-file-scan-dir=${php73_location}/php.d \
-    --with-libxml-dir=${libxml2_localtion} \
+    --with-libxml-dir=${libxml2_location} \
     --with-pcre-dir=${pcre_location} \
     --with-openssl=${openssl_location} \
     ${with_libdir} \

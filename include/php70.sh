@@ -126,11 +126,11 @@ _install_libxml2() {
     DownloadFile "${libxml2_filename}.tar.gz" "${libxml2_download_url}"
     tar zxf ${libxml2_filename}.tar.gz
     cd ${libxml2_filename}
-    CheckError "./configure --prefix=${libxml2_localtion} --with-icu=${icu4c_location}"
+    CheckError "./configure --prefix=${libxml2_location} --with-icu=${icu4c_location}"
     CheckError "parallel_make"
     CheckError "make install"
-    AddToEnv "${libxml2_localtion}"
-    CreateLib64Dir "${libxml2_localtion}"
+    AddToEnv "${libxml2_location}"
+    CreateLib64Dir "${libxml2_location}"
     ldconfig
     _success "${libxml2_filename} install completed..."
     rm -f /tmp/${libxml2_filename}.tar.gz
@@ -381,17 +381,15 @@ EOF
 }
 
 install_php70(){
-    mkdir -p ${backup_dir}
-    if [ -d "${php70_location}" ]; then 
-        for pidfile in `ls ${php70_location}/var/run/`
-        do
-            kill -INT `cat ${php70_location}/var/run/${pidfile}`
-        done
-        if [ -d "${backup_dir}/${php70_install_path_name}" ]; then
-            mv ${backup_dir}/${php70_install_path_name} ${backup_dir}/${php70_install_path_name}-$(date +%Y-%m-%d_%H:%M:%S).bak
-        fi
-        mv ${php70_location} ${backup_dir}
+    if [ $# -lt 2 ]; then
+        echo "[ERROR]: Missing parameters: [php_location]"
+        exit 1
     fi
+    php70_location=${1}
+    service php70 stop >/dev/null 2>&1
+    mkdir -p ${backup_dir}
+    mv -f ${php70_location} ${backup_dir}/php70-$(date +%Y-%m-%d_%H:%M:%S).bak
+
     _install_php_depend
     cd /tmp
     _info "Downloading and Extracting ${php70_filename} files..."
@@ -404,7 +402,7 @@ install_php70(){
     php_configure_args="--prefix=${php70_location} \
     --with-config-file-path=${php70_location}/etc \
     --with-config-file-scan-dir=${php70_location}/php.d \
-    --with-libxml-dir=${libxml2_localtion} \
+    --with-libxml-dir=${libxml2_location} \
     --with-pcre-dir=${pcre_location} \
     --with-openssl=${openssl_location} \
     ${with_libdir} \

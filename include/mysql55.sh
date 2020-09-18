@@ -142,15 +142,16 @@ EOF
 }
 
 install_mysql55(){
-    pkill -9 mysqld >/dev/null 2>&1
-    mkdir -p ${backup_dir}
-    if [ -d "${mysql55_location}/mysql55_data" ]; then 
-        if [ -d "${backup_dir}/mysql55_data" ]; then
-            mv ${backup_dir}/mysql55_data ${backup_dir}/mysql55_data-$(date +%Y-%m-%d_%H:%M:%S).bak
-        fi
-        mv -f ${mysql55_location}/mysql55_data ${backup_dir}
-        rm -fr ${mysql55_location}
+    if [ $# -lt 2 ]; then
+        echo "[ERROR]: Missing parameters: [mysql_location] [password]"
+        exit 1
     fi
+    mysql55_location=${1}
+    mysql_pass=${2}
+    service mysql55 stop > /dev/null 2>&1
+    mkdir -p ${backup_dir}
+    mv -f ${mysql55_location} ${backup_dir}/mysql55-$(date +%Y-%m-%d_%H:%M:%S).bak
+
     _install_mysql_depend
     Is64bit && sys_bit=x86_64 || sys_bit=i686
     cd /tmp
