@@ -1,6 +1,7 @@
 load_config(){
-# Install prefix
-prefix=/hwsmaster
+
+# data
+var=/var/hwsmaster
 
 # download Url
 download_root_url="https://d.hws.com/linux/master/soft/"
@@ -153,5 +154,5 @@ apr_util_download_url="http://ftp.jaist.ac.jp/pub/apache//apr/apr-util-1.6.1.tar
 mysql_port=3306
 redis_port=6379
 pureftpd_port=21
-backup_dir=${prefix}/backup
+backup_dir=${var}/backup
 }

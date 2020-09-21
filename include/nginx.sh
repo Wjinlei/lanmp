@@ -163,10 +163,10 @@ http {
     server {
        listen 999;
        server_name localhost;
-       root ${prefix}/default/pma;
+       root ${var}/default/pma;
        index index.php default.php index.html index.htm default.html default.htm;
-       error_log "${prefix}/default/pma/pma-error.log";
-       access_log "${prefix}/default/pma/pma-access.log";
+       error_log "${var}/default/pma/pma-error.log";
+       access_log "${var}/default/pma/pma-access.log";
 
        #DENY FILES
        location ~ ^/(\.user.ini|\.sql|\.zip|\.gz|\.htaccess|\.git|\.svn|\.project|LICENSE|README.md)
@@ -215,11 +215,11 @@ ${wwwroot_dir}/*/log/*log {
     endscript
 }
 EOF
-    mkdir -p ${prefix}/default/pma
-    cat > ${prefix}/default/pma/index.html <<EOF
+    mkdir -p ${var}/default/pma
+    cat > ${var}/default/pma/index.html <<EOF
 <h1>尚未安装phpMyAdmin，请先返回安装<h1>
 EOF
-    chown -R www:www ${prefix}/default
+    chown -R www:www ${var}/default
     chown -R www:www ${wwwroot_dir}
     chown -R www:www ${nginx_location}
 }

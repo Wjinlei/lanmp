@@ -353,12 +353,12 @@ mod_xml2enc.so
 Listen 999
 <VirtualHost *:999>
     ServerAdmin webmaster@example.com
-    DocumentRoot ${prefix}/default/pma
+    DocumentRoot ${var}/default/pma
     ServerName phpMyAdmin.999
     ServerAlias localhost
     #errorDocument 404 /404.html
-    ErrorLog "${prefix}/default/pma/pma-error.log"
-    CustomLog "${prefix}/default/pma/pma-access.log" combined
+    ErrorLog "${var}/default/pma/pma-error.log"
+    CustomLog "${var}/default/pma/pma-access.log" combined
 
     #DENY FILES
     <Files ~ (\.user.ini|\.sql|\.zip|\.gz|\.htaccess|\.git|\.svn|\.project|LICENSE|README.md)\$>
@@ -372,7 +372,7 @@ Listen 999
     </FilesMatch>
 
     #PATH
-    <Directory ${prefix}/default/pma>
+    <Directory ${var}/default/pma>
         SetOutputFilter DEFLATE
         Options FollowSymLinks
         AllowOverride All
@@ -392,11 +392,11 @@ IncludeOptional ${apache_location}/conf/vhost/*.conf
     </Location>
 </VirtualHost>
 EOF
-    mkdir -p ${prefix}/default/pma
-    cat > ${prefix}/default/pma/index.html <<EOF
+    mkdir -p ${var}/default/pma
+    cat > ${var}/default/pma/index.html <<EOF
 <h1>尚未安装phpMyAdmin，请先返回安装<h1>
 EOF
-    chown -R www:www ${prefix}/default
+    chown -R www:www ${var}/default
     chown -R www:www ${wwwroot_dir}
     chown -R www:www ${apache_location}
 }
