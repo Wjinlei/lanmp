@@ -183,14 +183,7 @@ install_mysql56(){
     update-rc.d -f mysql56 defaults > /dev/null 2>&1
     service mysql56 restart > /dev/null 2>&1
 
-    cat >> ${prefix}/install.result <<EOF
-Install Time: $(date +%Y-%m-%d_%H:%M:%S)
-MySQL56 Install Path:${mysql56_location}
-MySQL56 Data Path:${mysql56_location}/mysql56_data
-MySQL56 Root PassWord:${mysql_pass}
-MySQL Config File: ${mysql56_location}/my.cnf
-
-EOF
+    echo "Root password:${mysql_pass}, Please keep it safe."
     _success "Install ${mysql56_filename} completed..."
     rm -fr /tmp/${mysql56_filename}
 }

@@ -46,10 +46,6 @@ install_redis(){
             ${redis_location}/bin/redis-server ${redis_location}/etc/redis.conf
         fi
 
-        cat >> ${prefix}/install.result <<EOF
-Redis Install Path:${redis_location}
-
-EOF
         rm -fr ${redis_filename}
         _success "redis-server install completed!"
     else

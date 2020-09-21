@@ -93,12 +93,6 @@ install_nginx(){
     fi
 
     _success "${nginx_filename} install completed..."
-    cat >> ${prefix}/install.result <<EOF
-Install Time: $(date +%Y-%m-%d_%H:%M:%S)
-Nginx Install Path:${nginx_location}
-Nginx Www Root Dir:${wwwroot_dir}
-
-EOF
     rm -fr /tmp/${pcre_filename}
     rm -fr /tmp/${openssl_filename}
     rm -fr /tmp/${nginx_filename}

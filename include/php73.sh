@@ -456,27 +456,8 @@ install_php73(){
     CheckError "./configure ${php_configure_args}"
     CheckError "parallel_make ZEND_EXTRA_LIBS='-liconv'"
     CheckError "make install"
-    #if [ -d "${backup_dir}/${php73_install_path_name}" ]; then
-        #if [ -d "${backup_dir}/${php73_install_path_name}/etc" ]; then
-            #rm -fr ${php73_location}/etc
-            #cp -fr ${backup_dir}/${php73_install_path_name}/etc ${php73_location}
-        #fi
-        #if [ -d "${backup_dir}/${php73_install_path_name}/php.d" ]; then
-            #rm -fr ${php73_location}/php.d
-            #cp -fr ${backup_dir}/${php73_install_path_name}/php.d ${php73_location}
-        #fi
-        #if [ -d "${backup_dir}/${php73_install_path_name}/lib" ]; then
-            #rm -fr ${php73_location}/lib
-            #cp -fr ${backup_dir}/${php73_install_path_name}/lib ${php73_location}
-        #fi
-    #else
-        _info "Config ${php73_filename}..."
-        _config_php
-    #fi
-    cat >> ${prefix}/install.result <<EOF
-php73 Install Path:${php73_location}
-
-EOF
+    _info "Config ${php73_filename}..."
+    _config_php
     _success "${php73_filename} install completed..."
     rm -fr /tmp/${php73_filename}
 }

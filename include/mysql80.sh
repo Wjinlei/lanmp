@@ -180,14 +180,7 @@ install_mysql80(){
     update-rc.d -f mysql80 defaults > /dev/null 2>&1
     service mysql80 restart > /dev/null 2>&1
 
-    cat >> ${prefix}/install.result <<EOF
-Install Time: $(date +%Y-%m-%d_%H:%M:%S)
-MySQL80 Install Path:${mysql80_location}
-MySQL80 Data Path:${mysql80_location}/mysql80_data
-MySQL80 Root PassWord:${mysql_pass}
-MySQL Config File: ${mysql80_location}/my.cnf
-
-EOF
+    echo "Root password:${mysql_pass}, Please keep it safe."
     _success "Install ${mysql80_filename} completed..."
     rm -fr /tmp/${mysql80_filename}
 }

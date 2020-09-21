@@ -446,27 +446,8 @@ install_php54(){
     CheckError "./configure ${php_configure_args}"
     CheckError "parallel_make ZEND_EXTRA_LIBS='-liconv'"
     CheckError "make install"
-    #if [ -d "${backup_dir}/${php54_install_path_name}" ]; then
-        #if [ -d "${backup_dir}/${php54_install_path_name}/etc" ]; then
-            #rm -fr ${php54_location}/etc
-            #cp -fr ${backup_dir}/${php54_install_path_name}/etc ${php54_location}
-        #fi
-        #if [ -d "${backup_dir}/${php54_install_path_name}/php.d" ]; then
-            #rm -fr ${php54_location}/php.d
-            #cp -fr ${backup_dir}/${php54_install_path_name}/php.d ${php54_location}
-        #fi
-        #if [ -d "${backup_dir}/${php54_install_path_name}/lib" ]; then
-            #rm -fr ${php54_location}/lib
-            #cp -fr ${backup_dir}/${php54_install_path_name}/lib ${php54_location}
-        #fi
-    #else
-        _info "Config ${php54_filename}..."
-        _config_php
-    #fi
-    cat >> ${prefix}/install.result <<EOF
-php54 Install Path:${php54_location}
-
-EOF
+    _info "Config ${php54_filename}..."
+    _config_php
     _success "${php54_filename} install completed..."
     rm -fr /tmp/${php54_filename}
 }

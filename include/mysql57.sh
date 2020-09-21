@@ -183,14 +183,7 @@ install_mysql57(){
     update-rc.d -f mysql57 defaults > /dev/null 2>&1
     service mysql57 restart > /dev/null 2>&1
 
-    cat >> ${prefix}/install.result <<EOF
-Install Time: $(date +%Y-%m-%d_%H:%M:%S)
-MySQL57 Install Path:${mysql57_location}
-MySQL57 Data Path:${mysql57_location}/mysql57_data
-MySQL57 Root PassWord:${mysql_pass}
-MySQL Config File: ${mysql57_location}/my.cnf
-
-EOF
+    echo "Root password:${mysql_pass}, Please keep it safe."
     _success "Install ${mysql57_filename} completed..."
     rm -fr /tmp/${mysql57_filename}
 }

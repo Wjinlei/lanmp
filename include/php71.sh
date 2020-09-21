@@ -459,27 +459,8 @@ install_php71(){
     CheckError "./configure ${php_configure_args}"
     CheckError "parallel_make ZEND_EXTRA_LIBS='-liconv'"
     CheckError "make install"
-    #if [ -d "${backup_dir}/${php71_install_path_name}" ]; then
-        #if [ -d "${backup_dir}/${php71_install_path_name}/etc" ]; then
-            #rm -fr ${php71_location}/etc
-            #cp -fr ${backup_dir}/${php71_install_path_name}/etc ${php71_location}
-        #fi
-        #if [ -d "${backup_dir}/${php71_install_path_name}/php.d" ]; then
-            #rm -fr ${php71_location}/php.d
-            #cp -fr ${backup_dir}/${php71_install_path_name}/php.d ${php71_location}
-        #fi
-        #if [ -d "${backup_dir}/${php71_install_path_name}/lib" ]; then
-            #rm -fr ${php71_location}/lib
-            #cp -fr ${backup_dir}/${php71_install_path_name}/lib ${php71_location}
-        #fi
-    #else
-        _info "Config ${php71_filename}..."
-        _config_php
-    #fi
-    cat >> ${prefix}/install.result <<EOF
-php71 Install Path:${php71_location}
-
-EOF
+    _info "Config ${php71_filename}..."
+    _config_php
     _success "${php71_filename} install completed..."
     rm -fr /tmp/${php71_filename}
 }

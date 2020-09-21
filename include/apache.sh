@@ -215,12 +215,6 @@ install_apache(){
     fi
 
     _success "${apache_filename} install completed..."
-    cat >> ${prefix}/install.result <<EOF
-Install Time: $(date +%Y-%m-%d_%H:%M:%S)
-Apache Install Path:${apache_location}
-Apache Www Root Dir:${wwwroot_dir}
-
-EOF
     rm -fr /tmp/${apache_filename}
 }
 

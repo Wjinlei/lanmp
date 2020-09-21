@@ -84,11 +84,6 @@ install_pureftpd(){
     fi
 
     _success "Install ${pureftpd_filename} completed..."
-    cat >> ${prefix}/install.result <<EOF
-Install Time: $(date +%Y-%m-%d_%H:%M:%S)
-Pureftpd Install Path:${pureftpd_location}
-
-EOF
     rm -fr /tmp/${pureftpd_filename}
 }
 

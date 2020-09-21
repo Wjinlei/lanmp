@@ -183,14 +183,7 @@ install_mysql55(){
     update-rc.d -f mysql55 defaults > /dev/null 2>&1
     service mysql55 restart > /dev/null 2>&1
 
-    cat >> ${prefix}/install.result <<EOF
-Install Time: $(date +%Y-%m-%d_%H:%M:%S)
-MySQL55 Install Path:${mysql55_location}
-MySQL55 Data Path:${mysql55_location}/mysql55_data
-MySQL55 Root PassWord:${mysql_pass}
-MySQL Config File: ${mysql55_location}/my.cnf
-
-EOF
+    echo "Root password:${mysql_pass}, Please keep it safe."
     _success "Install ${mysql55_filename} completed..."
     rm -fr /tmp/${mysql55_filename}
 }
