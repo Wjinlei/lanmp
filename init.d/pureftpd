@@ -101,20 +101,16 @@ reload() {
     if [ -f $PID_FILE ];then
         mPID=`cat $PID_FILE`
         isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
-        if [ "$isRunning" = '' ];then
-            echo "$NAME is not running."
+        if [ "$isRunning" != '' ];then
+            kill -USR2 `cat $PID_FILE`
+            echo " done"
+        else
+            echo "$NAME is not running, can't reload."
             exit 1
         fi
     else
-        echo "PID file found, $NAME is not running ?"
+        echo "$NAME is not running, can't reload."
         exit 1
-    fi
-    kill -USR2 `cat $PID_FILE`
-    if [ "$?" != 0 ] ; then
-        echo " failed"
-        exit 1
-    else
-        echo " done"
     fi
 }
 
