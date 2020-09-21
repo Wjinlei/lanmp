@@ -19,7 +19,7 @@ _install_pureftpd_depends(){
 }
 
 install_pureftpd(){
-    if [ $# -lt 2 ]; then
+    if [ $# -lt 1 ]; then
         echo "[ERROR]: Missing parameters: [pureftpd_location]"
         exit 1
     fi

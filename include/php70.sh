@@ -381,7 +381,7 @@ EOF
 }
 
 install_php70(){
-    if [ $# -lt 2 ]; then
+    if [ $# -lt 1 ]; then
         echo "[ERROR]: Missing parameters: [php_location]"
         exit 1
     fi

@@ -1,5 +1,5 @@
 install_redis(){
-    if [ $# -lt 2 ]; then
+    if [ $# -lt 1 ]; then
         echo "[ERROR]: Missing parameters: [redis_location]"
         exit 1
     fi
