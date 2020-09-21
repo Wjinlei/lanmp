@@ -11,7 +11,7 @@ install_pma(){
         mkdir -p ${var}/default/pma/{upload,save}
 
     # 下载配置文件
-    CheckError "wget --no-check-certificate -cv -t3 -T60 'https://d.hws.com/linux/master/conf/phpmyadmin-conf.tar.gz'"
+    CheckError "wget --no-check-certificate -cv -t3 -T60 https://d.hws.com/linux/master/conf/phpmyadmin-conf.tar.gz"
     tar zxf phpmyadmin-conf.tar.gz && cp -f config.inc.php ${var}/default/pma/config.inc.php
 
     chown -R www:www ${var}/default/pma
