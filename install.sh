@@ -18,7 +18,7 @@ include(){
     fi
 }
 
-main(){
+go(){
     case "$1" in
         -h|--help)
             printf "Usage: $0 <Options> [Parameter...]
@@ -118,11 +118,14 @@ Options:
     esac
 }
 
-include config
-include public
-load_config
-IsRoot
-InstallPreSetting
+main() {
+    include config
+    include public
+    load_config
+    IsRoot
+    InstallPreSetting
+    go "$@"
+}
 echo "The installation log will be written to /tmp/install.log"
 echo "Use tail -f /tmp/install.log to view dynamically"
 main "$@" > /tmp/install.log 2>&1
