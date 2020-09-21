@@ -148,6 +148,20 @@ _install_nghttp2(){
     rm -fr /tmp/${nghttp2_filename}
 }
 
+_start_apache() {
+    wget --no-check-certificate -cv -t3 -T60 -O /etc/init.d/httpd ${download_sysv_url}/httpd
+    if [ "$?" == 0 ]; then
+        sed -i "s|^prefix={apache_location}$|prefix=${apache_location}|i" /etc/init.d/httpd
+        sed -i "s|{openssl_location_lib}|${openssl_location}/lib|i" /etc/init.d/httpd
+        chmod +x /etc/init.d/httpd
+        chkconfig --add httpd > /dev/null 2>&1
+        update-rc.d -f httpd defaults > /dev/null 2>&1
+        service httpd start
+    else
+        _info "Start ${apache_filename}"
+        ${apache_location}/bin/apachectl start
+    fi
+}
 
 install_apache(){
     if [ $# -lt 2 ]; then
@@ -199,21 +213,7 @@ install_apache(){
     unset LDFLAGS
     _info "Config ${apache_filename}"
     _config_apache
-
-    # 下载服务脚本
-    wget --no-check-certificate -cv -t3 -T60 -O /etc/init.d/httpd ${download_sysv_url}/httpd
-    if [ "$?" == 0 ]; then
-        sed -i "s|^prefix={apache_location}$|prefix=${apache_location}|i" /etc/init.d/httpd
-        sed -i "s|{openssl_location_lib}|${openssl_location}/lib|i" /etc/init.d/httpd
-        chmod +x /etc/init.d/httpd
-        chkconfig --add httpd > /dev/null 2>&1
-        update-rc.d -f httpd defaults > /dev/null 2>&1
-        service httpd start
-    else
-        _info "Start ${apache_filename}"
-        ${apache_location}/bin/apachectl start
-    fi
-
+    _start_apache
     _success "${apache_filename} install completed..."
     rm -fr /tmp/${apache_filename}
 }

@@ -19,6 +19,20 @@ _install_nginx_depend(){
     _success "Install dependencies packages for Nginx completed..."
 }
 
+_start_nginx() {
+    wget --no-check-certificate -cv -t3 -T60 -O /etc/init.d/nginx ${download_sysv_url}/nginx
+    if [ "$?" == 0 ]; then
+        sed -i "s|^prefix={nginx_location}$|prefix=${nginx_location}|i" /etc/init.d/nginx
+        chmod +x /etc/init.d/nginx
+        chkconfig --add nginx > /dev/null 2>&1
+        update-rc.d -f nginx defaults > /dev/null 2>&1
+        service nginx start
+    else
+        _info "Start ${nginx_filename}"
+        ${nginx_location}/sbin/nginx
+    fi
+}
+
 install_nginx(){
     if [ $# -lt 2 ]; then
         echo "[ERROR]: Missing parameters: [nginx_location] [wwwroot_dir]"
@@ -78,20 +92,7 @@ install_nginx(){
     _info "Config ${nginx_filename}"
     _config_nginx
     chown -R www:www ${nginx_location}
-
-    # 下载服务脚本
-    wget --no-check-certificate -cv -t3 -T60 -O /etc/init.d/nginx ${download_sysv_url}/nginx
-    if [ "$?" == 0 ]; then
-        sed -i "s|^prefix={nginx_location}$|prefix=${nginx_location}|i" /etc/init.d/nginx
-        chmod +x /etc/init.d/nginx
-        chkconfig --add nginx > /dev/null 2>&1
-        update-rc.d -f nginx defaults > /dev/null 2>&1
-        service nginx start
-    else
-        _info "Start ${nginx_filename}"
-        ${nginx_location}/sbin/nginx
-    fi
-
+    _start_nginx
     _success "${nginx_filename} install completed..."
     rm -fr /tmp/${pcre_filename}
     rm -fr /tmp/${openssl_filename}

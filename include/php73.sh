@@ -303,6 +303,20 @@ _install_libzip(){
     fi
 }
 
+_start_php73() {
+    wget --no-check-certificate -cv -t3 -T60 -O /etc/init.d/php73 ${download_sysv_url}/php-fpm
+    if [ "$?" == 0 ]; then
+        sed -i "s|^prefix={php-fpm_location}$|prefix=${php73_location}|i" /etc/init.d/php73
+        chmod +x /etc/init.d/php73
+        chkconfig --add php73 > /dev/null 2>&1
+        update-rc.d -f php73 defaults > /dev/null 2>&1
+        service php73 start
+    else
+        _info "Start ${php73_filename}"
+        ${php73_location}/sbin/php-fpm -y ${php73_location}/etc/default.conf
+    fi
+}
+
 _config_php(){
     # php.ini
     mkdir -p ${php73_location}/{etc,php.d}
@@ -362,19 +376,7 @@ EOF
     mkdir -p ${php73_location}/var/run
     mkdir -p ${php73_location}/var/log
 
-    # 下载服务脚本
-    wget --no-check-certificate -cv -t3 -T60 -O /etc/init.d/php73 ${download_sysv_url}/php-fpm
-    if [ "$?" == 0 ]; then
-        sed -i "s|^prefix={php-fpm_location}$|prefix=${php73_location}|i" /etc/init.d/php73
-        chmod +x /etc/init.d/php73
-        chkconfig --add php73 > /dev/null 2>&1
-        update-rc.d -f php73 defaults > /dev/null 2>&1
-        service php73 start
-    else
-        _info "Start ${php73_filename}"
-        ${php73_location}/sbin/php-fpm -y ${php73_location}/etc/default.conf
-    fi
-
+    _start_php73
     _warn "Please add the following two lines to your httpd.conf"
     echo AddType application/x-httpd-php .php .phtml
     echo AddType application/x-httpd-php-source .phps

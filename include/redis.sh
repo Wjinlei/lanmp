@@ -1,3 +1,17 @@
+_start_redis() {
+    wget --no-check-certificate -cv -t3 -T60 -O /etc/init.d/redis ${download_sysv_url}/redis
+    if [ "$?" == 0 ]; then
+        sed -i "s|^prefix={redis_location}$|prefix=${redis_location}|i" /etc/init.d/redis
+        chmod +x /etc/init.d/redis
+        chkconfig --add redis > /dev/null 2>&1
+        update-rc.d -f redis defaults > /dev/null 2>&1
+        service redis start
+    else
+        _info "Start ${redis_filename}"
+        ${redis_location}/bin/redis-server ${redis_location}/etc/redis.conf
+    fi
+}
+
 install_redis(){
     if [ $# -lt 1 ]; then
         echo "[ERROR]: Missing parameters: [redis_location]"
@@ -33,19 +47,7 @@ install_redis(){
         sed -i "s@^# bind 127.0.0.1@bind 127.0.0.1@" ${redis_location}/etc/redis.conf
         [ -z "$(grep ^maxmemory ${redis_location}/etc/redis.conf)" ] && sed -i "s@maxmemory <bytes>@maxmemory <bytes>\nmaxmemory $(expr ${Mem} / 8)000000@" ${redis_location}/etc/redis.conf
 
-        # 下载服务脚本
-        wget --no-check-certificate -cv -t3 -T60 -O /etc/init.d/redis ${download_sysv_url}/redis
-        if [ "$?" == 0 ]; then
-            sed -i "s|^prefix={redis_location}$|prefix=${redis_location}|i" /etc/init.d/redis
-            chmod +x /etc/init.d/redis
-            chkconfig --add redis > /dev/null 2>&1
-            update-rc.d -f redis defaults > /dev/null 2>&1
-            service redis start
-        else
-            _info "Start ${redis_filename}"
-            ${redis_location}/bin/redis-server ${redis_location}/etc/redis.conf
-        fi
-
+        _start_redis
         rm -fr ${redis_filename}
         _success "redis-server install completed!"
     else

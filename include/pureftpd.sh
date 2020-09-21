@@ -18,6 +18,20 @@ _install_pureftpd_depends(){
     _success "Install dependencies packages for Pureftpd completed..."
 }
 
+_start_pureftpd() {
+    wget --no-check-certificate -cv -t3 -T60 -O /etc/init.d/pureftpd ${download_sysv_url}/pureftpd
+    if [ "$?" == 0 ]; then
+        sed -i "s|^prefix={pureftpd_location}$|prefix=${pureftpd_location}|i" /etc/init.d/pureftpd
+        chmod +x /etc/init.d/pureftpd
+        chkconfig --add pureftpd > /dev/null 2>&1
+        update-rc.d -f pureftpd defaults > /dev/null 2>&1
+        service pureftpd start
+    else
+        _info "Start ${pureftpd_filename}"
+        ${pureftpd_location}/sbin/pure-ftpd  ${pureftpd_location}/etc/pure-ftpd.conf
+    fi
+}
+
 install_pureftpd(){
     if [ $# -lt 1 ]; then
         echo "[ERROR]: Missing parameters: [pureftpd_location]"
@@ -54,35 +68,16 @@ install_pureftpd(){
     CheckError "./configure ${pureftpd_configure_args}"
     CheckError "parallel_make"
     CheckError "make install"
-    #if [ -d "${backup_dir}/${pureftpd_install_path_name}" ]; then
-        #if [ -d "${backup_dir}/${pureftpd_install_path_name}/etc" ]; then
-            #rm -fr ${pureftpd_location}/etc
-            #cp -fr ${backup_dir}/${pureftpd_install_path_name}/etc ${pureftpd_location}
-        #fi
-    #else
-        _info "Config ${pureftpd_filename}"
-        _create_pureftpd_config
-        _config_pureftpd
-    #fi
+    _info "Config ${pureftpd_filename}"
+    _create_pureftpd_config
+    _config_pureftpd
     mkdir -p /etc/ssl/private
     openssl req -x509 -nodes -subj /C=CN/ST=Sichuan/L=Chengdu/O=HWS-LINUXMASTER/OU=HWS/CN=$(GetIp)/emailAddress=admin@hws.com -days 3560 -newkey rsa:2048 -keyout /etc/ssl/private/pure-ftpd.pem -out /etc/ssl/private/pure-ftpd.pem
     if [ -f '/etc/ssl/private/pure-ftpd.pem' ];then
         chmod 600 /etc/ssl/private/pure-ftpd.pem
     fi
 
-    # 下载服务脚本
-    wget --no-check-certificate -cv -t3 -T60 -O /etc/init.d/pureftpd ${download_sysv_url}/pureftpd
-    if [ "$?" == 0 ]; then
-        sed -i "s|^prefix={pureftpd_location}$|prefix=${pureftpd_location}|i" /etc/init.d/pureftpd
-        chmod +x /etc/init.d/pureftpd
-        chkconfig --add pureftpd > /dev/null 2>&1
-        update-rc.d -f pureftpd defaults > /dev/null 2>&1
-        service pureftpd start
-    else
-        _info "Start ${pureftpd_filename}"
-        ${pureftpd_location}/sbin/pure-ftpd  ${pureftpd_location}/etc/pure-ftpd.conf
-    fi
-
+    _start_pureftpd
     _success "Install ${pureftpd_filename} completed..."
     rm -fr /tmp/${pureftpd_filename}
 }

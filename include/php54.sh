@@ -303,6 +303,20 @@ _install_libzip(){
     fi
 }
 
+_start_php54() {
+    wget --no-check-certificate -cv -t3 -T60 -O /etc/init.d/php54 ${download_sysv_url}/php-fpm
+    if [ "$?" == 0 ]; then
+        sed -i "s|^prefix={php-fpm_location}$|prefix=${php54_location}|i" /etc/init.d/php54
+        chmod +x /etc/init.d/php54
+        chkconfig --add php54 > /dev/null 2>&1
+        update-rc.d -f php54 defaults > /dev/null 2>&1
+        service php54 start
+    else
+        _info "Start ${php54_filename}"
+        ${php54_location}/sbin/php-fpm -y ${php54_location}/etc/default.conf
+    fi
+}
+
 _config_php(){
     # php.ini
     mkdir -p ${php54_location}/{etc,php.d}
@@ -349,19 +363,7 @@ EOF
     mkdir -p ${php54_location}/var/run
     mkdir -p ${php54_location}/var/log
 
-    # 下载服务脚本
-    wget --no-check-certificate -cv -t3 -T60 -O /etc/init.d/php54 ${download_sysv_url}/php-fpm
-    if [ "$?" == 0 ]; then
-        sed -i "s|^prefix={php-fpm_location}$|prefix=${php54_location}|i" /etc/init.d/php54
-        chmod +x /etc/init.d/php54
-        chkconfig --add php54 > /dev/null 2>&1
-        update-rc.d -f php54 defaults > /dev/null 2>&1
-        service php54 start
-    else
-        _info "Start ${php54_filename}"
-        ${php54_location}/sbin/php-fpm -y ${php54_location}/etc/default.conf
-    fi
-
+    _start_php54
     _warn "Please add the following two lines to your httpd.conf"
     echo AddType application/x-httpd-php .php .phtml
     echo AddType application/x-httpd-php-source .phps
