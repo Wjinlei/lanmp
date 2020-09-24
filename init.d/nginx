@@ -93,14 +93,14 @@ status(){
         isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
         if [ "$isRunning" != '' ];then
             echo "$NAME (pid `pidof $NAME`) already running."
-            exit 1
+            exit 0
         else
             echo "$NAME is stopped"
-            exit 0
+            exit 1
         fi
     else
         echo "$NAME is stopped"
-        exit 0
+        exit 1
     fi
 }
 
