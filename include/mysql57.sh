@@ -153,19 +153,6 @@ install_mysql57(){
     service mysqld stop > /dev/null 2>&1
     chkconfig --del mysqld > /dev/null 2>&1
     update-rc.d -f mysqld remove >/dev/null 2>&1
-
-    service mysql55 stop > /dev/null 2>&1
-    chkconfig --del mysql55 > /dev/null 2>&1
-    update-rc.d -f mysql55 remove >/dev/null 2>&1
-
-    service mysql56 stop > /dev/null 2>&1
-    chkconfig --del mysql56 > /dev/null 2>&1
-    update-rc.d -f mysql56 remove >/dev/null 2>&1
-
-    service mysql80 stop > /dev/null 2>&1
-    chkconfig --del mysql80 > /dev/null 2>&1
-    update-rc.d -f mysql80 remove >/dev/null 2>&1
-
     pkill -9 mysqld >/dev/null 2>&1
 
     mkdir -p ${backup_dir}
@@ -197,10 +184,10 @@ install_mysql57(){
         --datadir=${mysql57_location}/mysql57_data --user=mysql"
     _config_mysql
 
-    cp -f ${mysql57_location}/support-files/mysql.server /etc/init.d/mysql57
-    chkconfig --add mysql57 > /dev/null 2>&1
-    update-rc.d -f mysql57 defaults > /dev/null 2>&1
-    service mysql57 restart > /dev/null 2>&1
+    cp -f ${mysql57_location}/support-files/mysql.server /etc/init.d/mysqld
+    chkconfig --add mysqld > /dev/null 2>&1
+    update-rc.d -f mysqld defaults > /dev/null 2>&1
+    service mysqld restart > /dev/null 2>&1
 
     echo "Root password:${mysql_pass}, Please keep it safe."
     _success "Install ${mysql57_filename} completed..."
