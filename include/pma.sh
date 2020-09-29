@@ -14,7 +14,9 @@ install_pma(){
     CheckError "wget --no-check-certificate -cv -t3 -T60 https://d.hws.com/linux/master/conf/phpmyadmin-conf.tar.gz"
     tar zxf phpmyadmin-conf.tar.gz && cp -f config.inc.php ${var}/default/pma/config.inc.php
 
-    chown -R www:www ${var}/default/pma
+    id -u www >/dev/null 2>&1
+    [ $? -ne 0 ] && useradd -M -U www -r -d /dev/null -s /sbin/nologin
+    chown -R www:www ${var}/default/pma >/dev/null 2>&1
 
     _success "${phpmyadmin_filename} install completed..."
     rm -f /tmp/config.inc.php

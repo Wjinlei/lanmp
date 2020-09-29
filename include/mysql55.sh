@@ -150,12 +150,22 @@ install_mysql55(){
     mysql_pass=${2}
 
     # 安装前处理
+    service mysqld stop > /dev/null 2>&1
+    chkconfig --del mysqld > /dev/null 2>&1
+    update-rc.d -f mysqld remove >/dev/null 2>&1
+
     service mysql56 stop > /dev/null 2>&1
     chkconfig --del mysql56 > /dev/null 2>&1
+    update-rc.d -f mysql56 remove >/dev/null 2>&1
+
     service mysql57 stop > /dev/null 2>&1
     chkconfig --del mysql57 > /dev/null 2>&1
+    update-rc.d -f mysql57 remove >/dev/null 2>&1
+
     service mysql80 stop > /dev/null 2>&1
     chkconfig --del mysql80 > /dev/null 2>&1
+    update-rc.d -f mysql80 remove >/dev/null 2>&1
+
     pkill -9 mysqld >/dev/null 2>&1
 
     mkdir -p ${backup_dir}

@@ -38,9 +38,8 @@ install_pureftpd(){
         exit 1
     fi
     pureftpd_location=${1}
-    service pureftpd stop >/dev/null 2>&1
     mkdir -p ${backup_dir}
-    mv -f ${pureftpd_location} ${backup_dir}/pureftpd-$(date +%Y-%m-%d_%H:%M:%S).bak
+    mv -f ${pureftpd_location} ${backup_dir}/pureftpd-$(date +%Y-%m-%d_%H:%M:%S).bak >/dev/null 2>&1
 
     _install_pureftpd_depends
     cd /tmp

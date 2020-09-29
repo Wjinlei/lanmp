@@ -18,9 +18,8 @@ install_redis(){
         exit 1
     fi
     redis_location=${1}
-    service redis stop >/dev/null 2>&1
     mkdir -p ${backup_dir}
-    mv -f ${redis_location} ${backup_dir}/redis-$(date +%Y-%m-%d_%H:%M:%S).bak
+    mv -f ${redis_location} ${backup_dir}/redis-$(date +%Y-%m-%d_%H:%M:%S).bak >/dev/null 2>&1
 
     local tram=$( free -m | awk '/Mem/ {print $2}' )
     local swap=$( free -m | awk '/Swap/ {print $2}' )

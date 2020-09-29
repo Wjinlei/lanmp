@@ -388,9 +388,8 @@ install_php55(){
         exit 1
     fi
     php55_location=${1}
-    service php55 stop >/dev/null 2>&1
     mkdir -p ${backup_dir}
-    mv -f ${php55_location} ${backup_dir}/php55-$(date +%Y-%m-%d_%H:%M:%S).bak
+    mv -f ${php55_location} ${backup_dir}/php55-$(date +%Y-%m-%d_%H:%M:%S).bak >/dev/null 2>&1
 
     _install_php_depend
     cd /tmp

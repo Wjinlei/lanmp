@@ -388,9 +388,8 @@ install_php72(){
         exit 1
     fi
     php72_location=${1}
-    service php72 stop >/dev/null 2>&1
     mkdir -p ${backup_dir}
-    mv -f ${php72_location} ${backup_dir}/php72-$(date +%Y-%m-%d_%H:%M:%S).bak
+    mv -f ${php72_location} ${backup_dir}/php72-$(date +%Y-%m-%d_%H:%M:%S).bak >/dev/null 2>&1
 
     _install_php_depend
     cd /tmp

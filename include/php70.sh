@@ -388,9 +388,8 @@ install_php70(){
         exit 1
     fi
     php70_location=${1}
-    service php70 stop >/dev/null 2>&1
     mkdir -p ${backup_dir}
-    mv -f ${php70_location} ${backup_dir}/php70-$(date +%Y-%m-%d_%H:%M:%S).bak
+    mv -f ${php70_location} ${backup_dir}/php70-$(date +%Y-%m-%d_%H:%M:%S).bak >/dev/null 2>&1
 
     _install_php_depend
     cd /tmp
