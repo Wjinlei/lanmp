@@ -148,9 +148,18 @@ install_mysql55(){
     fi
     mysql55_location=${1}
     mysql_pass=${2}
-    service mysql55 stop > /dev/null 2>&1
+
+    # 安装前处理
+    service mysql56 stop > /dev/null 2>&1
+    chkconfig --del mysql56 > /dev/null 2>&1
+    service mysql57 stop > /dev/null 2>&1
+    chkconfig --del mysql57 > /dev/null 2>&1
+    service mysql80 stop > /dev/null 2>&1
+    chkconfig --del mysql80 > /dev/null 2>&1
+    pkill -9 mysqld >/dev/null 2>&1
+
     mkdir -p ${backup_dir}
-    mv -f ${mysql55_location} ${backup_dir}/mysql55-$(date +%Y-%m-%d_%H:%M:%S).bak
+    mv -f ${mysql55_location} ${backup_dir}/mysql55-$(date +%Y-%m-%d_%H:%M:%S).bak >/dev/null 2>&1
 
     _install_mysql_depend
     Is64bit && sys_bit=x86_64 || sys_bit=i686
