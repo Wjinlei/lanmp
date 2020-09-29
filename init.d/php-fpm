@@ -123,15 +123,15 @@ status(){
         mPID=`cat $PID_FILE`
         isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
         if [ "$isRunning" != '' ];then
-            echo "$NAME (pid $mPID) already running."
-            exit 1
-        else
-            echo "$NAME is stopped"
+            echo "$NAME (pid $mPID) is running."
             exit 0
+        else
+            echo "$NAME already stopped."
+            exit 1
         fi
     else
-        echo "$NAME is stopped"
-        exit 0
+        echo "$NAME already stopped."
+        exit 1
     fi
 }
 
