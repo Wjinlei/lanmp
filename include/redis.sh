@@ -18,6 +18,10 @@ install_redis(){
         exit 1
     fi
     redis_location=${1}
+
+    service redis stop > /dev/null 2>&1
+    pkill -9 'redis-server' >/dev/null 2>&1
+
     mkdir -p ${backup_dir}
     mv -f ${redis_location} ${backup_dir}/redis-$(date +%Y-%m-%d_%H:%M:%S).bak >/dev/null 2>&1
 

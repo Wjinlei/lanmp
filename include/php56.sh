@@ -388,6 +388,8 @@ install_php56(){
         exit 1
     fi
     php56_location=${1}
+    service php56 stop > /dev/null 2>&1
+    service php56 force-stop > /dev/null 2>&1
     mkdir -p ${backup_dir}
     mv -f ${php56_location} ${backup_dir}/php56-$(date +%Y-%m-%d_%H:%M:%S).bak >/dev/null 2>&1
 
