@@ -171,11 +171,7 @@ install_apache(){
     apache_location=${1}
     wwwroot_dir=${2}
 
-    service httpd stop > /dev/null 2>&1
-    pkill -9 httpd >/dev/null 2>&1
-    service nginx stop > /dev/null 2>&1
-    pkill -9 nginx >/dev/null 2>&1
-
+    # 安装前备份
     mkdir -p ${backup_dir}
     mv -f ${apache_location} ${backup_dir}/apache-$(date +%Y-%m-%d_%H:%M:%S).bak > /dev/null 2>&1
 
