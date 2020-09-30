@@ -19,12 +19,13 @@ _install_nginx_depend(){
 }
 
 _start_nginx() {
+    CheckError "${nginx_location}/sbin/nginx -c ${nginx_location}/etc/nginx.conf"
     DownloadUrl "/etc/init.d/nginx" "${download_sysv_url}/nginx"
     sed -i "s|^prefix={nginx_location}$|prefix=${nginx_location}|i" /etc/init.d/nginx
     CheckError "chmod +x /etc/init.d/nginx"
     chkconfig --add nginx > /dev/null 2>&1
     update-rc.d -f nginx defaults > /dev/null 2>&1
-    CheckError "service nginx start"
+    CheckError "service nginx restart"
 }
 
 install_nginx(){

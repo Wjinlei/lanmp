@@ -39,11 +39,12 @@ _install_mysql_depend(){
 
 _config_mysql(){
     sed -i "s|^basedir=.*|basedir=${mysql57_location}|g" ${mysql57_location}/support-files/mysql.server
+    CheckError "${mysql57_location}/support-files/mysql.server start >/dev/null 2>&1"
     cp -f ${mysql57_location}/support-files/mysql.server /etc/init.d/mysql57
     chkconfig --add mysql57 > /dev/null 2>&1
     update-rc.d -f mysql57 defaults > /dev/null 2>&1
     _info "Starting MySQL..."
-    CheckError "service mysql57 start > /dev/null 2>&1"
+    CheckError "service mysql57 restart > /dev/null 2>&1"
     ${mysql57_location}/bin/mysql -e "GRANT ALL PRIVILEGES ON *.* to root@'127.0.0.1' IDENTIFIED BY \"${mysql_pass}\" WITH GRANT OPTION;"
     ${mysql57_location}/bin/mysql -e "GRANT ALL PRIVILEGES ON *.* to root@'localhost' IDENTIFIED BY \"${mysql_pass}\" WITH GRANT OPTION;"
     ${mysql57_location}/bin/mysql -uroot -p${mysql_pass} > /dev/null 2>&1 <<EOF

@@ -304,12 +304,15 @@ _install_libzip(){
 }
 
 _start_php71() {
+    CheckError "${php71_location}/sbin/php-fpm --daemonize \
+        --fpm-config ${php71_location}/etc/default.conf \
+        --pid ${php71_location}/var/run/default.pid"
     DownloadUrl "/etc/init.d/php71" "${download_sysv_url}/php-fpm"
     sed -i "s|^prefix={php-fpm_location}$|prefix=${php71_location}|i" /etc/init.d/php71
     CheckError "chmod +x /etc/init.d/php71"
     chkconfig --add php71 > /dev/null 2>&1
     update-rc.d -f php71 defaults > /dev/null 2>&1
-    CheckError "service php71 start"
+    CheckError "service php71 restart"
 }
 
 _config_php(){

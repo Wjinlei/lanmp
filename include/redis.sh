@@ -1,10 +1,11 @@
 _start_redis() {
+    CheckError "${redis_location}/bin/redis-server ${redis_location}/etc/redis.conf"
     DownloadUrl "/etc/init.d/redis" "${download_sysv_url}/redis"
     sed -i "s|^prefix={redis_location}$|prefix=${redis_location}|i" /etc/init.d/redis
     CheckError "chmod +x /etc/init.d/redis"
     chkconfig --add redis > /dev/null 2>&1
     update-rc.d -f redis defaults > /dev/null 2>&1
-    CheckError "service redis start"
+    CheckError "service redis restart"
 }
 
 install_redis(){

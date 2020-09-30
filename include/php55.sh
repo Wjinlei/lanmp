@@ -304,12 +304,15 @@ _install_libzip(){
 }
 
 _start_php55() {
+    CheckError "${php55_location}/sbin/php-fpm --daemonize \
+        --fpm-config ${php55_location}/etc/default.conf \
+        --pid ${php55_location}/var/run/default.pid"
     DownloadUrl "/etc/init.d/php55" "${download_sysv_url}/php-fpm"
     sed -i "s|^prefix={php-fpm_location}$|prefix=${php55_location}|i" /etc/init.d/php55
     CheckError "chmod +x /etc/init.d/php55"
     chkconfig --add php55 > /dev/null 2>&1
     update-rc.d -f php55 defaults > /dev/null 2>&1
-    CheckError "service php55 start"
+    CheckError "service php55 restart"
 }
 
 _config_php(){

@@ -19,12 +19,13 @@ _install_pureftpd_depends(){
 }
 
 _start_pureftpd() {
+    CheckError "${pureftpd_location}/sbin/pure-ftpd ${pureftpd_location}/etc/pure-ftpd.conf"
     DownloadUrl "/etc/init.d/pureftpd" "${download_sysv_url}/pureftpd"
     sed -i "s|^prefix={pureftpd_location}$|prefix=${pureftpd_location}|i" /etc/init.d/pureftpd
     CheckError "chmod +x /etc/init.d/pureftpd"
     chkconfig --add pureftpd > /dev/null 2>&1
     update-rc.d -f pureftpd defaults > /dev/null 2>&1
-    CheckError "service pureftpd start"
+    CheckError "service pureftpd restart"
 }
 
 install_pureftpd(){

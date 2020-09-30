@@ -304,12 +304,15 @@ _install_libzip(){
 }
 
 _start_php73() {
+    CheckError "${php73_location}/sbin/php-fpm --daemonize \
+        --fpm-config ${php73_location}/etc/default.conf \
+        --pid ${php73_location}/var/run/default.pid"
     DownloadUrl "/etc/init.d/php73" "${download_sysv_url}/php-fpm"
     sed -i "s|^prefix={php-fpm_location}$|prefix=${php73_location}|i" /etc/init.d/php73
     CheckError "chmod +x /etc/init.d/php73"
     chkconfig --add php73 > /dev/null 2>&1
     update-rc.d -f php73 defaults > /dev/null 2>&1
-    CheckError "service php73 start"
+    CheckError "service php73 restart"
 }
 
 _config_php(){

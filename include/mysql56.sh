@@ -39,11 +39,12 @@ _install_mysql_depend(){
 
 _config_mysql(){
     sed -i "s|^basedir=.*|basedir=${mysql56_location}|g" ${mysql56_location}/support-files/mysql.server
+    CheckError "${mysql56_location}/support-files/mysql.server start >/dev/null 2>&1"
     cp -f ${mysql56_location}/support-files/mysql.server /etc/init.d/mysql56
     chkconfig --add mysql56 > /dev/null 2>&1
     update-rc.d -f mysql56 defaults > /dev/null 2>&1
     _info "Starting MySQL..."
-    CheckError "service mysql56 start > /dev/null 2>&1"
+    CheckError "service mysql56 restart > /dev/null 2>&1"
     ${mysql56_location}/bin/mysql -e "GRANT ALL PRIVILEGES ON *.* to root@'127.0.0.1' IDENTIFIED BY \"${mysql_pass}\" WITH GRANT OPTION;"
     ${mysql56_location}/bin/mysql -e "GRANT ALL PRIVILEGES ON *.* to root@'localhost' IDENTIFIED BY \"${mysql_pass}\" WITH GRANT OPTION;"
     ${mysql56_location}/bin/mysql -uroot -p${mysql_pass} > /dev/null 2>&1 <<EOF

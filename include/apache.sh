@@ -148,13 +148,14 @@ _install_nghttp2(){
 }
 
 _start_apache() {
+    CheckError "${apache_location}/bin/httpd -k start"
     DownloadUrl "/etc/init.d/httpd" "${download_sysv_url}/httpd"
     sed -i "s|^prefix={apache_location}$|prefix=${apache_location}|i" /etc/init.d/httpd
     sed -i "s|{openssl_location_lib}|${openssl_location}/lib|i" /etc/init.d/httpd
     CheckError "chmod +x /etc/init.d/httpd"
     chkconfig --add httpd > /dev/null 2>&1
     update-rc.d -f httpd defaults > /dev/null 2>&1
-    CheckError "service httpd start"
+    CheckError "service httpd restart"
 }
 
 install_apache(){
