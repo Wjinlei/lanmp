@@ -375,8 +375,8 @@ install_php54(){
         exit 1
     fi
     php54_location=${1}
-    service php54 stop > /dev/null 2>&1
-    service php54 force-stop > /dev/null 2>&1
+
+    # 安装前备份
     mkdir -p ${backup_dir}
     mv -f ${php54_location} ${backup_dir}/php54-$(date +%Y-%m-%d_%H:%M:%S).bak >/dev/null 2>&1
 

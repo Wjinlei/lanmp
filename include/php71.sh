@@ -388,8 +388,8 @@ install_php71(){
         exit 1
     fi
     php71_location=${1}
-    service php71 stop > /dev/null 2>&1
-    service php71 force-stop > /dev/null 2>&1
+
+    # 安装前备份
     mkdir -p ${backup_dir}
     mv -f ${php71_location} ${backup_dir}/php71-$(date +%Y-%m-%d_%H:%M:%S).bak >/dev/null 2>&1
 
