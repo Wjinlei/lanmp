@@ -28,15 +28,15 @@ _start_nginx() {
 }
 
 install_nginx(){
-    if [ $# -lt 1 ]; then
-        echo "[Parameter Error]: nginx_location [default_port]"
+    if [ $# -lt 2 ]; then
+        echo "[Parameter Error]: nginx_location [wwwroot] [default_port]"
         exit 1
     fi
     nginx_location=${1}
 
     # 如果存在第二个参数
-    if [ $# -ge 2 ]; then
-        nginx_port=${2}
+    if [ $# -ge 3 ]; then
+        nginx_port=${3}
     fi
 
     _install_nginx_depend

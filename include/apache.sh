@@ -158,15 +158,15 @@ _start_apache() {
 }
 
 install_apache(){
-    if [ $# -lt 1 ]; then
-        echo "[Parameter Error]: apache_location [default_port]"
+    if [ $# -lt 2 ]; then
+        echo "[Parameter Error]: apache_location [wwwroot] [default_port]"
         exit 1
     fi
     apache_location=${1}
 
     # 如果存在第二个参数
-    if [ $# -ge 2 ]; then
-        apache_port=${2}
+    if [ $# -ge 3 ]; then
+        apache_port=${3}
     fi
 
     _install_apache_depend
