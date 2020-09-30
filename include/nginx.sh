@@ -203,5 +203,7 @@ ${nginx_location}/logs/*log {
 EOF
 
     # 授权
+    mkdir -p ${var}/pma
+    chown -R www:www ${var/pma}
     chown -R www:www ${nginx_location}
 }

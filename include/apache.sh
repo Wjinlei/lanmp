@@ -376,6 +376,9 @@ IncludeOptional ${apache_location}/conf/vhost/*.conf
     </Location>
 </VirtualHost>
 EOF
+
     # 授权
+    mkdir -p ${var}/pma
+    chown -R www:www ${var/pma}
     chown -R www:www ${apache_location}
 }
