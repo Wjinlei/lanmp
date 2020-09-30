@@ -304,17 +304,12 @@ _install_libzip(){
 }
 
 _start_php56() {
-    wget --no-check-certificate -cv -t3 -T60 -O /etc/init.d/php56 ${download_sysv_url}/php-fpm
-    if [ "$?" == 0 ]; then
-        sed -i "s|^prefix={php-fpm_location}$|prefix=${php56_location}|i" /etc/init.d/php56
-        chmod +x /etc/init.d/php56
-        chkconfig --add php56 > /dev/null 2>&1
-        update-rc.d -f php56 defaults > /dev/null 2>&1
-        service php56 start
-    else
-        _info "Start ${php56_filename}"
-        ${php56_location}/sbin/php-fpm -y ${php56_location}/etc/default.conf
-    fi
+    DownloadUrl "/etc/init.d/php56" "${download_sysv_url}/php-fpm"
+    sed -i "s|^prefix={php-fpm_location}$|prefix=${php56_location}|i" /etc/init.d/php56
+    CheckError "chmod +x /etc/init.d/php56"
+    chkconfig --add php56 > /dev/null 2>&1
+    update-rc.d -f php56 defaults > /dev/null 2>&1
+    CheckError "service php56 start"
 }
 
 _config_php(){
@@ -384,14 +379,10 @@ EOF
 
 install_php56(){
     if [ $# -lt 1 ]; then
-        echo "[ERROR]: Missing parameters: [php_location]"
+        echo "[Parameter Error]: php_location"
         exit 1
     fi
     php56_location=${1}
-
-    # 安装前备份
-    mkdir -p ${backup_dir}
-    mv -f ${php56_location} ${backup_dir}/php56-$(date +%Y-%m-%d_%H:%M:%S).bak >/dev/null 2>&1
 
     _install_php_depend
     cd /tmp

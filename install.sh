@@ -54,19 +54,19 @@ Options:
             ;;
         --install-mysql55)
             include mysql55
-            install_mysql55 ${2} ${3}
+            install_mysql55 ${2} ${3} ${4}
             ;;
         --install-mysql56)
             include mysql56
-            install_mysql56 ${2} ${3}
+            install_mysql56 ${2} ${3} ${4}
             ;;
         --install-mysql57)
             include mysql57
-            install_mysql57 ${2} ${3}
+            install_mysql57 ${2} ${3} ${4}
             ;;
         --install-mysql80)
             include mysql80
-            install_mysql80 ${2} ${3}
+            install_mysql80 ${2} ${3} ${4}
             ;;
         --install-php53)
             include php53
@@ -102,11 +102,11 @@ Options:
             ;;
         --install-pureftpd)
             include pureftpd
-            install_pureftpd ${2}
+            install_pureftpd ${2} ${3}
             ;;
         --install-redis)
             include redis
-            install_redis ${2}
+            install_redis ${2} ${3}
             ;;
         --install-pma)
             include pma

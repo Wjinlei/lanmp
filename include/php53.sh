@@ -305,17 +305,12 @@ _install_libzip(){
 }
 
 _start_php53() {
-    wget --no-check-certificate -cv -t3 -T60 -O /etc/init.d/php53 ${download_sysv_url}/php-fpm
-    if [ "$?" == 0 ]; then
-        sed -i "s|^prefix={php-fpm_location}$|prefix=${php53_location}|i" /etc/init.d/php53
-        chmod +x /etc/init.d/php53
-        chkconfig --add php53 > /dev/null 2>&1
-        update-rc.d -f php53 defaults > /dev/null 2>&1
-        service php53 start
-    else
-        _info "Start ${php53_filename}"
-        ${php53_location}/sbin/php-fpm -y ${php53_location}/etc/default.conf
-    fi
+    DownloadUrl "/etc/init.d/php53" "${download_sysv_url}/php-fpm"
+    sed -i "s|^prefix={php-fpm_location}$|prefix=${php53_location}|i" /etc/init.d/php53
+    CheckError "chmod +x /etc/init.d/php53"
+    chkconfig --add php53 > /dev/null 2>&1
+    update-rc.d -f php53 defaults > /dev/null 2>&1
+    CheckError "service php53 start"
 }
 
 _config_php(){
@@ -372,14 +367,10 @@ EOF
 
 install_php53(){
     if [ $# -lt 1 ]; then
-        echo "[ERROR]: Missing parameters: [php_location]"
+        echo "[Parameter Error]: php_location"
         exit 1
     fi
     php53_location=${1}
-
-    # 安装前备份
-    mkdir -p ${backup_dir}
-    mv -f ${php53_location} ${backup_dir}/php53-$(date +%Y-%m-%d_%H:%M:%S).bak >/dev/null 2>&1
 
     _install_php_depend
     cd /tmp

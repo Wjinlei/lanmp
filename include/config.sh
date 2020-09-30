@@ -153,6 +153,7 @@ apr_util_download_url="http://ftp.jaist.ac.jp/pub/apache//apr/apr-util-1.6.1.tar
 # Other
 mysql_port=3306
 redis_port=6379
-pureftpd_port=21
-backup_dir=${var}/backup
+ftp_port=21
+apache_port=80
+nginx_port=80
 }

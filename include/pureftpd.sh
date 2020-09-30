@@ -19,29 +19,25 @@ _install_pureftpd_depends(){
 }
 
 _start_pureftpd() {
-    wget --no-check-certificate -cv -t3 -T60 -O /etc/init.d/pureftpd ${download_sysv_url}/pureftpd
-    if [ "$?" == 0 ]; then
-        sed -i "s|^prefix={pureftpd_location}$|prefix=${pureftpd_location}|i" /etc/init.d/pureftpd
-        chmod +x /etc/init.d/pureftpd
-        chkconfig --add pureftpd > /dev/null 2>&1
-        update-rc.d -f pureftpd defaults > /dev/null 2>&1
-        service pureftpd start
-    else
-        _info "Start ${pureftpd_filename}"
-        ${pureftpd_location}/sbin/pure-ftpd  ${pureftpd_location}/etc/pure-ftpd.conf
-    fi
+    DownloadUrl "/etc/init.d/pureftpd" "${download_sysv_url}/pureftpd"
+    sed -i "s|^prefix={pureftpd_location}$|prefix=${pureftpd_location}|i" /etc/init.d/pureftpd
+    CheckError "chmod +x /etc/init.d/pureftpd"
+    chkconfig --add pureftpd > /dev/null 2>&1
+    update-rc.d -f pureftpd defaults > /dev/null 2>&1
+    CheckError "service pureftpd start"
 }
 
 install_pureftpd(){
     if [ $# -lt 1 ]; then
-        echo "[ERROR]: Missing parameters: [pureftpd_location]"
+        echo "[Parameter Error]: pureftpd_location [default_port]"
         exit 1
     fi
     pureftpd_location=${1}
 
-    # 安装前备份
-    mkdir -p ${backup_dir}
-    mv -f ${pureftpd_location} ${backup_dir}/pureftpd-$(date +%Y-%m-%d_%H:%M:%S).bak >/dev/null 2>&1
+    # 如果存在第二个参数
+    if [ $# -ge 2 ]; then
+        ftp_port=${2}
+    fi
 
     _install_pureftpd_depends
     cd /tmp
@@ -86,7 +82,7 @@ install_pureftpd(){
 _create_pureftpd_config(){
     cat > ${pureftpd_location}/etc/pure-ftpd.conf <<EOF
 # default 21
-Bind 0.0.0.0,${pureftpd_port}
+Bind 0.0.0.0,${ftp_port}
 
 # default yes
 ChrootEveryone yes

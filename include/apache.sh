@@ -22,7 +22,6 @@ _install_apache_depend(){
 
     id -u www >/dev/null 2>&1
     [ $? -ne 0 ] && useradd -M -U www -r -d /dev/null -s /sbin/nologin
-    mkdir -p ${wwwroot_dir}
     _success "Install dependencies packages for Apache completed..."
 }
 
@@ -149,31 +148,26 @@ _install_nghttp2(){
 }
 
 _start_apache() {
-    wget --no-check-certificate -cv -t3 -T60 -O /etc/init.d/httpd ${download_sysv_url}/httpd
-    if [ "$?" == 0 ]; then
-        sed -i "s|^prefix={apache_location}$|prefix=${apache_location}|i" /etc/init.d/httpd
-        sed -i "s|{openssl_location_lib}|${openssl_location}/lib|i" /etc/init.d/httpd
-        chmod +x /etc/init.d/httpd
-        chkconfig --add httpd > /dev/null 2>&1
-        update-rc.d -f httpd defaults > /dev/null 2>&1
-        service httpd start
-    else
-        _info "Start ${apache_filename}"
-        ${apache_location}/bin/apachectl start
-    fi
+    DownloadUrl "/etc/init.d/httpd" "${download_sysv_url}/httpd"
+    sed -i "s|^prefix={apache_location}$|prefix=${apache_location}|i" /etc/init.d/httpd
+    sed -i "s|{openssl_location_lib}|${openssl_location}/lib|i" /etc/init.d/httpd
+    CheckError "chmod +x /etc/init.d/httpd"
+    chkconfig --add httpd > /dev/null 2>&1
+    update-rc.d -f httpd defaults > /dev/null 2>&1
+    CheckError "service httpd start"
 }
 
 install_apache(){
-    if [ $# -lt 2 ]; then
-        echo "[ERROR]: Missing parameters: [apache_location] [wwwroot_dir]"
+    if [ $# -lt 1 ]; then
+        echo "[Parameter Error]: apache_location [default_port]"
         exit 1
     fi
     apache_location=${1}
-    wwwroot_dir=${2}
 
-    # 安装前备份
-    mkdir -p ${backup_dir}
-    mv -f ${apache_location} ${backup_dir}/apache-$(date +%Y-%m-%d_%H:%M:%S).bak > /dev/null 2>&1
+    # 如果存在第二个参数
+    if [ $# -ge 2 ]; then
+        apache_port=${2}
+    fi
 
     _install_apache_depend
     cd /tmp
@@ -226,39 +220,39 @@ _config_apache(){
     grep -qE "^\s*#\s*Include conf/extra/httpd-vhosts.conf" ${apache_location}/conf/httpd.conf && \
     sed -i 's#^\s*\#\s*Include conf/extra/httpd-vhosts.conf#Include conf/extra/httpd-vhosts.conf#' ${apache_location}/conf/httpd.conf || \
     sed -i '$aInclude conf/extra/httpd-vhosts.conf' ${apache_location}/conf/httpd.conf
+    sed -i 's/^Listen.*/Listen ${apache_port}/i' ${apache_location}/conf/httpd.conf
     sed -i 's/^User.*/User www/i' ${apache_location}/conf/httpd.conf
     sed -i 's/^Group.*/Group www/i' ${apache_location}/conf/httpd.conf
     sed -i 's/^ServerAdmin you@example.com/ServerAdmin admin@localhost/' ${apache_location}/conf/httpd.conf
-    sed -i 's/^#ServerName www.example.com:80/ServerName 0.0.0.0:80/' ${apache_location}/conf/httpd.conf
+    sed -i 's/^#ServerName www.example.com:80/ServerName 0.0.0.0:${apache_port}/' ${apache_location}/conf/httpd.conf
     sed -i 's@^#Include conf/extra/httpd-default.conf@Include conf/extra/httpd-default.conf@' ${apache_location}/conf/httpd.conf
     sed -i 's@^#Include conf/extra/httpd-info.conf@Include conf/extra/httpd-info.conf@' ${apache_location}/conf/httpd.conf
     sed -i 's@DirectoryIndex index.html@DirectoryIndex index.php default.php index.html index.htm default.html default.htm@' ${apache_location}/conf/httpd.conf
     sed -i 's/Require all granted/Require all denied/g' ${apache_location}/conf/httpd.conf
-    #echo "ServerTokens ProductOnly" >> ${apache_location}/conf/httpd.conf
-    #echo "ProtocolsHonorOrder On" >> ${apache_location}/conf/httpd.conf
-    #echo "Protocols h2 http/1.1" >> ${apache_location}/conf/httpd.conf
     sed -i 's/Require host .example.com/Require host localhost/g' ${apache_location}/conf/extra/httpd-info.conf
     sed -i "s@AddType\(.*\)Z@AddType\1Z\n    AddType application/x-httpd-php .php .phtml\n    AddType application/x-httpd-php-source .phps@" ${apache_location}/conf/httpd.conf
     sed -i "s@^export LD_LIBRARY_PATH.*@export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:${openssl_location}/lib@" ${apache_location}/bin/envvars
     mkdir -p ${apache_location}/conf/vhost/
-    cat > ${apache_location}/conf/extra/httpd-ssl.conf <<EOF
-Listen 443
-AddType application/x-x509-ca-cert .crt
-AddType application/x-pkcs7-crl .crl
-SSLPassPhraseDialog  builtin
-SSLSessionCache  "shmcb:logs/ssl_scache(512000)"
-SSLSessionCacheTimeout  300
-SSLUseStapling On
-SSLStaplingCache "shmcb:logs/ssl_stapling(512000)"
-SSLProtocol -All +TLSv1.2 +TLSv1.3
-SSLProxyProtocol -All +TLSv1.2 +TLSv1.3
-SSLCipherSuite HIGH:!aNULL:!MD5:!3DES:!CAMELLIA:!AES128
-SSLProxyCipherSuite HIGH:!aNULL:!MD5:!3DES:!CAMELLIA:!AES128
-SSLHonorCipherOrder on
-SSLCompression off
-Mutex sysvsem default
-SSLStrictSNIVHostCheck on
-EOF
+    #cat > ${apache_location}/conf/extra/httpd-ssl.conf <<EOF
+#Listen 443
+#AddType application/x-x509-ca-cert .crt
+#AddType application/x-pkcs7-crl .crl
+#SSLPassPhraseDialog  builtin
+#SSLSessionCache  "shmcb:logs/ssl_scache(512000)"
+#SSLSessionCacheTimeout  300
+#SSLUseStapling On
+#SSLStaplingCache "shmcb:logs/ssl_stapling(512000)"
+#SSLProtocol -All +TLSv1.2 +TLSv1.3
+#SSLProxyProtocol -All +TLSv1.2 +TLSv1.3
+#SSLCipherSuite HIGH:!aNULL:!MD5:!3DES:!CAMELLIA:!AES128
+#SSLProxyCipherSuite HIGH:!aNULL:!MD5:!3DES:!CAMELLIA:!AES128
+#SSLHonorCipherOrder on
+#SSLCompression off
+#Mutex sysvsem default
+#SSLStrictSNIVHostCheck on
+#EOF
+
+    # 定期清理日志
     cat > /etc/logrotate.d/hws_apache_log <<EOF
 ${apache_location}/logs/*log {
     daily
@@ -272,19 +266,7 @@ ${apache_location}/logs/*log {
     endscript
 }
 EOF
-    cat > /etc/logrotate.d/hws_apache_site_log <<EOF
-${wwwroot_dir}/*/log/*log {
-    daily
-    rotate 30
-    missingok
-    notifempty
-    compress
-    sharedscripts
-    postrotate
-        [ ! -f ${apache_location}/logs/httpd.pid ] || kill -USR1 \`cat ${apache_location}/logs/httpd.pid\`
-    endscript
-}
-EOF
+
 # httpd modules array
 httpd_mod_list=(
 mod_actions.so
@@ -349,17 +331,17 @@ mod_xml2enc.so
         fi
     done
 
-    # 写入phpMyAdmin配置文件
+    # 写入默认配置文件
     cat > ${apache_location}/conf/extra/httpd-vhosts.conf <<EOF
 Listen 999
 <VirtualHost *:999>
     ServerAdmin webmaster@example.com
-    DocumentRoot ${var}/default/pma
+    DocumentRoot ${var}/pma
     ServerName phpMyAdmin.999
     ServerAlias localhost
     #errorDocument 404 /404.html
-    ErrorLog "${var}/default/pma/pma-error.log"
-    CustomLog "${var}/default/pma/pma-access.log" combined
+    ErrorLog "${var}/pma/pma-error.log"
+    CustomLog "${var}/pma/pma-access.log" combined
 
     #DENY FILES
     <Files ~ (\.user.ini|\.sql|\.zip|\.gz|\.htaccess|\.git|\.svn|\.project|LICENSE|README.md)\$>
@@ -373,7 +355,7 @@ Listen 999
     </FilesMatch>
 
     #PATH
-    <Directory ${var}/default/pma>
+    <Directory ${var}/pma>
         SetOutputFilter DEFLATE
         Options FollowSymLinks
         AllowOverride All
@@ -386,18 +368,14 @@ Listen 999
 
 IncludeOptional ${apache_location}/conf/vhost/*.conf
 
-<VirtualHost *:80>
+# 对默认端口,防止范解析攻击
+<VirtualHost *:${apache_port}>
     ServerAlias *
     <Location />
         Require all denied
     </Location>
 </VirtualHost>
 EOF
-    mkdir -p ${var}/default/pma
-    cat > ${var}/default/pma/index.html <<EOF
-<h1>尚未安装phpMyAdmin，请先返回安装<h1>
-EOF
-    chown -R www:www ${var}/default
-    chown -R www:www ${wwwroot_dir}
+    # 授权
     chown -R www:www ${apache_location}
 }

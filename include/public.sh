@@ -51,6 +51,21 @@ DownloadFile(){
     fi
 }
 
+DownloadUrl(){
+    local cur_dir=$(pwd)
+    if [ -s "$1" ]; then
+        _info "$1 [found]"
+    else
+        _info "$1 not found, download now..."
+        wget --no-check-certificate -cv -t3 -T60 -O $1 ${2}
+        if [ $? -eq 0 ]; then
+            _success "$1 download completed..."
+        else
+            _error "Failed to download $1, please download it to ${cur_dir} directory manually and try again."
+        fi
+    fi
+}
+
 _get_package_manager(){
     yum >/dev/null 2>&1 
     if [ "$?" -ne 127 ]; then 

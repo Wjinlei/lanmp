@@ -1,27 +1,23 @@
 _start_redis() {
-    wget --no-check-certificate -cv -t3 -T60 -O /etc/init.d/redis ${download_sysv_url}/redis
-    if [ "$?" == 0 ]; then
-        sed -i "s|^prefix={redis_location}$|prefix=${redis_location}|i" /etc/init.d/redis
-        chmod +x /etc/init.d/redis
-        chkconfig --add redis > /dev/null 2>&1
-        update-rc.d -f redis defaults > /dev/null 2>&1
-        service redis start
-    else
-        _info "Start ${redis_filename}"
-        ${redis_location}/bin/redis-server ${redis_location}/etc/redis.conf
-    fi
+    DownloadUrl "/etc/init.d/redis" "${download_sysv_url}/redis"
+    sed -i "s|^prefix={redis_location}$|prefix=${redis_location}|i" /etc/init.d/redis
+    CheckError "chmod +x /etc/init.d/redis"
+    chkconfig --add redis > /dev/null 2>&1
+    update-rc.d -f redis defaults > /dev/null 2>&1
+    CheckError "service redis start"
 }
 
 install_redis(){
     if [ $# -lt 1 ]; then
-        echo "[ERROR]: Missing parameters: [redis_location]"
+        echo "[Parameter Error]: redis_location [default_port]"
         exit 1
     fi
     redis_location=${1}
 
-    # 安装前备份
-    mkdir -p ${backup_dir}
-    mv -f ${redis_location} ${backup_dir}/redis-$(date +%Y-%m-%d_%H:%M:%S).bak >/dev/null 2>&1
+    # 如果存在第二个参数
+    if [ $# -ge 2 ]; then
+        redis_port=${2}
+    fi
 
     local tram=$( free -m | awk '/Mem/ {print $2}' )
     local swap=$( free -m | awk '/Swap/ {print $2}' )

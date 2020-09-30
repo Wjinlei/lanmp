@@ -144,15 +144,16 @@ EOF
 
 install_mysql80(){
     if [ $# -lt 2 ]; then
-        echo "[ERROR]: Missing parameters: [mysql_location] [password]"
+        echo "[Parameter Error]: mysql_location password [default_port]"
         exit 1
     fi
     mysql80_location=${1}
     mysql_pass=${2}
 
-    # 安装前备份
-    mkdir -p ${backup_dir}
-    mv -f ${mysql80_location} ${backup_dir}/mysql80-$(date +%Y-%m-%d_%H:%M:%S).bak >/dev/null 2>&1
+    # 如果存在第三个参数
+    if [ $# -ge 3 ]; then
+        mysql_port=${3}
+    fi
 
     _install_mysql_depend
     Is64bit && sys_bit=x86_64 || sys_bit=i686

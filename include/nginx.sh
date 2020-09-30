@@ -15,35 +15,29 @@ _install_nginx_depend(){
     fi
     id -u www >/dev/null 2>&1
     [ $? -ne 0 ] && useradd -M -U www -r -d /dev/null -s /sbin/nologin
-    mkdir -p ${wwwroot_dir}
     _success "Install dependencies packages for Nginx completed..."
 }
 
 _start_nginx() {
-    wget --no-check-certificate -cv -t3 -T60 -O /etc/init.d/nginx ${download_sysv_url}/nginx
-    if [ "$?" == 0 ]; then
-        sed -i "s|^prefix={nginx_location}$|prefix=${nginx_location}|i" /etc/init.d/nginx
-        chmod +x /etc/init.d/nginx
-        chkconfig --add nginx > /dev/null 2>&1
-        update-rc.d -f nginx defaults > /dev/null 2>&1
-        service nginx start
-    else
-        _info "Start ${nginx_filename}"
-        ${nginx_location}/sbin/nginx
-    fi
+    DownloadUrl "/etc/init.d/nginx" "${download_sysv_url}/nginx"
+    sed -i "s|^prefix={nginx_location}$|prefix=${nginx_location}|i" /etc/init.d/nginx
+    CheckError "chmod +x /etc/init.d/nginx"
+    chkconfig --add nginx > /dev/null 2>&1
+    update-rc.d -f nginx defaults > /dev/null 2>&1
+    CheckError "service nginx start"
 }
 
 install_nginx(){
-    if [ $# -lt 2 ]; then
-        echo "[ERROR]: Missing parameters: [nginx_location] [wwwroot_dir]"
+    if [ $# -lt 1 ]; then
+        echo "[Parameter Error]: nginx_location [default_port]"
         exit 1
     fi
     nginx_location=${1}
-    wwwroot_dir=${2}
 
-    # 安装前备份
-    mkdir -p ${backup_dir}
-    mv -f ${nginx_location} ${backup_dir}/nginx-$(date +%Y-%m-%d_%H:%M:%S).bak >/dev/null 2>&1
+    # 如果存在第二个参数
+    if [ $# -ge 2 ]; then
+        nginx_port=${2}
+    fi
 
     _install_nginx_depend
     cd /tmp
@@ -92,7 +86,6 @@ install_nginx(){
     mkdir -p ${nginx_location}/etc/vhost
     _info "Config ${nginx_filename}"
     _config_nginx
-    chown -R www:www ${nginx_location}
     _start_nginx
     _success "${nginx_filename} install completed..."
     rm -fr /tmp/${pcre_filename}
@@ -101,7 +94,11 @@ install_nginx(){
 }
 
 _config_nginx(){
-    [ -f "${nginx_location}/etc/nginx.conf" ] && mv ${nginx_location}/etc/nginx.conf ${nginx_location}/etc/nginx.conf-$(date +%Y-%m-%d_%H:%M:%S).bak
+    # 备份原配置文件
+    [ -f "${nginx_location}/etc/nginx.conf" ] && \
+        mv ${nginx_location}/etc/nginx.conf ${nginx_location}/etc/nginx.conf-$(date +%Y-%m-%d_%H:%M:%S).bak
+
+    # 写入默认配置文件
     cat > ${nginx_location}/etc/nginx.conf <<EOF
 worker_processes auto;
 worker_rlimit_nofile 51200;
@@ -125,9 +122,6 @@ http {
     tcp_nopush on;
     tcp_nodelay on;
     keepalive_timeout 60;
-
-    # include virtual host config
-    include vhost/*.conf;
 
     # fastcgi
     fastcgi_connect_timeout 300;
@@ -161,13 +155,16 @@ http {
     limit_conn_zone \$binary_remote_addr zone=perip:10m;
     limit_conn_zone \$server_name zone=perserver:10m;
 
+    # include virtual host config
+    include vhost/*.conf;
+
     server {
-       listen 999;
+       listen 998;
        server_name localhost;
-       root ${var}/default/pma;
+       root ${var}/pma;
        index index.php default.php index.html index.htm default.html default.htm;
-       error_log "${var}/default/pma/pma-error.log";
-       access_log "${var}/default/pma/pma-access.log";
+       error_log "${var}/pma/pma-error.log";
+       access_log "${var}/pma/pma-access.log";
 
        #DENY FILES
        location ~ ^/(\.user.ini|\.sql|\.zip|\.gz|\.htaccess|\.git|\.svn|\.project|LICENSE|README.md)
@@ -184,12 +181,13 @@ http {
     }
 
     server {
-       listen 80 default;
+       listen ${nginx_port} default;
        return 403;
     }
 }
-
 EOF
+
+    # 定期清理日志
     cat > /etc/logrotate.d/hws_nginx_log <<EOF
 ${nginx_location}/logs/*log {
     daily
@@ -203,24 +201,7 @@ ${nginx_location}/logs/*log {
     endscript
 }
 EOF
-    cat > /etc/logrotate.d/hws_nginx_site_log <<EOF
-${wwwroot_dir}/*/log/*log {
-    daily
-    rotate 30
-    missingok
-    notifempty
-    compress
-    sharedscripts
-    postrotate
-        [ ! -f ${nginx_location}/var/run/nginx.pid ] || kill -USR1 \`cat ${nginx_location}/var/run/nginx.pid\`
-    endscript
-}
-EOF
-    mkdir -p ${var}/default/pma
-    cat > ${var}/default/pma/index.html <<EOF
-<h1>尚未安装phpMyAdmin，请先返回安装<h1>
-EOF
-    chown -R www:www ${var}/default
-    chown -R www:www ${wwwroot_dir}
+
+    # 授权
     chown -R www:www ${nginx_location}
 }
