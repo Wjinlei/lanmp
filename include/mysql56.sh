@@ -39,8 +39,11 @@ _install_mysql_depend(){
 
 _config_mysql(){
     sed -i "s|^basedir=.*|basedir=${mysql56_location}|g" ${mysql56_location}/support-files/mysql.server
+    cp -f ${mysql56_location}/support-files/mysql.server /etc/init.d/mysql56
+    chkconfig --add mysql56 > /dev/null 2>&1
+    update-rc.d -f mysql56 defaults > /dev/null 2>&1
     _info "Starting MySQL..."
-    ${mysql56_location}/support-files/mysql.server start > /dev/null 2>&1
+    CheckError "service mysql56 start > /dev/null 2>&1"
     ${mysql56_location}/bin/mysql -e "GRANT ALL PRIVILEGES ON *.* to root@'127.0.0.1' IDENTIFIED BY \"${mysql_pass}\" WITH GRANT OPTION;"
     ${mysql56_location}/bin/mysql -e "GRANT ALL PRIVILEGES ON *.* to root@'localhost' IDENTIFIED BY \"${mysql_pass}\" WITH GRANT OPTION;"
     ${mysql56_location}/bin/mysql -uroot -p${mysql_pass} > /dev/null 2>&1 <<EOF
@@ -50,6 +53,7 @@ _config_mysql(){
     DELETE FROM mysql.user WHERE user="root" AND host="%";
     FLUSH PRIVILEGES;
 EOF
+    CheckError "service mysql56 restart > /dev/null 2>&1"
 }
 
 
@@ -149,9 +153,7 @@ install_mysql56(){
     mysql56_location=${1}
     mysql_pass=${2}
 
-    service mysqld stop > /dev/null 2>&1
-    pkill -9 mysqld >/dev/null 2>&1
-
+    # 安装前备份
     mkdir -p ${backup_dir}
     mv -f ${mysql56_location} ${backup_dir}/mysql56-$(date +%Y-%m-%d_%H:%M:%S).bak >/dev/null 2>&1
 
@@ -180,11 +182,6 @@ install_mysql56(){
         --basedir=${mysql56_location} \
         --datadir=${mysql56_location}/mysql56_data --user=mysql"
     _config_mysql
-
-    cp -f ${mysql56_location}/support-files/mysql.server /etc/init.d/mysqld
-    chkconfig --add mysqld > /dev/null 2>&1
-    update-rc.d -f mysqld defaults > /dev/null 2>&1
-    service mysqld restart > /dev/null 2>&1
 
     echo "Root password:${mysql_pass}, Please keep it safe."
     _success "Install ${mysql56_filename} completed..."

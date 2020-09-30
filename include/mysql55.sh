@@ -39,8 +39,11 @@ _install_mysql_depend(){
 
 _config_mysql(){
     sed -i "s|^basedir=.*|basedir=${mysql55_location}|g" ${mysql55_location}/support-files/mysql.server
+    cp -f ${mysql55_location}/support-files/mysql.server /etc/init.d/mysql55
+    chkconfig --add mysql55 > /dev/null 2>&1
+    update-rc.d -f mysql55 defaults > /dev/null 2>&1
     _info "Starting MySQL..."
-    ${mysql55_location}/support-files/mysql.server start > /dev/null 2>&1
+    CheckError "service mysql55 start > /dev/null 2>&1"
     ${mysql55_location}/bin/mysql -e "GRANT ALL PRIVILEGES ON *.* to root@'127.0.0.1' IDENTIFIED BY \"${mysql_pass}\" WITH GRANT OPTION;"
     ${mysql55_location}/bin/mysql -e "GRANT ALL PRIVILEGES ON *.* to root@'localhost' IDENTIFIED BY \"${mysql_pass}\" WITH GRANT OPTION;"
     ${mysql55_location}/bin/mysql -uroot -p${mysql_pass} > /dev/null 2>&1 <<EOF
@@ -50,6 +53,7 @@ _config_mysql(){
     DELETE FROM mysql.user WHERE user="root" AND host="%";
     FLUSH PRIVILEGES;
 EOF
+    CheckError "service mysql55 restart > /dev/null 2>&1"
 }
 
 
@@ -149,9 +153,7 @@ install_mysql55(){
     mysql55_location=${1}
     mysql_pass=${2}
 
-    service mysqld stop > /dev/null 2>&1
-    pkill -9 mysqld >/dev/null 2>&1
-
+    # 安装前备份
     mkdir -p ${backup_dir}
     mv -f ${mysql55_location} ${backup_dir}/mysql55-$(date +%Y-%m-%d_%H:%M:%S).bak >/dev/null 2>&1
 
@@ -180,11 +182,6 @@ install_mysql55(){
         --basedir=${mysql55_location} \
         --datadir=${mysql55_location}/mysql55_data --user=mysql"
     _config_mysql
-
-    cp -f ${mysql55_location}/support-files/mysql.server /etc/init.d/mysqld
-    chkconfig --add mysqld > /dev/null 2>&1
-    update-rc.d -f mysqld defaults > /dev/null 2>&1
-    service mysqld restart > /dev/null 2>&1
 
     echo "Root password:${mysql_pass}, Please keep it safe."
     _success "Install ${mysql55_filename} completed..."
