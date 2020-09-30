@@ -39,9 +39,7 @@ install_pureftpd(){
     fi
     pureftpd_location=${1}
 
-    service pureftpd stop > /dev/null 2>&1
-    pkill -9 'pure-ftpd' >/dev/null 2>&1
-
+    # 安装前备份
     mkdir -p ${backup_dir}
     mv -f ${pureftpd_location} ${backup_dir}/pureftpd-$(date +%Y-%m-%d_%H:%M:%S).bak >/dev/null 2>&1
 
