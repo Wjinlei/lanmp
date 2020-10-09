@@ -5,14 +5,14 @@ var=/var/hwsmaster
 
 # download Url
 download_root_url="https://d.hws.com/linux/master/soft/"
-download_sysv_url="https://d.hws.com/linux/master/script/init.d/"
+download_sysv_url="https://d.hws.com/linux/debug/script/init.d/"
 
 # parallel compile option,1:enable,0:disable
 parallel_compile=1
 
 # apache
 apache_filename="httpd-2.4.41"
-apache_download_url="http://ftp.jaist.ac.jp/pub/apache//httpd/httpd-2.4.41.tar.gz"
+apache_download_url="http://ftp.jaist.ac.jp/pub/apache/httpd/httpd-2.4.41.tar.gz"
 
 # nginx
 nginx_filename="nginx-1.16.1"
@@ -144,11 +144,11 @@ nghttp2_download_url="https://github.com/nghttp2/nghttp2/releases/download/v1.40
 
 # apr
 apr_filename="apr-1.7.0"
-apr_download_url="http://ftp.jaist.ac.jp/pub/apache//apr/apr-1.7.0.tar.gz"
+apr_download_url="http://ftp.jaist.ac.jp/pub/apache/apr/apr-1.7.0.tar.gz"
 
 # apr-util
 apr_util_filename="apr-util-1.6.1"
-apr_util_download_url="http://ftp.jaist.ac.jp/pub/apache//apr/apr-util-1.6.1.tar.gz"
+apr_util_download_url="http://ftp.jaist.ac.jp/pub/apache/apr/apr-util-1.6.1.tar.gz"
 
 # Other
 mysql_port=3306
