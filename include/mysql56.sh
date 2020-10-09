@@ -97,14 +97,14 @@ _create_mysql_config(){
     cat >${mysql56_location}/my.cnf <<EOF
 [mysql]
 port                           = ${mysql_port}
-socket                         = /tmp/mysql.sock
+socket                         = /tmp/mysql56.sock
 
 [mysqld]
 basedir                        = ${mysql56_location}
 datadir                        = ${mysql56_location}/mysql56_data
 user                           = mysql
 port                           = ${mysql_port}
-socket                         = /tmp/mysql.sock
+socket                         = /tmp/mysql56.sock
 default-storage-engine         = InnoDB
 pid-file                       = ${mysql56_location}/mysql56_data/mysql.pid
 character-set-server           = utf8mb4
