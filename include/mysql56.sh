@@ -33,6 +33,7 @@ _install_mysql_depend(){
     fi
     id -u mysql >/dev/null 2>&1
     [ $? -ne 0 ] && useradd -M -U mysql -r -d /dev/null -s /sbin/nologin
+    mkdir -p ${mysql56_location}
     _info "Install dependencies packages for MySQL completed..."
 }
 

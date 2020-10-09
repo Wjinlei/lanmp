@@ -20,6 +20,7 @@ install_redis(){
         redis_port=${2}
     fi
 
+    mkdir -p ${redis_location}
     CheckError "rm -fr ${redis_location}"
     local tram=$( free -m | awk '/Mem/ {print $2}' )
     local swap=$( free -m | awk '/Swap/ {print $2}' )

@@ -77,6 +77,7 @@ _install_php_depend(){
     fi
     id -u www >/dev/null 2>&1
     [ $? -ne 0 ] && useradd -M -U www -r -d /dev/null -s /sbin/nologin
+    mkdir -p ${php53_location}
 }
 
 _install_freetype() {
