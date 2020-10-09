@@ -8,12 +8,14 @@ install_pma(){
 
     CheckError "tar zxf ${phpmyadmin_filename}.tar.gz"
     CheckError "mv ${phpmyadmin_filename} ${var}/pma"
-    CheckError "rm -fr ${var}/pma/setup && mkdir -p ${var}/pma/{upload,save}"
+    CheckError "mkdir -p ${var}/pma/{upload,save}"
+    CheckError "rm -fr ${var}/pma/setup"
 
     # 下载配置文件
     DownloadUrl "phpmyadmin-conf.tar.gz" "https://d.hws.com/linux/master/conf/phpmyadmin-conf.tar.gz"
     CheckError "tar zxf phpmyadmin-conf.tar.gz"
-    CheckError "rm -f ${var}/pma/config.inc.php && mv config.inc.php ${var}/pma/config.inc.php"
+    CheckError "rm -f ${var}/pma/config.inc.php"
+    CheckError "mv config.inc.php ${var}/pma/config.inc.php"
 
     id -u www >/dev/null 2>&1
     [ $? -ne 0 ] && useradd -M -U www -r -d /dev/null -s /sbin/nologin
