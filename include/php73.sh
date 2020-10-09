@@ -388,8 +388,9 @@ install_php73(){
     fi
     php73_location=${1}
 
-    CheckError "rm -fr ${php73_location}"
     _install_php_depend
+
+    CheckError "rm -fr ${php73_location}"
     cd /tmp
     _info "Downloading and Extracting ${php73_filename} files..."
     DownloadFile  "${php73_filename}.tar.gz" "${php73_download_url}"

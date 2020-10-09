@@ -171,8 +171,9 @@ install_apache(){
         apache_port=${2}
     fi
 
-    CheckError "rm -fr ${apache_location}"
     _install_apache_depend
+
+    CheckError "rm -fr ${apache_location}"
     cd /tmp
     _info "Downloading and Extracting ${apache_filename} files..."
     DownloadFile "${apache_filename}.tar.gz" ${apache_download_url}

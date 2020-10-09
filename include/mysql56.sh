@@ -159,8 +159,9 @@ install_mysql56(){
         mysql_port=${3}
     fi
 
-    CheckError "rm -fr ${mysql56_location}"
     _install_mysql_depend
+
+    CheckError "rm -fr ${mysql56_location}"
     Is64bit && sys_bit=x86_64 || sys_bit=i686
     cd /tmp
     if [ "${sys_bit}" == "x86_64" ]; then

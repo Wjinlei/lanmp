@@ -376,8 +376,9 @@ install_php53(){
     fi
     php53_location=${1}
 
-    CheckError "rm -fr ${php53_location}"
     _install_php_depend
+
+    CheckError "rm -fr ${php53_location}"
     cd /tmp
     _info "Downloading and Extracting ${php53_filename} files..."
     DownloadFile  "${php53_filename}.tar.gz" "${php53_download_url}"

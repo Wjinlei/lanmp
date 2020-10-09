@@ -41,8 +41,9 @@ install_pureftpd(){
         ftp_port=${2}
     fi
 
-    CheckError "rm -fr ${pureftpd_location}"
     _install_pureftpd_depends
+
+    CheckError "rm -fr ${pureftpd_location}"
     cd /tmp
     _info "Downloading and Extracting ${pureftpd_filename} files..."
     DownloadFile "${pureftpd_filename}.tar.gz" ${pureftpd_download_url}

@@ -388,8 +388,9 @@ install_php55(){
     fi
     php55_location=${1}
 
-    CheckError "rm -fr ${php55_location}"
     _install_php_depend
+
+    CheckError "rm -fr ${php55_location}"
     cd /tmp
     _info "Downloading and Extracting ${php55_filename} files..."
     DownloadFile  "${php55_filename}.tar.gz" "${php55_download_url}"
