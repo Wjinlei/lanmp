@@ -40,6 +40,7 @@ install_nginx(){
         nginx_port=${2}
     fi
 
+    CheckError "rm -fr ${nginx_location}"
     _install_nginx_depend
     cd /tmp
     _info "Downloading and Extracting ${pcre_filename} files..."

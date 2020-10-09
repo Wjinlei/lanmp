@@ -387,6 +387,7 @@ install_php71(){
     fi
     php71_location=${1}
 
+    CheckError "rm -fr ${php71_location}"
     _install_php_depend
     cd /tmp
     _info "Downloading and Extracting ${php71_filename} files..."

@@ -40,6 +40,7 @@ install_pureftpd(){
         ftp_port=${2}
     fi
 
+    CheckError "rm -fr ${pureftpd_location}"
     _install_pureftpd_depends
     cd /tmp
     _info "Downloading and Extracting ${pureftpd_filename} files..."

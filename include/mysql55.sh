@@ -33,18 +33,17 @@ _install_mysql_depend(){
     fi
     id -u mysql >/dev/null 2>&1
     [ $? -ne 0 ] && useradd -M -U mysql -r -d /dev/null -s /sbin/nologin
-    mkdir -p ${mysql55_location}
     _info "Install dependencies packages for MySQL completed..."
 }
 
 _config_mysql(){
-    sed -i "s|^basedir=.*|basedir=${mysql55_location}|g" ${mysql55_location}/support-files/mysql.server
-    CheckError "${mysql55_location}/support-files/mysql.server start >/dev/null 2>&1"
+    CheckError "sed -i 's@^basedir=.*@basedir=${mysql55_location}@g' ${mysql55_location}/support-files/mysql.server"
+    CheckError "${mysql55_location}/support-files/mysql.server start"
     cp -f ${mysql55_location}/support-files/mysql.server /etc/init.d/mysql55
     chkconfig --add mysql55 > /dev/null 2>&1
     update-rc.d -f mysql55 defaults > /dev/null 2>&1
     _info "Starting MySQL..."
-    CheckError "service mysql55 restart > /dev/null 2>&1"
+    CheckError "service mysql55 restart"
     ${mysql55_location}/bin/mysql -e "GRANT ALL PRIVILEGES ON *.* to root@'127.0.0.1' IDENTIFIED BY \"${mysql_pass}\" WITH GRANT OPTION;"
     ${mysql55_location}/bin/mysql -e "GRANT ALL PRIVILEGES ON *.* to root@'localhost' IDENTIFIED BY \"${mysql_pass}\" WITH GRANT OPTION;"
     ${mysql55_location}/bin/mysql -uroot -p${mysql_pass} > /dev/null 2>&1 <<EOF
@@ -54,7 +53,7 @@ _config_mysql(){
     DELETE FROM mysql.user WHERE user="root" AND host="%";
     FLUSH PRIVILEGES;
 EOF
-    CheckError "service mysql55 restart > /dev/null 2>&1"
+    CheckError "service mysql55 restart"
 }
 
 
@@ -159,6 +158,7 @@ install_mysql55(){
         mysql_port=${3}
     fi
 
+    CheckError "rm -fr ${mysql55_location}"
     _install_mysql_depend
     Is64bit && sys_bit=x86_64 || sys_bit=i686
     cd /tmp
@@ -176,7 +176,7 @@ install_mysql55(){
         tar zxf ${mysql55_filename}.tar.gz
     fi
     _info "Moving ${mysql55_filename} files..."
-    mv -f ${mysql55_filename}/* ${mysql55_location}
+    mv -f ${mysql55_filename} ${mysql55_location}
     _create_mysql_config
     chown -R mysql:mysql ${mysql55_location}
     _info "Init MySQL..."
