@@ -38,15 +38,17 @@ _install_mysql_depend(){
 }
 
 _config_mysql(){
-    CheckError "sed -i 's@^basedir=.*@basedir=${mysql57_location}@g' ${mysql57_location}/support-files/mysql.server"
+    sed -i "s@^basedir=.*@basedir=${mysql57_location}@g" ${mysql57_location}/support-files/mysql.server
     CheckError "${mysql57_location}/support-files/mysql.server start"
     cp -f ${mysql57_location}/support-files/mysql.server /etc/init.d/mysql57
     chkconfig --add mysql57 > /dev/null 2>&1
     update-rc.d -f mysql57 defaults > /dev/null 2>&1
     _info "Starting MySQL..."
     CheckError "service mysql57 restart"
-    ${mysql57_location}/bin/mysql -e "GRANT ALL PRIVILEGES ON *.* to root@'127.0.0.1' IDENTIFIED BY \"${mysql_pass}\" WITH GRANT OPTION;"
-    ${mysql57_location}/bin/mysql -e "GRANT ALL PRIVILEGES ON *.* to root@'localhost' IDENTIFIED BY \"${mysql_pass}\" WITH GRANT OPTION;"
+    ${mysql57_location}/bin/mysql -e "GRANT ALL PRIVILEGES \
+        ON *.* to root@'127.0.0.1' IDENTIFIED BY \"${mysql_pass}\" WITH GRANT OPTION;" >/dev/null 2>&1
+    ${mysql57_location}/bin/mysql -e "GRANT ALL PRIVILEGES \
+        ON *.* to root@'localhost' IDENTIFIED BY \"${mysql_pass}\" WITH GRANT OPTION;" >/dev/null 2>&1
     ${mysql57_location}/bin/mysql -uroot -p${mysql_pass} > /dev/null 2>&1 <<EOF
     DROP DATABASE IF EXISTS test;
     DELETE FROM mysql.user WHERE NOT (user='root');
@@ -184,7 +186,7 @@ install_mysql57(){
     _info "Init MySQL..."
     CheckError "${mysql57_location}/bin/mysqld --initialize-insecure \
         --basedir=${mysql57_location} \
-        --datadir=${mysql57_location}/mysql57_data --user=mysql"
+        --datadir=${mysql57_location}/mysql57_data --user=mysql" "noOutput"
     _config_mysql
 
     echo "Root password:${mysql_pass}, Please keep it safe."

@@ -38,18 +38,22 @@ _install_mysql_depend(){
 }
 
 _config_mysql(){
-    CheckError "sed -i 's@^basedir=.*@basedir=${mysql80_location}@g' ${mysql80_location}/support-files/mysql.server"
+    sed -i "s@^basedir=.*@basedir=${mysql80_location}@g" ${mysql80_location}/support-files/mysql.server
     CheckError "${mysql80_location}/support-files/mysql.server start"
     cp -f ${mysql80_location}/support-files/mysql.server /etc/init.d/mysql80
     chkconfig --add mysql80 > /dev/null 2>&1
     update-rc.d -f mysql80 defaults > /dev/null 2>&1
     _info "Starting MySQL..."
     CheckError "service mysql80 restart"
-    ${mysql80_location}/bin/mysql -uroot -hlocalhost -e "CREATE USER root@'127.0.0.1' IDENTIFIED WITH mysql_native_password BY \"${mysql_pass}\";"
-    ${mysql80_location}/bin/mysql -uroot -hlocalhost -e "ALTER USER root@'localhost' IDENTIFIED WITH mysql_native_password BY \"${mysql_pass}\";"
-    ${mysql80_location}/bin/mysql -uroot -p${mysql_pass} -hlocalhost -e "GRANT ALL PRIVILEGES ON *.* to root@'127.0.0.1' WITH GRANT OPTION;"
-    ${mysql80_location}/bin/mysql -uroot -p${mysql_pass} -hlocalhost -e "GRANT ALL PRIVILEGES ON *.* to root@'localhost' WITH GRANT OPTION;"
-    ${mysql80_location}/bin/mysql -uroot -p${mysql_pass} -hlocalhost -e "FLUSH PRIVILEGES;"
+    ${mysql80_location}/bin/mysql -uroot -hlocalhost -e "CREATE USER root@'127.0.0.1' \
+        IDENTIFIED WITH mysql_native_password BY \"${mysql_pass}\";" >/dev/null 2>&1
+    ${mysql80_location}/bin/mysql -uroot -hlocalhost -e "ALTER USER root@'localhost' \
+        IDENTIFIED WITH mysql_native_password BY \"${mysql_pass}\";" >/dev/null 2>&1
+    ${mysql80_location}/bin/mysql -uroot -p${mysql_pass} -hlocalhost -e "GRANT ALL PRIVILEGES \
+        ON *.* to root@'127.0.0.1' WITH GRANT OPTION;" >/dev/null 2>&1
+    ${mysql80_location}/bin/mysql -uroot -p${mysql_pass} -hlocalhost -e "GRANT ALL PRIVILEGES \
+        ON *.* to root@'localhost' WITH GRANT OPTION;" >/dev/null 2>&1
+    ${mysql80_location}/bin/mysql -uroot -p${mysql_pass} -hlocalhost -e "FLUSH PRIVILEGES;" >/dev/null 2>&1
     CheckError "service mysql80 restart"
 }
 
@@ -181,7 +185,7 @@ install_mysql80(){
     _info "Init MySQL..."
     CheckError "${mysql80_location}/bin/mysqld --initialize-insecure \
         --basedir=${mysql80_location} \
-        --datadir=${mysql80_location}/mysql80_data --user=mysql"
+        --datadir=${mysql80_location}/mysql80_data --user=mysql" "noOutput"
     _config_mysql
 
     echo "Root password:${mysql_pass}, Please keep it safe."

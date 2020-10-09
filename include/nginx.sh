@@ -38,7 +38,7 @@ install_nginx(){
 
     # 如果存在第二个参数
     if [ $# -ge 2 ]; then
-        nginx_port=${2}
+        www_port=${2}
     fi
 
     _install_nginx_depend
@@ -185,7 +185,7 @@ http {
     }
 
     server {
-       listen ${nginx_port} default;
+       listen ${www_port} default;
        return 403;
     }
 }

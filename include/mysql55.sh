@@ -38,15 +38,17 @@ _install_mysql_depend(){
 }
 
 _config_mysql(){
-    CheckError "sed -i 's@^basedir=.*@basedir=${mysql55_location}@g' ${mysql55_location}/support-files/mysql.server"
+    sed -i "s@^basedir=.*@basedir=${mysql55_location}@g" ${mysql55_location}/support-files/mysql.server
     CheckError "${mysql55_location}/support-files/mysql.server start"
     cp -f ${mysql55_location}/support-files/mysql.server /etc/init.d/mysql55
     chkconfig --add mysql55 > /dev/null 2>&1
     update-rc.d -f mysql55 defaults > /dev/null 2>&1
     _info "Starting MySQL..."
     CheckError "service mysql55 restart"
-    ${mysql55_location}/bin/mysql -e "GRANT ALL PRIVILEGES ON *.* to root@'127.0.0.1' IDENTIFIED BY \"${mysql_pass}\" WITH GRANT OPTION;"
-    ${mysql55_location}/bin/mysql -e "GRANT ALL PRIVILEGES ON *.* to root@'localhost' IDENTIFIED BY \"${mysql_pass}\" WITH GRANT OPTION;"
+    ${mysql55_location}/bin/mysql -e "GRANT ALL PRIVILEGES \
+        ON *.* to root@'127.0.0.1' IDENTIFIED BY \"${mysql_pass}\" WITH GRANT OPTION;" >/dev/null 2>&1
+    ${mysql55_location}/bin/mysql -e "GRANT ALL PRIVILEGES \
+        ON *.* to root@'localhost' IDENTIFIED BY \"${mysql_pass}\" WITH GRANT OPTION;" >/dev/null 2>&1
     ${mysql55_location}/bin/mysql -uroot -p${mysql_pass} > /dev/null 2>&1 <<EOF
     DROP DATABASE IF EXISTS test;
     DELETE FROM mysql.user WHERE NOT (user='root');
@@ -184,7 +186,7 @@ install_mysql55(){
     _info "Init MySQL..."
     CheckError "${mysql55_location}/scripts/mysql_install_db \
         --basedir=${mysql55_location} \
-        --datadir=${mysql55_location}/mysql55_data --user=mysql"
+        --datadir=${mysql55_location}/mysql55_data --user=mysql" "noOutput"
     _config_mysql
 
     echo "Root password:${mysql_pass}, Please keep it safe."

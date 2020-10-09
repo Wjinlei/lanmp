@@ -168,7 +168,7 @@ install_apache(){
 
     # 如果存在第二个参数
     if [ $# -ge 2 ]; then
-        apache_port=${2}
+        www_port=${2}
     fi
 
     _install_apache_depend
@@ -224,11 +224,11 @@ _config_apache(){
     grep -qE "^\s*#\s*Include conf/extra/httpd-vhosts.conf" ${apache_location}/conf/httpd.conf && \
     sed -i 's#^\s*\#\s*Include conf/extra/httpd-vhosts.conf#Include conf/extra/httpd-vhosts.conf#' ${apache_location}/conf/httpd.conf || \
     sed -i '$aInclude conf/extra/httpd-vhosts.conf' ${apache_location}/conf/httpd.conf
-    sed -i 's/^Listen.*/Listen ${apache_port}/i' ${apache_location}/conf/httpd.conf
-    sed -i 's/^User.*/User www/i' ${apache_location}/conf/httpd.conf
-    sed -i 's/^Group.*/Group www/i' ${apache_location}/conf/httpd.conf
+    sed -i 's/^User.*/User www/g' ${apache_location}/conf/httpd.conf
+    sed -i 's/^Group.*/Group www/g' ${apache_location}/conf/httpd.conf
     sed -i 's/^ServerAdmin you@example.com/ServerAdmin admin@localhost/' ${apache_location}/conf/httpd.conf
-    sed -i 's/^#ServerName www.example.com:80/ServerName 0.0.0.0:${apache_port}/' ${apache_location}/conf/httpd.conf
+    sed -i "s/^Listen.*/Listen ${www_port}/g" ${apache_location}/conf/httpd.conf
+    sed -i "s/^#ServerName www.example.com:80/ServerName 0.0.0.0:${www_port}/g" ${apache_location}/conf/httpd.conf
     sed -i 's@^#Include conf/extra/httpd-default.conf@Include conf/extra/httpd-default.conf@' ${apache_location}/conf/httpd.conf
     sed -i 's@^#Include conf/extra/httpd-info.conf@Include conf/extra/httpd-info.conf@' ${apache_location}/conf/httpd.conf
     sed -i 's@DirectoryIndex index.html@DirectoryIndex index.php default.php index.html index.htm default.html default.htm@' ${apache_location}/conf/httpd.conf
@@ -373,7 +373,7 @@ Listen 999
 IncludeOptional ${apache_location}/conf/vhost/*.conf
 
 # 对默认端口,防止范解析攻击
-<VirtualHost *:${apache_port}>
+<VirtualHost *:${www_port}>
     ServerAlias *
     <Location />
         Require all denied

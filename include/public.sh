@@ -108,7 +108,11 @@ Error Log is available at /tmp/install_package.log"
 
 CheckError(){
     local command="$1"
-    ${command}
+    if [[ $2 == "noOutput" ]]; then
+        ${command} >/dev/null 2>&1
+    else
+        ${command}
+    fi
     if [ $? -ne 0 ]; then
         _error "
 +------------------+
