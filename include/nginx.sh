@@ -21,7 +21,7 @@ _install_nginx_depend(){
 
 _start_nginx() {
     CheckError "${nginx_location}/sbin/nginx -c ${nginx_location}/etc/nginx.conf"
-    wait_for_pid created ${apache_location}/var/run/nginx.pid
+    wait_for_pid created ${nginx_location}/var/run/nginx.pid
     if [ -n "$try" ] ; then
         echo "wait_for_pid failed"
         exit 1
