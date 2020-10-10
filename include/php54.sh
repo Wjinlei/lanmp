@@ -309,7 +309,7 @@ _start_php54() {
         --fpm-config ${php54_location}/etc/default.conf \
         --pid ${php54_location}/var/run/default.pid"
     DownloadUrl "/etc/init.d/php54" "${download_sysv_url}/php-fpm"
-    sed -i "s|^prefix={php-fpm_location}$|prefix=${php54_location}|i" /etc/init.d/php54
+    sed -i "s|^prefix={php-fpm_location}$|prefix=${php54_location}|g" /etc/init.d/php54
     CheckError "chmod +x /etc/init.d/php54"
     chkconfig --add php54 > /dev/null 2>&1
     update-rc.d -f php54 defaults > /dev/null 2>&1

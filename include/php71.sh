@@ -309,7 +309,7 @@ _start_php71() {
         --fpm-config ${php71_location}/etc/default.conf \
         --pid ${php71_location}/var/run/default.pid"
     DownloadUrl "/etc/init.d/php71" "${download_sysv_url}/php-fpm"
-    sed -i "s|^prefix={php-fpm_location}$|prefix=${php71_location}|i" /etc/init.d/php71
+    sed -i "s|^prefix={php-fpm_location}$|prefix=${php71_location}|g" /etc/init.d/php71
     CheckError "chmod +x /etc/init.d/php71"
     chkconfig --add php71 > /dev/null 2>&1
     update-rc.d -f php71 defaults > /dev/null 2>&1

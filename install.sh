@@ -101,8 +101,8 @@ Options:
             install_php73 ${2}
             ;;
         --install-pureftpd)
-            include pureftpd
-            install_pureftpd ${2} ${3}
+            include pure-ftpd
+            install_pure-ftpd ${2} ${3}
             ;;
         --install-redis)
             include redis

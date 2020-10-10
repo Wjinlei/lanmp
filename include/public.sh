@@ -122,6 +122,29 @@ An error occurred,The Full Log is available at /tmp/install.log"
     fi
 }
 
+wait_for_pid () {
+    try=0
+    while test $try -lt 35 ; do
+        case "$1" in
+            'created')
+            if [ -f "$2" ] ; then
+                try=''
+                break
+            fi
+            ;;
+            'removed')
+            if [ ! -f "$2" ] ; then
+                try=''
+                break
+            fi
+            ;;
+        esac
+        echo -n .
+        try=`expr $try + 1`
+        sleep 1
+    done
+}
+
 _disable_selinux(){
     if [ -s /etc/selinux/config ]; then
         selinux=`grep "SELINUX=enforcing" /etc/selinux/config |wc -l`
