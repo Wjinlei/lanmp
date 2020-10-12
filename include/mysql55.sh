@@ -45,11 +45,11 @@ _config_mysql(){
     update-rc.d -f mysql55 defaults > /dev/null 2>&1
     _info "Starting MySQL..."
     CheckError "service mysql55 restart"
-    ${mysql55_location}/bin/mysql -e "GRANT ALL PRIVILEGES \
-        ON *.* to root@'127.0.0.1' IDENTIFIED BY \"${mysql_pass}\" WITH GRANT OPTION;" >/dev/null 2>&1
-    ${mysql55_location}/bin/mysql -e "GRANT ALL PRIVILEGES \
-        ON *.* to root@'localhost' IDENTIFIED BY \"${mysql_pass}\" WITH GRANT OPTION;" >/dev/null 2>&1
-    ${mysql55_location}/bin/mysql -uroot -p${mysql_pass} > /dev/null 2>&1 <<EOF
+    ${mysql55_location}/bin/mysql -uroot -S /tmp/mysql55.sock \
+        -e "GRANT ALL PRIVILEGES ON *.* to root@'127.0.0.1' IDENTIFIED BY \"${mysql_pass}\" WITH GRANT OPTION;"
+    ${mysql55_location}/bin/mysql -uroot -S /tmp/mysql55.sock \
+        -e "GRANT ALL PRIVILEGES ON *.* to root@'localhost' IDENTIFIED BY \"${mysql_pass}\" WITH GRANT OPTION;"
+    ${mysql55_location}/bin/mysql -uroot -p${mysql_pass} -S /tmp/mysql55.sock <<EOF
     DROP DATABASE IF EXISTS test;
     DELETE FROM mysql.user WHERE NOT (user='root');
     DELETE FROM mysql.db WHERE user='';
@@ -95,7 +95,7 @@ _create_mysql_config(){
     [ -d "/etc/mysql" ] && mv /etc/mysql /etc/mysql-$(date +%Y-%m-%d_%H:%M:%S).bak
     _info "Create ${mysql55_location}/my.cnf file..."
     cat >${mysql55_location}/my.cnf <<EOF
-[mysql]
+[client]
 port                           = ${mysql_port}
 socket                         = /tmp/mysql55.sock
 

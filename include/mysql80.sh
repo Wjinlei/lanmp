@@ -45,15 +45,16 @@ _config_mysql(){
     update-rc.d -f mysql80 defaults > /dev/null 2>&1
     _info "Starting MySQL..."
     CheckError "service mysql80 restart"
-    ${mysql80_location}/bin/mysql -uroot -hlocalhost -e "CREATE USER root@'127.0.0.1' \
-        IDENTIFIED WITH mysql_native_password BY \"${mysql_pass}\";" >/dev/null 2>&1
-    ${mysql80_location}/bin/mysql -uroot -hlocalhost -e "ALTER USER root@'localhost' \
-        IDENTIFIED WITH mysql_native_password BY \"${mysql_pass}\";" >/dev/null 2>&1
-    ${mysql80_location}/bin/mysql -uroot -p${mysql_pass} -hlocalhost -e "GRANT ALL PRIVILEGES \
-        ON *.* to root@'127.0.0.1' WITH GRANT OPTION;" >/dev/null 2>&1
-    ${mysql80_location}/bin/mysql -uroot -p${mysql_pass} -hlocalhost -e "GRANT ALL PRIVILEGES \
-        ON *.* to root@'localhost' WITH GRANT OPTION;" >/dev/null 2>&1
-    ${mysql80_location}/bin/mysql -uroot -p${mysql_pass} -hlocalhost -e "FLUSH PRIVILEGES;" >/dev/null 2>&1
+    ${mysql80_location}/bin/mysql -uroot -S /tmp/mysql80.sock \
+        -e "CREATE USER root@'127.0.0.1' IDENTIFIED WITH mysql_native_password BY \"${mysql_pass}\";"
+    ${mysql80_location}/bin/mysql -uroot -S /tmp/mysql80.sock \
+        -e "ALTER USER root@'localhost' IDENTIFIED WITH mysql_native_password BY \"${mysql_pass}\";"
+    ${mysql80_location}/bin/mysql -uroot -p${mysql_pass} -S /tmp/mysql80.sock \
+        -e "GRANT ALL PRIVILEGES ON *.* to root@'127.0.0.1' WITH GRANT OPTION;" >/dev/null 2>&1
+    ${mysql80_location}/bin/mysql -uroot -p${mysql_pass} -S /tmp/mysql80.sock \
+        -e "GRANT ALL PRIVILEGES ON *.* to root@'localhost' WITH GRANT OPTION;" >/dev/null 2>&1
+    ${mysql80_location}/bin/mysql -uroot -p${mysql_pass} -S /tmp/mysql80.sock \
+        -e "FLUSH PRIVILEGES;" >/dev/null 2>&1
     CheckError "service mysql80 restart"
 }
 
@@ -93,7 +94,7 @@ _create_mysql_config(){
     [ -d "/etc/mysql" ] && mv /etc/mysql /etc/mysql-$(date +%Y-%m-%d_%H:%M:%S).bak
     _info "Create ${mysql80_location}/my.cnf file..."
     cat >${mysql80_location}/my.cnf <<EOF
-[mysql]
+[client]
 port                           = ${mysql_port}
 socket                         = /tmp/mysql80.sock
 
