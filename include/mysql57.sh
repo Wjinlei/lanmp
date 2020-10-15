@@ -186,7 +186,7 @@ install_mysql57(){
     _info "Init MySQL..."
     CheckError "${mysql57_location}/bin/mysqld --initialize-insecure \
         --basedir=${mysql57_location} \
-        --datadir=${mysql57_location}/mysql57_data --user=mysql" "noOutput"
+        --datadir=${mysql57_location}/mysql57_data --user=mysql"
     _config_mysql
 
     echo "Root password:${mysql_pass}, Please keep it safe."

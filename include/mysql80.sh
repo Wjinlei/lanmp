@@ -186,7 +186,7 @@ install_mysql80(){
     _info "Init MySQL..."
     CheckError "${mysql80_location}/bin/mysqld --initialize-insecure \
         --basedir=${mysql80_location} \
-        --datadir=${mysql80_location}/mysql80_data --user=mysql" "noOutput"
+        --datadir=${mysql80_location}/mysql80_data --user=mysql"
     _config_mysql
 
     echo "Root password:${mysql_pass}, Please keep it safe."

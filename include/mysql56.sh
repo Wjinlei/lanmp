@@ -186,7 +186,7 @@ install_mysql56(){
     _info "Init MySQL..."
     CheckError "${mysql56_location}/scripts/mysql_install_db \
         --basedir=${mysql56_location} \
-        --datadir=${mysql56_location}/mysql56_data --user=mysql" "noOutput"
+        --datadir=${mysql56_location}/mysql56_data --user=mysql"
     _config_mysql
 
     echo "Root password:${mysql_pass}, Please keep it safe."
