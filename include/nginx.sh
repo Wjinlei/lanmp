@@ -42,11 +42,6 @@ install_nginx(){
     fi
     nginx_location=${1}
 
-    # 如果存在第二个参数
-    if [ $# -ge 2 ]; then
-        www_port=${2}
-    fi
-
     _install_nginx_depend
 
     CheckError "rm -fr ${nginx_location}"
@@ -169,7 +164,7 @@ http {
     include vhost/*.conf;
 
     server {
-       listen 998;
+       listen 999;
        server_name localhost;
        root ${var}/pma;
        index index.php default.php index.html index.htm default.html default.htm;
@@ -191,7 +186,7 @@ http {
     }
 
     server {
-       listen ${www_port} default;
+       listen 80 default;
        return 403;
     }
 }

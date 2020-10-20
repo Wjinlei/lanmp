@@ -46,11 +46,11 @@ Options:
             ;;
         --install-apache)
             include apache
-            install_apache ${2} ${3}
+            install_apache ${2}
             ;;
         --install-nginx)
             include nginx
-            install_nginx ${2} ${3}
+            install_nginx ${2}
             ;;
         --install-mysql55)
             include mysql55
