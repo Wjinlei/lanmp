@@ -337,39 +337,6 @@ mod_xml2enc.so
 
     # 写入默认配置文件
     cat > ${apache_location}/conf/extra/httpd-vhosts.conf <<EOF
-Listen 999
-<VirtualHost *:999>
-    ServerAdmin webmaster@example.com
-    DocumentRoot ${var}/pma
-    ServerName phpMyAdmin.999
-    ServerAlias localhost
-    #errorDocument 404 /404.html
-    ErrorLog "${var}/pma/pma-error.log"
-    CustomLog "${var}/pma/pma-access.log" combined
-
-    #DENY FILES
-    <Files ~ (\.user.ini|\.sql|\.zip|\.gz|\.htaccess|\.git|\.svn|\.project|LICENSE|README.md)\$>
-        Order allow,deny
-        Deny from all
-    </Files>
-
-    #PHP
-    <FilesMatch \.php\$>
-        SetHandler "proxy:unix:/tmp/php-5.6.40-default.sock|fcgi://localhost"
-    </FilesMatch>
-
-    #PATH
-    <Directory ${var}/pma>
-        SetOutputFilter DEFLATE
-        Options FollowSymLinks
-        AllowOverride All
-        <RequireAll>
-            Require all granted
-        </RequireAll>
-        DirectoryIndex index.php default.php index.html index.htm default.html default.htm
-    </Directory>
-</VirtualHost>
-
 IncludeOptional ${apache_location}/conf/vhost/*.conf
 IncludeOptional ${var}/default/conf/apache/*.conf
 

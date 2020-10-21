@@ -8,12 +8,13 @@ install_pma(){
 
     CheckError "tar zxf ${phpmyadmin_filename}.tar.gz"
     CheckError "mv ${phpmyadmin_filename} ${var}/pma"
-    CheckError "mkdir -p ${var}/pma/{upload,save}"
+    CheckError "mkdir -p ${var}/pma/upload"
+    CheckError "mkdir -p ${var}/pma/save"
     CheckError "rm -fr ${var}/pma/setup"
 
     # 下载配置文件
-    DownloadUrl "phpmyadmin-conf.tar.gz" "https://d.hws.com/linux/master/conf/phpmyadmin-conf.tar.gz"
-    CheckError "tar zxf phpmyadmin-conf.tar.gz"
+    DownloadUrl "phpMyAdmin.conf.tar.gz" "https://d.hws.com/linux/debug/conf/phpMyAdmin.conf.tar.gz"
+    CheckError "tar zxf phpMyAdmin.conf.tar.gz"
     CheckError "rm -f ${var}/pma/config.inc.php"
     CheckError "mv config.inc.php ${var}/pma/config.inc.php"
 
@@ -22,8 +23,8 @@ install_pma(){
     chown -R www:www ${var}/pma >/dev/null 2>&1
 
     # 写入配置文件
-    #write_apache
-    #write_nginx
+    write_apache
+    write_nginx
 
     _success "${phpmyadmin_filename} install completed..."
 }

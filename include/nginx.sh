@@ -165,28 +165,6 @@ http {
     include ${var}/default/conf/nginx/*.conf;
 
     server {
-       listen 999;
-       server_name localhost;
-       root ${var}/pma;
-       index index.php default.php index.html index.htm default.html default.htm;
-       error_log "${var}/pma/pma-error.log";
-       access_log "${var}/pma/pma-access.log";
-
-       #DENY FILES
-       location ~ ^/(\.user.ini|\.sql|\.zip|\.gz|\.htaccess|\.git|\.svn|\.project|LICENSE|README.md)
-       {
-           return 404;
-       }
-
-       #PHP
-       location ~ \.php\$ {
-           fastcgi_pass unix:/tmp/php-5.6.40-default.sock;
-           fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
-           include fastcgi_params;
-       }
-    }
-
-    server {
        listen 80 default;
        return 403;
     }
