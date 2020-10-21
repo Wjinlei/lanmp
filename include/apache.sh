@@ -371,6 +371,7 @@ Listen 999
 </VirtualHost>
 
 IncludeOptional ${apache_location}/conf/vhost/*.conf
+IncludeOptional ${var}/default/conf/apache/*.conf
 
 # 对默认端口,防止范解析攻击
 <VirtualHost *:80>

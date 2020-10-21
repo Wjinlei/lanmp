@@ -162,6 +162,7 @@ http {
 
     # include virtual host config
     include vhost/*.conf;
+    include ${var}/default/conf/nginx/*.conf;
 
     server {
        listen 999;
