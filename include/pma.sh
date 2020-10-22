@@ -1,47 +1,53 @@
 install_pma(){
+    if [ $# -lt 1 ]; then
+        echo "[Parameter Error]: pma_location"
+        exit 1
+    fi
+    pma_location=${1}
     cd /tmp
     CheckError "rm -fr ${phpmyadmin_filename}"
-    CheckError "rm -fr ${var}/pma"
+    CheckError "rm -fr ${pma_location}"
 
     _info "${phpmyadmin_filename} install start..."
     DownloadFile "${phpmyadmin_filename}.tar.gz" "${phpmyadmin_download_url}"
 
     CheckError "tar zxf ${phpmyadmin_filename}.tar.gz"
-    CheckError "mv ${phpmyadmin_filename} ${var}/pma"
-    CheckError "mkdir -p ${var}/pma/upload"
-    CheckError "mkdir -p ${var}/pma/save"
-    CheckError "rm -fr ${var}/pma/setup"
+    CheckError "mv ${phpmyadmin_filename} ${pma_location}"
+    CheckError "mkdir -p ${pma_location}/upload"
+    CheckError "mkdir -p ${pma_location}/save"
+    CheckError "rm -fr ${pma_location}/setup"
 
     # 下载配置文件
     DownloadUrl "phpMyAdmin.conf.tar.gz" "https://d.hws.com/linux/debug/conf/phpMyAdmin.conf.tar.gz"
     CheckError "tar zxf phpMyAdmin.conf.tar.gz"
-    CheckError "rm -f ${var}/pma/config.inc.php"
-    CheckError "mv config.inc.php ${var}/pma/config.inc.php"
+    CheckError "rm -f ${pma_location}/config.inc.php"
+    CheckError "mv config.inc.php ${pma_location}/config.inc.php"
 
     id -u www >/dev/null 2>&1
     [ $? -ne 0 ] && useradd -M -U www -r -d /dev/null -s /sbin/nologin
-    chown -R www:www ${var}/pma >/dev/null 2>&1
+    chown -R www:www ${pma_location} >/dev/null 2>&1
 
     # 写入配置文件
-    write_apache
     write_nginx
+    write_apache
 
     _success "${phpmyadmin_filename} install completed..."
 }
 
 write_apache() {
     # 写入phpMyAdmin配置文件
-    mkdir -p ${var}/default/conf/apache
-    cat > ${var}/default/conf/apache/pma.conf <<EOF
+    mkdir -p ${var}/default/wwwlogs/apache
+    mkdir -p ${var}/default/wwwconf/apache
+    cat > ${var}/default/wwwconf/apache/pma.conf <<EOF
 Listen 999
 <VirtualHost *:999>
     ServerAdmin webmaster@example.com
-    DocumentRoot ${var}/pma
+    DocumentRoot ${pma_location}
     ServerName phpMyAdmin.999
     ServerAlias localhost
     #errorDocument 404 /404.html
-    ErrorLog "${var}/pma/pma-error.log"
-    CustomLog "${var}/pma/pma-access.log" combined
+    ErrorLog "${var}/default/wwwlogs/apache/pma-error.log"
+    CustomLog "${var}/default/wwwlogs/apache/pma-access.log" combined
 
     #DENY FILES
     <Files ~ (\.user.ini|\.sql|\.zip|\.gz|\.htaccess|\.git|\.svn|\.project|LICENSE|README.md)\$>
@@ -55,7 +61,7 @@ Listen 999
     </FilesMatch>
 
     #PATH
-    <Directory ${var}/pma>
+    <Directory ${pma_location}>
         SetOutputFilter DEFLATE
         Options FollowSymLinks
         AllowOverride All
@@ -66,19 +72,21 @@ Listen 999
     </Directory>
 </VirtualHost>
 EOF
+    service httpd restart >/dev/null 2>&1
 }
 
 write_nginx() {
     # 写入phpMyAdmin配置文件
-    mkdir -p ${var}/default/conf/nginx
-    cat > ${var}/default/conf/nginx/pma.conf <<EOF
+    mkdir -p ${var}/default/wwwlogs/nginx
+    mkdir -p ${var}/default/wwwconf/nginx
+    cat > ${var}/default/wwwconf/nginx/pma.conf <<EOF
 server {
    listen 999;
    server_name localhost;
-   root ${var}/pma;
+   root ${pma_location};
    index index.php default.php index.html index.htm default.html default.htm;
-   error_log "${var}/pma/pma-error.log";
-   access_log "${var}/pma/pma-access.log";
+   error_log "${var}/default/wwwlogs/nginx/pma-error.log";
+   access_log "${var}/default/wwwlogs/nginx/pma-access.log";
 
    #DENY FILES
    location ~ ^/(\.user.ini|\.sql|\.zip|\.gz|\.htaccess|\.git|\.svn|\.project|LICENSE|README.md)
@@ -94,4 +102,5 @@ server {
    }
 }
 EOF
+    service nginx restart >/dev/null 2>&1
 }

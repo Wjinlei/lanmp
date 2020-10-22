@@ -167,7 +167,7 @@ _start_apache() {
 
 install_apache(){
     if [ $# -lt 1 ]; then
-        echo "[Parameter Error]: apache_location [default_port]"
+        echo "[Parameter Error]: apache_location"
         exit 1
     fi
     apache_location=${1}
@@ -338,7 +338,8 @@ mod_xml2enc.so
     # 写入默认配置文件
     cat > ${apache_location}/conf/extra/httpd-vhosts.conf <<EOF
 IncludeOptional ${apache_location}/conf/vhost/*.conf
-IncludeOptional ${var}/default/conf/apache/*.conf
+IncludeOptional ${var}/default/wwwconf/apache/*.conf
+IncludeOptional ${var}/wwwconf/apache/*.conf
 
 # 对默认端口,防止范解析攻击
 <VirtualHost *:80>
@@ -348,9 +349,10 @@ IncludeOptional ${var}/default/conf/apache/*.conf
     </Location>
 </VirtualHost>
 EOF
-
     # 授权
-    mkdir -p ${var}/pma
-    chown -R www:www ${var/pma}
+    mkdir -p ${var}/wwwlogs/apache
+    mkdir -p ${var}/wwwconf/apache
+    mkdir -p ${var}/default/wwwlogs/apache
+    mkdir -p ${var}/default/wwwconf/apache
     chown -R www:www ${apache_location}
 }

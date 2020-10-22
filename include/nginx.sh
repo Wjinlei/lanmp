@@ -37,7 +37,7 @@ _start_nginx() {
 
 install_nginx(){
     if [ $# -lt 1 ]; then
-        echo "[Parameter Error]: nginx_location [default_port]"
+        echo "[Parameter Error]: nginx_location"
         exit 1
     fi
     nginx_location=${1}
@@ -162,7 +162,8 @@ http {
 
     # include virtual host config
     include vhost/*.conf;
-    include ${var}/default/conf/nginx/*.conf;
+    include ${var}/default/wwwconf/nginx/*.conf;
+    include ${var}/wwwconf/nginx/*.conf;
 
     server {
        listen 80 default;
@@ -185,9 +186,10 @@ ${nginx_location}/logs/*log {
     endscript
 }
 EOF
-
     # 授权
-    mkdir -p ${var}/pma
-    chown -R www:www ${var/pma}
+    mkdir -p ${var}/wwwlogs/nginx
+    mkdir -p ${var}/wwwconf/nginx
+    mkdir -p ${var}/default/wwwlogs/nginx
+    mkdir -p ${var}/default/wwwconf/nginx
     chown -R www:www ${nginx_location}
 }

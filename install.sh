@@ -110,7 +110,7 @@ Options:
             ;;
         --install-pma)
             include pma
-            install_pma
+            install_pma ${2}
             ;;
         *)
             echo "Missing parameters,Please Usage: $0 -h, Show Help" && exit 1
