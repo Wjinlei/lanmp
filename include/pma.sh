@@ -46,8 +46,8 @@ Listen 999
     ServerName phpMyAdmin.999
     ServerAlias localhost
     #errorDocument 404 /404.html
-    ErrorLog "${var}/default/wwwlogs/apache/pma-error.log"
-    CustomLog "${var}/default/wwwlogs/apache/pma-access.log" combined
+    ErrorLog "${var}/default/wwwlogs/pma-error.log"
+    CustomLog "${var}/default/wwwlogs/pma-access.log" combined
 
     #DENY FILES
     <Files ~ (\.user.ini|\.sql|\.zip|\.gz|\.htaccess|\.git|\.svn|\.project|LICENSE|README.md)\$>
@@ -85,8 +85,8 @@ server {
    server_name localhost;
    root ${pma_location};
    index index.php default.php index.html index.htm default.html default.htm;
-   error_log "${var}/default/wwwlogs/nginx/pma-error.log";
-   access_log "${var}/default/wwwlogs/nginx/pma-access.log";
+   error_log "${var}/default/wwwlogs/pma-error.log";
+   access_log "${var}/default/wwwlogs/pma-access.log";
 
    #DENY FILES
    location ~ ^/(\.user.ini|\.sql|\.zip|\.gz|\.htaccess|\.git|\.svn|\.project|LICENSE|README.md)

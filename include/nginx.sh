@@ -187,9 +187,9 @@ ${nginx_location}/logs/*log {
 }
 EOF
     # 授权
-    mkdir -p ${var}/wwwlogs/nginx
+    mkdir -p ${var}/wwwlogs
     mkdir -p ${var}/wwwconf/nginx
-    mkdir -p ${var}/default/wwwlogs/nginx
+    mkdir -p ${var}/default/wwwlogs
     mkdir -p ${var}/default/wwwconf/nginx
     chown -R www:www ${nginx_location}
 }

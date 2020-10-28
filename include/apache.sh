@@ -350,9 +350,9 @@ IncludeOptional ${var}/wwwconf/apache/*.conf
 </VirtualHost>
 EOF
     # 授权
-    mkdir -p ${var}/wwwlogs/apache
+    mkdir -p ${var}/wwwlogs
     mkdir -p ${var}/wwwconf/apache
-    mkdir -p ${var}/default/wwwlogs/apache
+    mkdir -p ${var}/default/wwwlogs
     mkdir -p ${var}/default/wwwconf/apache
     chown -R www:www ${apache_location}
 }
