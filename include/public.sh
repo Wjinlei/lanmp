@@ -176,6 +176,7 @@ _install_tools(){
             bzip2
             xz
             tar
+            e2fsprogs
         )
         for depend in ${yum_depends[@]}
         do
@@ -202,6 +203,7 @@ _install_tools(){
             bzip2
             xz-utils
             tar
+            e2fsprogs
         )
         apt-get update > /dev/null 2>&1
         for depend in ${apt_depends[@]}
@@ -243,6 +245,8 @@ _install_tools(){
     _check_command_exist "unzip"
     _check_command_exist "xz"
     _check_command_exist "tar"
+    _check_command_exist "chattr"
+    _check_command_exist "lsattr"
 }
 
 
