@@ -149,7 +149,7 @@ _install_nghttp2(){
 }
 
 _start_apache() {
-    CheckError "${apache_location}/bin/httpd -k start"
+    CheckError "${apache_location}/bin/apachectl -k start"
     wait_for_pid created ${apache_location}/logs/httpd.pid
     if [ -n "$try" ] ; then
         echo "wait_for_pid failed"
