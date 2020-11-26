@@ -111,14 +111,14 @@ CheckError(){
     if [[ $2 == "noOutput" ]]; then
         ${command} >/dev/null 2>&1
     else
-        ${command}
+        ${command} 2>/tmp/install_error.log
     fi
     if [ $? -ne 0 ]; then
         _error "
 +------------------+
 |  ERROR DETECTED  |
 +------------------+
-An error occurred,The Full Log is available at /tmp/install.log"
+An error occurred,The Error Log is available at /tmp/install_error.log"
     fi
 }
 
