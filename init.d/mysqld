@@ -1,15 +1,15 @@
 #!/bin/bash
 # chkconfig: 2345 55 25
-# description: apache service script
+# description: mysql service script
 
 ### BEGIN INIT INFO
-# Provides:          apache
+# Provides:          mysql
 # Required-Start:    $all
 # Required-Stop:     $all
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: apache
-# Description:       apache service script
+# Short-Description: mysql
+# Description:       mysql service script
 ### END INIT INFO
 
 prefix={mysql_location}
