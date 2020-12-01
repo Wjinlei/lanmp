@@ -33,30 +33,36 @@ _install_mysql_depend(){
     fi
     id -u mysql >/dev/null 2>&1
     [ $? -ne 0 ] && useradd -M -U mysql -r -d /dev/null -s /sbin/nologin
-    mkdir -p ${mysql56_location}
+    mkdir -p ${mysql_location}
     _info "Install dependencies packages for MySQL completed..."
 }
 
 _config_mysql(){
-    sed -i "s@^basedir=.*@basedir=${mysql56_location}@g" ${mysql56_location}/support-files/mysql.server
-    CheckError "${mysql56_location}/support-files/mysql.server start"
-    cp -f ${mysql56_location}/support-files/mysql.server /etc/init.d/mysql56
-    chkconfig --add mysql56 > /dev/null 2>&1
-    update-rc.d -f mysql56 defaults > /dev/null 2>&1
-    _info "Starting MySQL..."
-    CheckError "service mysql56 restart"
-    ${mysql56_location}/bin/mysql -uroot -S /tmp/mysql56.sock \
+    ${mysql_location}/bin/mysqld_safe --defaults-file=${mysql_location}/my.cnf &
+    wait_for_pid created ${mysql_location}/mysql_data/mysql.pid
+    if [ -n "$try" ] ; then
+        echo "wait_for_pid failed"
+        exit 1
+    else
+        DownloadUrl "/etc/init.d/mysqld" "${download_sysv_url}/mysqld"
+        sed -i "s|^prefix={mysql_location}$|prefix=${mysql_location}|g" /etc/init.d/mysqld
+        CheckError "chmod +x /etc/init.d/mysqld"
+        chkconfig --add mysqld > /dev/null 2>&1
+        update-rc.d -f mysqld defaults > /dev/null 2>&1
+        CheckError "service mysqld restart"
+    fi
+    ${mysql_location}/bin/mysql -uroot -S /tmp/mysql.sock \
         -e "GRANT ALL PRIVILEGES ON *.* to root@'127.0.0.1' IDENTIFIED BY \"${mysql_pass}\" WITH GRANT OPTION;"
-    ${mysql56_location}/bin/mysql -uroot -S /tmp/mysql56.sock \
+    ${mysql_location}/bin/mysql -uroot -S /tmp/mysql.sock \
         -e "GRANT ALL PRIVILEGES ON *.* to root@'localhost' IDENTIFIED BY \"${mysql_pass}\" WITH GRANT OPTION;"
-    ${mysql56_location}/bin/mysql -uroot -p${mysql_pass} -S /tmp/mysql56.sock <<EOF
+    ${mysql_location}/bin/mysql -uroot -p${mysql_pass} -S /tmp/mysql.sock <<EOF
     DROP DATABASE IF EXISTS test;
     DELETE FROM mysql.user WHERE NOT (user='root');
     DELETE FROM mysql.db WHERE user='';
     DELETE FROM mysql.user WHERE user="root" AND host="%";
     FLUSH PRIVILEGES;
 EOF
-    CheckError "service mysql56 restart"
+    CheckError "service mysqld restart"
 }
 
 
@@ -93,25 +99,25 @@ _create_mysql_config(){
     esac
     [ -f "/etc/my.cnf" ] && mv /etc/my.cnf /etc/my.cnf-$(date +%Y-%m-%d_%H:%M:%S).bak
     [ -d "/etc/mysql" ] && mv /etc/mysql /etc/mysql-$(date +%Y-%m-%d_%H:%M:%S).bak
-    _info "Create ${mysql56_location}/my.cnf file..."
-    cat >${mysql56_location}/my.cnf <<EOF
+    _info "Create ${mysql_location}/my.cnf file..."
+    cat >${mysql_location}/my.cnf <<EOF
 [client]
 port                           = ${mysql_port}
-socket                         = /tmp/mysql56.sock
+socket                         = /tmp/mysql.sock
 
 [mysqld]
-basedir                        = ${mysql56_location}
-datadir                        = ${mysql56_location}/mysql56_data
+basedir                        = ${mysql_location}
+datadir                        = ${mysql_location}/mysql_data
 user                           = mysql
 port                           = ${mysql_port}
-socket                         = /tmp/mysql56.sock
+socket                         = /tmp/mysql.sock
 default-storage-engine         = InnoDB
-pid-file                       = ${mysql56_location}/mysql56_data/mysql.pid
+pid-file                       = ${mysql_location}/mysql_data/mysql.pid
 character-set-server           = utf8mb4
 collation-server               = utf8mb4_unicode_ci
 skip_name_resolve
 skip-external-locking
-log-error                      = ${mysql56_location}/mysql56_data/mysql-error.log
+log-error                      = ${mysql_location}/mysql_data/mysql-error.log
 
 # INNODB #
 innodb-log-files-in-group      = 2
@@ -153,7 +159,7 @@ install_mysql56(){
         echo "[Parameter Error]: mysql_location password [default_port]"
         exit 1
     fi
-    mysql56_location=${1}
+    mysql_location=${1}
     mysql_pass=${2}
 
     # 如果存在第三个参数
@@ -163,7 +169,7 @@ install_mysql56(){
 
     _install_mysql_depend
 
-    CheckError "rm -fr ${mysql56_location}"
+    CheckError "rm -fr ${mysql_location}"
     Is64bit && sys_bit=x86_64 || sys_bit=i686
     cd /tmp
     if [ "${sys_bit}" == "x86_64" ]; then
@@ -180,13 +186,13 @@ install_mysql56(){
         tar zxf ${mysql56_filename}.tar.gz
     fi
     _info "Moving ${mysql56_filename} files..."
-    mv -f ${mysql56_filename} ${mysql56_location}
+    mv -f ${mysql56_filename} ${mysql_location}
     _create_mysql_config
-    chown -R mysql:mysql ${mysql56_location}
+    chown -R mysql:mysql ${mysql_location}
     _info "Init MySQL..."
-    CheckError "${mysql56_location}/scripts/mysql_install_db \
-        --basedir=${mysql56_location} \
-        --datadir=${mysql56_location}/mysql56_data --user=mysql"
+    CheckError "${mysql_location}/scripts/mysql_install_db \
+        --basedir=${mysql_location} \
+        --datadir=${mysql_location}/mysql_data --user=mysql"
     _config_mysql
 
     echo "Root password:${mysql_pass}, Please keep it safe."

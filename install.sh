@@ -3,6 +3,7 @@
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 
 cur_dir=$(pwd)
+rm -fr ${cur_dir}/include
 
 include(){
     local include=${1}

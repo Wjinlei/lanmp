@@ -33,29 +33,35 @@ _install_mysql_depend(){
     fi
     id -u mysql >/dev/null 2>&1
     [ $? -ne 0 ] && useradd -M -U mysql -r -d /dev/null -s /sbin/nologin
-    mkdir -p ${mysql80_location}
+    mkdir -p ${mysql_location}
     _info "Install dependencies packages for MySQL completed..."
 }
 
 _config_mysql(){
-    sed -i "s@^basedir=.*@basedir=${mysql80_location}@g" ${mysql80_location}/support-files/mysql.server
-    CheckError "${mysql80_location}/support-files/mysql.server start"
-    cp -f ${mysql80_location}/support-files/mysql.server /etc/init.d/mysql80
-    chkconfig --add mysql80 > /dev/null 2>&1
-    update-rc.d -f mysql80 defaults > /dev/null 2>&1
-    _info "Starting MySQL..."
-    CheckError "service mysql80 restart"
-    ${mysql80_location}/bin/mysql -uroot -S /tmp/mysql80.sock \
+    ${mysql_location}/bin/mysqld_safe --defaults-file=${mysql_location}/my.cnf &
+    wait_for_pid created ${mysql_location}/mysql_data/mysql.pid
+    if [ -n "$try" ] ; then
+        echo "wait_for_pid failed"
+        exit 1
+    else
+        DownloadUrl "/etc/init.d/mysqld" "${download_sysv_url}/mysqld"
+        sed -i "s|^prefix={mysql_location}$|prefix=${mysql_location}|g" /etc/init.d/mysqld
+        CheckError "chmod +x /etc/init.d/mysqld"
+        chkconfig --add mysqld > /dev/null 2>&1
+        update-rc.d -f mysqld defaults > /dev/null 2>&1
+        CheckError "service mysqld restart"
+    fi
+    ${mysql_location}/bin/mysql -uroot -S /tmp/mysql.sock \
         -e "CREATE USER root@'127.0.0.1' IDENTIFIED WITH mysql_native_password BY \"${mysql_pass}\";"
-    ${mysql80_location}/bin/mysql -uroot -S /tmp/mysql80.sock \
+    ${mysql_location}/bin/mysql -uroot -S /tmp/mysql.sock \
         -e "ALTER USER root@'localhost' IDENTIFIED WITH mysql_native_password BY \"${mysql_pass}\";"
-    ${mysql80_location}/bin/mysql -uroot -p${mysql_pass} -S /tmp/mysql80.sock \
+    ${mysql_location}/bin/mysql -uroot -p${mysql_pass} -S /tmp/mysql.sock \
         -e "GRANT ALL PRIVILEGES ON *.* to root@'127.0.0.1' WITH GRANT OPTION;" >/dev/null 2>&1
-    ${mysql80_location}/bin/mysql -uroot -p${mysql_pass} -S /tmp/mysql80.sock \
+    ${mysql_location}/bin/mysql -uroot -p${mysql_pass} -S /tmp/mysql.sock \
         -e "GRANT ALL PRIVILEGES ON *.* to root@'localhost' WITH GRANT OPTION;" >/dev/null 2>&1
-    ${mysql80_location}/bin/mysql -uroot -p${mysql_pass} -S /tmp/mysql80.sock \
+    ${mysql_location}/bin/mysql -uroot -p${mysql_pass} -S /tmp/mysql.sock \
         -e "FLUSH PRIVILEGES;" >/dev/null 2>&1
-    CheckError "service mysql80 restart"
+    CheckError "service mysqld restart"
 }
 
 
@@ -92,25 +98,25 @@ _create_mysql_config(){
     esac
     [ -f "/etc/my.cnf" ] && mv /etc/my.cnf /etc/my.cnf-$(date +%Y-%m-%d_%H:%M:%S).bak
     [ -d "/etc/mysql" ] && mv /etc/mysql /etc/mysql-$(date +%Y-%m-%d_%H:%M:%S).bak
-    _info "Create ${mysql80_location}/my.cnf file..."
-    cat >${mysql80_location}/my.cnf <<EOF
+    _info "Create ${mysql_location}/my.cnf file..."
+    cat >${mysql_location}/my.cnf <<EOF
 [client]
 port                           = ${mysql_port}
-socket                         = /tmp/mysql80.sock
+socket                         = /tmp/mysql.sock
 
 [mysqld]
-basedir                        = ${mysql80_location}
-datadir                        = ${mysql80_location}/mysql80_data
+basedir                        = ${mysql_location}
+datadir                        = ${mysql_location}/mysql_data
 user                           = mysql
 port                           = ${mysql_port}
-socket                         = /tmp/mysql80.sock
+socket                         = /tmp/mysql.sock
 default-storage-engine         = InnoDB
-pid-file                       = ${mysql80_location}/mysql80_data/mysql.pid
+pid-file                       = ${mysql_location}/mysql_data/mysql.pid
 character-set-server           = utf8mb4
 collation-server               = utf8mb4_unicode_ci
 skip_name_resolve
 skip-external-locking
-log-error                      = ${mysql80_location}/mysql80_data/mysql-error.log
+log-error                      = ${mysql_location}/mysql_data/mysql-error.log
 default_authentication_plugin  = mysql_native_password
 
 # INNODB #
@@ -153,7 +159,7 @@ install_mysql80(){
         echo "[Parameter Error]: mysql_location password [default_port]"
         exit 1
     fi
-    mysql80_location=${1}
+    mysql_location=${1}
     mysql_pass=${2}
 
     # 如果存在第三个参数
@@ -163,7 +169,7 @@ install_mysql80(){
 
     _install_mysql_depend
 
-    CheckError "rm -fr ${mysql80_location}"
+    CheckError "rm -fr ${mysql_location}"
     Is64bit && sys_bit=x86_64 || sys_bit=i686
     cd /tmp
     if [ "${sys_bit}" == "x86_64" ]; then
@@ -180,13 +186,13 @@ install_mysql80(){
         tar Jxf ${mysql80_filename}.tar.xz
     fi
     _info "Moving ${mysql80_filename} files..."
-    mv -f ${mysql80_filename} ${mysql80_location}
+    mv -f ${mysql80_filename} ${mysql_location}
     _create_mysql_config
-    chown -R mysql:mysql ${mysql80_location}
+    chown -R mysql:mysql ${mysql_location}
     _info "Init MySQL..."
-    CheckError "${mysql80_location}/bin/mysqld --initialize-insecure \
-        --basedir=${mysql80_location} \
-        --datadir=${mysql80_location}/mysql80_data --user=mysql"
+    CheckError "${mysql_location}/bin/mysqld --initialize-insecure \
+        --basedir=${mysql_location} \
+        --datadir=${mysql_location}/mysql_data --user=mysql"
     _config_mysql
 
     echo "Root password:${mysql_pass}, Please keep it safe."

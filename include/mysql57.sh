@@ -33,30 +33,36 @@ _install_mysql_depend(){
     fi
     id -u mysql >/dev/null 2>&1
     [ $? -ne 0 ] && useradd -M -U mysql -r -d /dev/null -s /sbin/nologin
-    mkdir -p ${mysql57_location}
+    mkdir -p ${mysql_location}
     _info "Install dependencies packages for MySQL completed..."
 }
 
 _config_mysql(){
-    sed -i "s@^basedir=.*@basedir=${mysql57_location}@g" ${mysql57_location}/support-files/mysql.server
-    CheckError "${mysql57_location}/support-files/mysql.server start"
-    cp -f ${mysql57_location}/support-files/mysql.server /etc/init.d/mysql57
-    chkconfig --add mysql57 > /dev/null 2>&1
-    update-rc.d -f mysql57 defaults > /dev/null 2>&1
-    _info "Starting MySQL..."
-    CheckError "service mysql57 restart"
-    ${mysql57_location}/bin/mysql -uroot -S /tmp/mysql57.sock \
+    ${mysql_location}/bin/mysqld_safe --defaults-file=${mysql_location}/my.cnf &
+    wait_for_pid created ${mysql_location}/mysql_data/mysql.pid
+    if [ -n "$try" ] ; then
+        echo "wait_for_pid failed"
+        exit 1
+    else
+        DownloadUrl "/etc/init.d/mysqld" "${download_sysv_url}/mysqld"
+        sed -i "s|^prefix={mysql_location}$|prefix=${mysql_location}|g" /etc/init.d/mysqld
+        CheckError "chmod +x /etc/init.d/mysqld"
+        chkconfig --add mysqld > /dev/null 2>&1
+        update-rc.d -f mysqld defaults > /dev/null 2>&1
+        CheckError "service mysqld restart"
+    fi
+    ${mysql_location}/bin/mysql -uroot -S /tmp/mysql.sock \
         -e "GRANT ALL PRIVILEGES ON *.* to root@'127.0.0.1' IDENTIFIED BY \"${mysql_pass}\" WITH GRANT OPTION;"
-    ${mysql57_location}/bin/mysql -uroot -S /tmp/mysql57.sock \
+    ${mysql_location}/bin/mysql -uroot -S /tmp/mysql.sock \
         -e "GRANT ALL PRIVILEGES ON *.* to root@'localhost' IDENTIFIED BY \"${mysql_pass}\" WITH GRANT OPTION;"
-    ${mysql57_location}/bin/mysql -uroot -p${mysql_pass} -S /tmp/mysql57.sock <<EOF
+    ${mysql_location}/bin/mysql -uroot -p${mysql_pass} -S /tmp/mysql.sock <<EOF
     DROP DATABASE IF EXISTS test;
     DELETE FROM mysql.user WHERE NOT (user='root');
     DELETE FROM mysql.db WHERE user='';
     DELETE FROM mysql.user WHERE user="root" AND host="%";
     FLUSH PRIVILEGES;
 EOF
-    CheckError "service mysql57 restart"
+    CheckError "service mysqld restart"
 }
 
 
@@ -93,25 +99,25 @@ _create_mysql_config(){
     esac
     [ -f "/etc/my.cnf" ] && mv /etc/my.cnf /etc/my.cnf-$(date +%Y-%m-%d_%H:%M:%S).bak
     [ -d "/etc/mysql" ] && mv /etc/mysql /etc/mysql-$(date +%Y-%m-%d_%H:%M:%S).bak
-    _info "Create ${mysql57_location}/my.cnf file..."
-    cat >${mysql57_location}/my.cnf <<EOF
+    _info "Create ${mysql_location}/my.cnf file..."
+    cat >${mysql_location}/my.cnf <<EOF
 [client]
 port                           = ${mysql_port}
-socket                         = /tmp/mysql57.sock
+socket                         = /tmp/mysql.sock
 
 [mysqld]
-basedir                        = ${mysql57_location}
-datadir                        = ${mysql57_location}/mysql57_data
+basedir                        = ${mysql_location}
+datadir                        = ${mysql_location}/mysql_data
 user                           = mysql
 port                           = ${mysql_port}
-socket                         = /tmp/mysql57.sock
+socket                         = /tmp/mysql.sock
 default-storage-engine         = InnoDB
-pid-file                       = ${mysql57_location}/mysql57_data/mysql.pid
+pid-file                       = ${mysql_location}/mysql_data/mysql.pid
 character-set-server           = utf8mb4
 collation-server               = utf8mb4_unicode_ci
 skip_name_resolve
 skip-external-locking
-log-error                      = ${mysql57_location}/mysql57_data/mysql-error.log
+log-error                      = ${mysql_location}/mysql_data/mysql-error.log
 
 # INNODB #
 innodb-log-files-in-group      = 2
@@ -153,7 +159,7 @@ install_mysql57(){
         echo "[Parameter Error]: mysql_location password [default_port]"
         exit 1
     fi
-    mysql57_location=${1}
+    mysql_location=${1}
     mysql_pass=${2}
 
     # 如果存在第三个参数
@@ -163,7 +169,7 @@ install_mysql57(){
 
     _install_mysql_depend
 
-    CheckError "rm -fr ${mysql57_location}"
+    CheckError "rm -fr ${mysql_location}"
     Is64bit && sys_bit=x86_64 || sys_bit=i686
     cd /tmp
     if [ "${sys_bit}" == "x86_64" ]; then
@@ -180,13 +186,13 @@ install_mysql57(){
         tar zxf ${mysql57_filename}.tar.gz
     fi
     _info "Moving ${mysql57_filename} files..."
-    mv -f ${mysql57_filename} ${mysql57_location}
+    mv -f ${mysql57_filename} ${mysql_location}
     _create_mysql_config
-    chown -R mysql:mysql ${mysql57_location}
+    chown -R mysql:mysql ${mysql_location}
     _info "Init MySQL..."
-    CheckError "${mysql57_location}/bin/mysqld --initialize-insecure \
-        --basedir=${mysql57_location} \
-        --datadir=${mysql57_location}/mysql57_data --user=mysql"
+    CheckError "${mysql_location}/bin/mysqld --initialize-insecure \
+        --basedir=${mysql_location} \
+        --datadir=${mysql_location}/mysql_data --user=mysql"
     _config_mysql
 
     echo "Root password:${mysql_pass}, Please keep it safe."
