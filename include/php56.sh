@@ -63,7 +63,7 @@ _install_php_depend(){
         fi
         _install_freetype
     fi
-    _install_openssl
+    _install_openssl102
     _install_pcre
     _install_libiconv
     _install_re2c
@@ -145,11 +145,11 @@ _install_curl(){
     DownloadFile "${curl_filename}.tar.gz" "${curl_download_url}"
     tar zxf ${curl_filename}.tar.gz
     cd ${curl_filename}
-    CheckError "./configure --prefix=${curl_location} --with-ssl=${openssl102_location}"
+    CheckError "./configure --prefix=${curl102_locatioon} --with-ssl=${openssl102_location}"
     CheckError "parallel_make"
     CheckError "make install"
-    AddToEnv "${curl_location}"
-    CreateLib64Dir "${curl_location}"
+    AddToEnv "${curl102_locatioon}"
+    CreateLib64Dir "${curl102_locatioon}"
     ldconfig
     _success "${curl_filename} install completed..."
     rm -f /tmp/${curl_filename}.tar.gz
@@ -177,7 +177,7 @@ _install_pcre(){
     rm -fr /tmp/${pcre_filename}
 }
 
-_install_openssl(){
+_install_openssl102(){
     cd /tmp
     _info "${openssl102_filename} install start..."
     rm -fr ${openssl102_filename}
@@ -421,7 +421,7 @@ install_php56(){
     --with-freetype-dir \
     --with-zlib \
     --with-bz2 \
-    --with-curl=${curl_location} \
+    --with-curl=${curl102_locatioon} \
     --with-gettext \
     --with-gmp \
     --with-mhash \

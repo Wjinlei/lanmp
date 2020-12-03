@@ -63,7 +63,6 @@ _install_php_depend(){
         fi
         _install_freetype
     fi
-    _install_openssl
     _install_openssl102
     _install_pcre
     _install_libiconv
@@ -146,11 +145,11 @@ _install_curl(){
     DownloadFile "${curl_filename}.tar.gz" "${curl_download_url}"
     tar zxf ${curl_filename}.tar.gz
     cd ${curl_filename}
-    CheckError "./configure --prefix=${curl_location} --with-ssl=${openssl102_location}"
+    CheckError "./configure --prefix=${curl102_location} --with-ssl=${openssl102_location}"
     CheckError "parallel_make"
     CheckError "make install"
-    AddToEnv "${curl_location}"
-    CreateLib64Dir "${curl_location}"
+    AddToEnv "${curl102_location}"
+    CreateLib64Dir "${curl102_location}"
     ldconfig
     _success "${curl_filename} install completed..."
     rm -f /tmp/${curl_filename}.tar.gz
@@ -176,27 +175,6 @@ _install_pcre(){
     _success "${pcre_filename} install completed..."
     rm -f /tmp/${pcre_filename}.tar.gz
     rm -fr /tmp/${pcre_filename}
-}
-
-_install_openssl(){
-    cd /tmp
-    _info "${openssl_filename} install start..."
-    rm -fr ${openssl_filename}
-    DownloadFile "${openssl_filename}.tar.gz" "${openssl_download_url}"
-    tar zxf ${openssl_filename}.tar.gz
-    cd ${openssl_filename}
-    CheckError "./config --prefix=${openssl_location} -fPIC shared zlib"
-    CheckError "parallel_make"
-    CheckError "make install"
-    AddToEnv "${openssl_location}"
-    CreateLib64Dir "${openssl_location}"
-    if ! grep -qE "^${openssl_location}/lib" /etc/ld.so.conf.d/*.conf; then
-        echo "${openssl_location}/lib" > /etc/ld.so.conf.d/openssl111.conf
-    fi
-    ldconfig
-    _success "${openssl_filename} install completed..."
-    rm -f /tmp/${openssl_filename}.tar.gz
-    rm -fr /tmp/${openssl_filename}
 }
 
 _install_openssl102(){
@@ -429,7 +407,7 @@ install_php73(){
     --with-config-file-scan-dir=${php73_location}/php.d \
     --with-libxml-dir=${libxml2_location} \
     --with-pcre-dir=${pcre_location} \
-    --with-openssl=${openssl_location} \
+    --with-openssl=${openssl102_location} \
     ${with_libdir} \
     --with-mysqli=mysqlnd \
     --with-mysql-sock=/tmp/mysql.sock \
@@ -442,7 +420,7 @@ install_php73(){
     --with-freetype-dir \
     --with-zlib \
     --with-bz2 \
-    --with-curl=${curl_location} \
+    --with-curl=${curl102_location} \
     --with-gettext \
     --with-gmp \
     --with-mhash \

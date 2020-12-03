@@ -14,7 +14,7 @@ _install_apache_depend(){
         done
     fi
     CheckInstalled "_install_pcre" ${pcre_location}
-    CheckInstalled "_install_openssl" ${openssl_location}
+    CheckInstalled "_install_openssl102" ${openssl102_location}
     _install_nghttp2
     _install_icu4c
     _install_libxml2
@@ -72,11 +72,11 @@ _install_curl(){
     DownloadFile "${curl_filename}.tar.gz" "${curl_download_url}"
     tar zxf ${curl_filename}.tar.gz
     cd ${curl_filename}
-    CheckError "./configure --prefix=${curl_location} --with-ssl=${openssl_location}"
+    CheckError "./configure --prefix=${curl102_location} --with-ssl=${openssl102_location}"
     CheckError "parallel_make"
     CheckError "make install"
-    AddToEnv "${curl_location}"
-    CreateLib64Dir "${curl_location}"
+    AddToEnv "${curl102_location}"
+    CreateLib64Dir "${curl102_location}"
     ldconfig
     _success "${curl_filename} install completed..."
     rm -f /tmp/${curl_filename}.tar.gz
@@ -104,25 +104,25 @@ _install_pcre(){
     rm -fr /tmp/${pcre_filename}
 }
 
-_install_openssl(){
+_install_openssl102(){
     cd /tmp
-    _info "${openssl_filename} install start..."
-    rm -fr ${openssl_filename}
-    DownloadFile "${openssl_filename}.tar.gz" "${openssl_download_url}"
-    tar zxf ${openssl_filename}.tar.gz
-    cd ${openssl_filename}
-    CheckError "./config --prefix=${openssl_location} -fPIC shared zlib"
+    _info "${openssl102_filename} install start..."
+    rm -fr ${openssl102_filename}
+    DownloadFile "${openssl102_filename}.tar.gz" "${openssl102_download_url}"
+    tar zxf ${openssl102_filename}.tar.gz
+    cd ${openssl102_filename}
+    CheckError "./config --prefix=${openssl102_location} -fPIC shared zlib"
     CheckError "parallel_make"
     CheckError "make install"
-    AddToEnv "${openssl_location}"
-    CreateLib64Dir "${openssl_location}"
-    if ! grep -qE "^${openssl_location}/lib" /etc/ld.so.conf.d/*.conf; then
-        echo "${openssl_location}/lib" > /etc/ld.so.conf.d/openssl111.conf
+    AddToEnv "${openssl102_location}"
+    CreateLib64Dir "${openssl102_location}"
+    if ! grep -qE "^${openssl102_location}/lib" /etc/ld.so.conf.d/*.conf; then
+        echo "${openssl102_location}/lib" > /etc/ld.so.conf.d/openssl102.conf
     fi
     ldconfig
-    _success "${openssl_filename} install completed..."
-    rm -f /tmp/${openssl_filename}.tar.gz
-    rm -fr /tmp/${openssl_filename}
+    _success "${openssl102_filename} install completed..."
+    rm -f /tmp/${openssl102_filename}.tar.gz
+    rm -fr /tmp/${openssl102_filename}
 }
 
 _install_nghttp2(){
@@ -132,9 +132,9 @@ _install_nghttp2(){
     DownloadFile "${nghttp2_filename}.tar.gz" "${nghttp2_download_url}"
     tar zxf ${nghttp2_filename}.tar.gz
     cd ${nghttp2_filename}
-    if [ -d "${openssl_location}" ]; then
-        export OPENSSL_CFLAGS="-I${openssl_location}/include"
-        export OPENSSL_LIBS="-L${openssl_location}/lib -lssl -lcrypto"
+    if [ -d "${openssl102_location}" ]; then
+        export OPENSSL_CFLAGS="-I${openssl102_location}/include"
+        export OPENSSL_LIBS="-L${openssl102_location}/lib -lssl -lcrypto"
     fi
     CheckError "./configure --prefix=${nghttp2_location} --enable-lib-only"
     CheckError "parallel_make"
@@ -160,7 +160,7 @@ _start_apache() {
     else
         DownloadUrl "/etc/init.d/httpd" "${download_sysv_url}/httpd"
         sed -i "s|^prefix={apache_location}$|prefix=${apache_location}|g" /etc/init.d/httpd
-        sed -i "s|{openssl_location_lib}|${openssl_location}/lib|g" /etc/init.d/httpd
+        sed -i "s|{openssl102_location_lib}|${openssl102_location}/lib|g" /etc/init.d/httpd
         CheckError "chmod +x /etc/init.d/httpd"
         chkconfig --add httpd > /dev/null 2>&1
         update-rc.d -f httpd defaults > /dev/null 2>&1
@@ -201,10 +201,10 @@ install_apache(){
     --sysconfdir=${apache_location}/conf \
     --libexecdir=${apache_location}/modules \
     --with-pcre=${pcre_location} \
-    --with-ssl=${openssl_location} \
+    --with-ssl=${openssl102_location} \
     --with-nghttp2=${nghttp2_location} \
     --with-libxml2=${libxml2_location} \
-    --with-curl=${curl_location} \
+    --with-curl=${curl102_location} \
     --with-mpm=event \
     --with-included-apr \
     --enable-modules=reallyall \
@@ -238,7 +238,7 @@ _config_apache(){
     sed -i 's/Require all granted/Require all denied/g' ${apache_location}/conf/httpd.conf
     sed -i 's/Require host .example.com/Require host localhost/g' ${apache_location}/conf/extra/httpd-info.conf
     sed -i "s@AddType\(.*\)Z@AddType\1Z\n    AddType application/x-httpd-php .php .phtml\n    AddType application/x-httpd-php-source .phps@" ${apache_location}/conf/httpd.conf
-    sed -i "s@^export LD_LIBRARY_PATH.*@export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:${openssl_location}/lib@" ${apache_location}/bin/envvars
+    sed -i "s@^export LD_LIBRARY_PATH.*@export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:${openssl102_location}/lib@" ${apache_location}/bin/envvars
     mkdir -p ${apache_location}/conf/vhost/
     #cat > ${apache_location}/conf/extra/httpd-ssl.conf <<EOF
 #Listen 443

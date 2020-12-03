@@ -109,15 +109,16 @@ pcre_filename="pcre-8.43"
 pcre_download_url="https://ftp.pcre.org/pub/pcre/pcre-8.43.tar.gz"
 
 # openssl
-openssl_location=/usr/local/openssl111
-openssl_filename="openssl-1.1.1d"
-openssl_download_url="https://www.openssl.org/source/openssl-1.1.1d.tar.gz"
+openssl111_location=/usr/local/openssl111
+openssl111_filename="openssl-1.1.1d"
+openssl111_download_url="https://www.openssl.org/source/openssl-1.1.1d.tar.gz"
 openssl102_location=/usr/local/openssl102
 openssl102_filename="openssl-1.0.2u"
 openssl102_download_url="https://www.openssl.org/source/old/1.0.2/openssl-1.0.2u.tar.gz"
 
 #curl
-curl_location=/usr/local/curl
+curl102_location=/usr/local/curl102
+curl111_location=/usr/local/curl111
 curl_filename="curl-7.29.0"
 curl_download_url="https://curl.haxx.se/download/curl-7.29.0.tar.gz"
 
