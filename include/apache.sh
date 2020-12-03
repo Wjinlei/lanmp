@@ -116,6 +116,9 @@ _install_openssl(){
     CheckError "make install"
     AddToEnv "${openssl_location}"
     CreateLib64Dir "${openssl_location}"
+    if ! grep -qE "^${openssl_location}/lib" /etc/ld.so.conf.d/*.conf; then
+        echo "${openssl_location}/lib" > /etc/ld.so.conf.d/openssl111.conf
+    fi
     ldconfig
     _success "${openssl_filename} install completed..."
     rm -f /tmp/${openssl_filename}.tar.gz
