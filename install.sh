@@ -1,16 +1,13 @@
 #!/usr/bin/env bash
-
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
-
 cur_dir=$(pwd)
-rm -fr ${cur_dir}/include
 
 include(){
     local include=${1}
     if [[ -s ${cur_dir}/include/${include}.sh ]];then
         . ${cur_dir}/include/${include}.sh
     else
-        wget -P include https://d.hws.com/linux/debug/script/include/${include}.sh >/dev/null 2>&1
+        wget --no-check-certificate -P include https://d.hws.com/linux/debug/script/include/${include}.sh >/dev/null 2>&1
         if [ "$?" -ne 0 ]; then
             echo "Error: ${cur_dir}/include/${include}.sh not found, shell can not be executed."
             exit 1
@@ -129,4 +126,5 @@ main() {
 }
 echo "The installation log will be written to /tmp/install.log"
 echo "Use tail -f /tmp/install.log to view dynamically"
+rm -fr ${cur_dir}/include
 main "$@" > /tmp/install.log 2>&1
