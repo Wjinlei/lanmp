@@ -145,11 +145,11 @@ _install_curl(){
     DownloadFile "${curl_filename}.tar.gz" "${curl_download_url}"
     tar zxf ${curl_filename}.tar.gz
     cd ${curl_filename}
-    CheckError "./configure --prefix=${curl102_locatioon} --with-ssl=${openssl102_location}"
+    CheckError "./configure --prefix=${curl102_location} --with-ssl=${openssl102_location}"
     CheckError "parallel_make"
     CheckError "make install"
-    AddToEnv "${curl102_locatioon}"
-    CreateLib64Dir "${curl102_locatioon}"
+    AddToEnv "${curl102_location}"
+    CreateLib64Dir "${curl102_location}"
     ldconfig
     _success "${curl_filename} install completed..."
     rm -f /tmp/${curl_filename}.tar.gz
@@ -421,7 +421,7 @@ install_php56(){
     --with-freetype-dir \
     --with-zlib \
     --with-bz2 \
-    --with-curl=${curl102_locatioon} \
+    --with-curl=${curl102_location} \
     --with-gettext \
     --with-gmp \
     --with-mhash \

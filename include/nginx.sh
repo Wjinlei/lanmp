@@ -50,10 +50,10 @@ install_nginx(){
     DownloadFile "${pcre_filename}.tar.gz" ${pcre_download_url}
     rm -fr ${pcre_filename}
     tar zxf ${pcre_filename}.tar.gz
-    _info "Downloading and Extracting ${openssl_filename} files..."
-    DownloadFile "${openssl_filename}.tar.gz" ${openssl_download_url}
-    rm -fr ${openssl_filename}
-    tar zxf ${openssl_filename}.tar.gz
+    _info "Downloading and Extracting ${openssl102_filename} files..."
+    DownloadFile "${openssl102_filename}.tar.gz" ${openssl102_download_url}
+    rm -fr ${openssl102_filename}
+    tar zxf ${openssl102_filename}.tar.gz
     _info "Downloading and Extracting ${nginx_filename} files..."
     DownloadFile "${nginx_filename}.tar.gz" ${nginx_download_url}
     rm -fr ${nginx_filename}
@@ -71,7 +71,7 @@ install_nginx(){
     --http-uwsgi-temp-path=${nginx_location}/var/tmp/uwsgi \
     --http-scgi-temp-path=${nginx_location}/var/tmp/scgi \
     --with-pcre=/tmp/${pcre_filename} \
-    --with-openssl=/tmp/${openssl_filename} \
+    --with-openssl=/tmp/${openssl102_filename} \
     --user=www \
     --group=www \
     --with-threads \
@@ -94,7 +94,7 @@ install_nginx(){
     _start_nginx
     _success "${nginx_filename} install completed..."
     rm -fr /tmp/${pcre_filename}
-    rm -fr /tmp/${openssl_filename}
+    rm -fr /tmp/${openssl102_filename}
     rm -fr /tmp/${nginx_filename}
 }
 
