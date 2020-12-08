@@ -72,7 +72,7 @@ Listen 999
     </Directory>
 </VirtualHost>
 EOF
-    service httpd restart >/dev/null 2>&1
+    /etc/init.d/httpd restart >/dev/null 2>&1
 }
 
 write_nginx() {
@@ -102,5 +102,5 @@ server {
    }
 }
 EOF
-    service nginx restart >/dev/null 2>&1
+    /etc/init.d/nginx restart >/dev/null 2>&1
 }
