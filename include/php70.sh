@@ -316,7 +316,7 @@ _start_php70() {
     CheckError "chmod +x /etc/init.d/php70"
     chkconfig --add php70 > /dev/null 2>&1
     update-rc.d -f php70 defaults > /dev/null 2>&1
-    CheckError "service php70 restart"
+    CheckError "/etc/init.d/php70 restart"
 }
 
 _config_php(){

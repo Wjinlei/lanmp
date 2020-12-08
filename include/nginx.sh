@@ -31,7 +31,7 @@ _start_nginx() {
         CheckError "chmod +x /etc/init.d/nginx"
         chkconfig --add nginx > /dev/null 2>&1
         update-rc.d -f nginx defaults > /dev/null 2>&1
-        CheckError "service nginx restart"
+        CheckError "/etc/init.d/nginx restart"
     fi
 }
 

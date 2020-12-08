@@ -316,7 +316,7 @@ _start_php56() {
     CheckError "chmod +x /etc/init.d/php56"
     chkconfig --add php56 > /dev/null 2>&1
     update-rc.d -f php56 defaults > /dev/null 2>&1
-    CheckError "service php56 restart"
+    CheckError "/etc/init.d/php56 restart"
 }
 
 _config_php(){

@@ -316,7 +316,7 @@ _start_php54() {
     CheckError "chmod +x /etc/init.d/php54"
     chkconfig --add php54 > /dev/null 2>&1
     update-rc.d -f php54 defaults > /dev/null 2>&1
-    CheckError "service php54 restart"
+    CheckError "/etc/init.d/php54 restart"
 }
 
 _config_php(){

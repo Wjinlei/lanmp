@@ -10,7 +10,7 @@ _start_redis() {
         CheckError "chmod +x /etc/init.d/redis"
         chkconfig --add redis > /dev/null 2>&1
         update-rc.d -f redis defaults > /dev/null 2>&1
-        CheckError "service redis restart"
+        CheckError "/etc/init.d/redis restart"
     fi
 }
 

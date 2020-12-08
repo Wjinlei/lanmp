@@ -317,7 +317,7 @@ _start_php53() {
     CheckError "chmod +x /etc/init.d/php53"
     chkconfig --add php53 > /dev/null 2>&1
     update-rc.d -f php53 defaults > /dev/null 2>&1
-    CheckError "service php53 restart"
+    CheckError "/etc/init.d/php53 restart"
 }
 
 _config_php(){

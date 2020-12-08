@@ -31,7 +31,7 @@ _start_pureftpd() {
         CheckError "chmod +x /etc/init.d/pure-ftpd"
         chkconfig --add pure-ftpd > /dev/null 2>&1
         update-rc.d -f pure-ftpd defaults > /dev/null 2>&1
-        CheckError "service pure-ftpd restart"
+        CheckError "/etc/init.d/pure-ftpd restart"
     fi
 }
 

@@ -49,7 +49,7 @@ _config_mysql(){
         CheckError "chmod +x /etc/init.d/mysqld"
         chkconfig --add mysqld > /dev/null 2>&1
         update-rc.d -f mysqld defaults > /dev/null 2>&1
-        CheckError "service mysqld restart"
+        CheckError "/etc/init.d/mysqld restart"
     fi
     ${mysql_location}/bin/mysql -uroot -S /tmp/mysql.sock \
         -e "GRANT ALL PRIVILEGES ON *.* to root@'127.0.0.1' IDENTIFIED BY \"${mysql_pass}\" WITH GRANT OPTION;"
@@ -62,7 +62,7 @@ _config_mysql(){
     DELETE FROM mysql.user WHERE user="root" AND host="%";
     FLUSH PRIVILEGES;
 EOF
-    CheckError "service mysqld restart"
+    CheckError "/etc/init.d/mysqld restart"
 }
 
 

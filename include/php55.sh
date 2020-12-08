@@ -316,7 +316,7 @@ _start_php55() {
     CheckError "chmod +x /etc/init.d/php55"
     chkconfig --add php55 > /dev/null 2>&1
     update-rc.d -f php55 defaults > /dev/null 2>&1
-    CheckError "service php55 restart"
+    CheckError "/etc/init.d/php55 restart"
 }
 
 _config_php(){

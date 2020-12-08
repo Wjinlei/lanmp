@@ -164,7 +164,7 @@ _start_apache() {
         CheckError "chmod +x /etc/init.d/httpd"
         chkconfig --add httpd > /dev/null 2>&1
         update-rc.d -f httpd defaults > /dev/null 2>&1
-        CheckError "service httpd restart"
+        CheckError "/etc/init.d/httpd restart"
     fi
 }
 
