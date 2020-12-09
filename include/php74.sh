@@ -165,7 +165,7 @@ _install_libiconv(){
     CheckError "./configure"
     CheckError "parallel_make"
     CheckError "make install"
-    export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
+    ldconfig
     _success "${libiconv_filename} install completed..."
     rm -f /tmp/${libiconv_filename}.tar.gz
     rm -f /tmp/${libiconv_patch_filename}.tar.gz
@@ -182,7 +182,7 @@ _install_re2c(){
     CheckError "./configure"
     CheckError "parallel_make"
     CheckError "make install"
-    export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
+    ldconfig
     _success "${re2c_filename} install completed..."
     rm -f /tmp/${re2c_filename}.tar.xz
     rm -fr /tmp/${re2c_filename}
@@ -197,7 +197,7 @@ _install_mhash(){
     CheckError "./configure"
     CheckError "parallel_make"
     CheckError "make install"
-    export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
+    ldconfig
     _success "${mhash_filename} install completed..."
     rm -f /tmp/${mhash_filename}.tar.gz
     rm -fr /tmp/${mhash_filename}
@@ -212,7 +212,7 @@ _install_mcrypt(){
     CheckError "./configure"
     CheckError "parallel_make"
     CheckError "make install"
-    export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
+    ldconfig
     _success "${mcrypt_filename} install completed..."
     rm -f /tmp/${mcrypt_filename}.tar.gz
     rm -fr /tmp/${mcrypt_filename}
@@ -227,7 +227,7 @@ _install_libmcrypt(){
     CheckError "./configure"
     CheckError "parallel_make"
     CheckError "make install"
-    export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
+    ldconfig
     _success "${libmcrypt_filename} install completed..."
     rm -f /tmp/${libmcrypt_filename}.tar.gz
     rm -fr /tmp/${libmcrypt_filename}
@@ -258,7 +258,7 @@ _install_freetype() {
     CheckError "./configure"
     CheckError "parallel_make"
     CheckError "make install"
-    export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
+    ldconfig
     _success "${freetype_filename} install completed..."
     rm -f /tmp/${freetype_filename}.tar.gz
     rm -fr /tmp/${freetype_filename}
