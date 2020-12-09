@@ -71,12 +71,14 @@ php73_filename="php-7.3.14"
 php73_download_url="https://www.php.net/distributions/php-7.3.14.tar.gz"
 php74_filename="php-7.4.13"
 php74_download_url="https://www.php.net/distributions/php-7.4.13.tar.gz"
+php80_filename="php-8.0.0"
+php80_download_url="https://www.php.net/distributions/php-8.0.0.tar.gz"
 
 # libiconv
 libiconv_filename="libiconv-1.16"
 libiconv_download_url="https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.16.tar.gz"
-libiconv_patch_filename="libiconv-glibc-2.16"
-libiconv_patch_download_url="${download_root_url}libiconv-glibc-2.16.tar.gz"
+libiconv_patch_filename="libiconv-1.16.glibc"
+libiconv_patch_download_url="${download_root_url}libiconv-1.16.glibc.tar.gz"
 
 # re2c
 re2c_filename="re2c-1.3"

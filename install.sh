@@ -84,6 +84,10 @@ Options:
             include php74
             install_php74 ${2}
             ;;
+        --install-php80)
+            include php80
+            install_php80 ${2}
+            ;;
         --install-pureftpd)
             include pure-ftpd
             install_pure-ftpd ${2} ${3}

@@ -65,7 +65,6 @@ _install_php_depend(){
     fi
     _install_openssl102
     _install_pcre2
-    _install_libiconv
     _install_re2c
     _install_curl
     _success "Install dependencies packages for PHP completed..."
@@ -75,7 +74,7 @@ _install_php_depend(){
     fi
     id -u www >/dev/null 2>&1
     [ $? -ne 0 ] && useradd -M -U www -r -d /dev/null -s /sbin/nologin
-    mkdir -p ${php74_location}
+    mkdir -p ${php80_location}
 }
 
 _install_openssl102(){
@@ -130,28 +129,6 @@ _install_curl(){
     _success "${curl_filename} install completed..."
     rm -f /tmp/${curl_filename}.tar.gz
     rm -fr /tmp/${curl_filename}
-}
-
-_install_libiconv(){
-    cd /tmp
-    _info "${libiconv_filename} install start..."
-    DownloadFile "${libiconv_filename}.tar.gz" "${libiconv_download_url}"
-    rm -fr ${libiconv_filename}
-    tar zxf ${libiconv_filename}.tar.gz
-    DownloadFile "${libiconv_patch_filename}.tar.gz" "${libiconv_patch_download_url}"
-    rm -f ${libiconv_patch_filename}.patch
-    tar zxf ${libiconv_patch_filename}.tar.gz
-    patch -d ${libiconv_filename} -p0 < ${libiconv_patch_filename}.patch
-    cd ${libiconv_filename}
-    CheckError "./configure"
-    CheckError "parallel_make"
-    CheckError "make install"
-    ldconfig
-    _success "${libiconv_filename} install completed..."
-    rm -f /tmp/${libiconv_filename}.tar.gz
-    rm -f /tmp/${libiconv_patch_filename}.tar.gz
-    rm -f /tmp/${libiconv_patch_filename}.patch
-    rm -fr /tmp/${libiconv_filename}
 }
 
 _install_re2c(){
@@ -245,43 +222,43 @@ _install_freetype() {
     rm -fr /tmp/${freetype_filename}
 }
 
-_start_php74() {
-    CheckError "${php74_location}/sbin/php-fpm --daemonize \
-        --fpm-config ${php74_location}/etc/default.conf \
-        --pid ${php74_location}/var/run/default.pid"
-    DownloadUrl "/etc/init.d/php74" "${download_sysv_url}/php-fpm"
-    sed -i "s|^prefix={php-fpm_location}$|prefix=${php74_location}|g" /etc/init.d/php74
-    CheckError "chmod +x /etc/init.d/php74"
-    chkconfig --add php74 > /dev/null 2>&1
-    update-rc.d -f php74 defaults > /dev/null 2>&1
-    CheckError "/etc/init.d/php74 restart"
+_start_php80() {
+    CheckError "${php80_location}/sbin/php-fpm --daemonize \
+        --fpm-config ${php80_location}/etc/default.conf \
+        --pid ${php80_location}/var/run/default.pid"
+    DownloadUrl "/etc/init.d/php80" "${download_sysv_url}/php-fpm"
+    sed -i "s|^prefix={php-fpm_location}$|prefix=${php80_location}|g" /etc/init.d/php80
+    CheckError "chmod +x /etc/init.d/php80"
+    chkconfig --add php80 > /dev/null 2>&1
+    update-rc.d -f php80 defaults > /dev/null 2>&1
+    CheckError "/etc/init.d/php80 restart"
 }
 
 _config_php(){
     # php.ini
-    mkdir -p ${php74_location}/{etc,php.d}
-    cp -f php.ini-production ${php74_location}/etc/php.ini
+    mkdir -p ${php80_location}/{etc,php.d}
+    cp -f php.ini-production ${php80_location}/etc/php.ini
 
-    sed -i 's/default_charset =.*/default_charset = "UTF-8"/g' ${php74_location}/etc/php.ini
-    sed -i 's/;always_populate_raw_post_data =.*/always_populate_raw_post_data = -1/g' ${php74_location}/etc/php.ini
-    sed -i 's/post_max_size =.*/post_max_size = 100M/g' ${php74_location}/etc/php.ini
-    sed -i 's/upload_max_filesize =.*/upload_max_filesize = 100M/g' ${php74_location}/etc/php.ini
-    sed -i 's/;date.timezone =.*/date.timezone = PRC/g' ${php74_location}/etc/php.ini
-    sed -i 's/short_open_tag =.*/short_open_tag = On/g' ${php74_location}/etc/php.ini
-    sed -i 's/expose_php =.*/expose_php = Off/g' ${php74_location}/etc/php.ini
-    sed -i 's/;cgi.fix_pathinfo=.*/cgi.fix_pathinfo=1/g' ${php74_location}/etc/php.ini
-    sed -i 's/max_execution_time =.*/max_execution_time = 300/g' ${php74_location}/etc/php.ini
+    sed -i 's/default_charset =.*/default_charset = "UTF-8"/g' ${php80_location}/etc/php.ini
+    sed -i 's/;always_populate_raw_post_data =.*/always_populate_raw_post_data = -1/g' ${php80_location}/etc/php.ini
+    sed -i 's/post_max_size =.*/post_max_size = 100M/g' ${php80_location}/etc/php.ini
+    sed -i 's/upload_max_filesize =.*/upload_max_filesize = 100M/g' ${php80_location}/etc/php.ini
+    sed -i 's/;date.timezone =.*/date.timezone = PRC/g' ${php80_location}/etc/php.ini
+    sed -i 's/short_open_tag =.*/short_open_tag = On/g' ${php80_location}/etc/php.ini
+    sed -i 's/expose_php =.*/expose_php = Off/g' ${php80_location}/etc/php.ini
+    sed -i 's/;cgi.fix_pathinfo=.*/cgi.fix_pathinfo=1/g' ${php80_location}/etc/php.ini
+    sed -i 's/max_execution_time =.*/max_execution_time = 300/g' ${php80_location}/etc/php.ini
     if [ -f /etc/pki/tls/certs/ca-bundle.crt ]; then
-        sed -i 's#;curl.cainfo =.*#curl.cainfo = /etc/pki/tls/certs/ca-bundle.crt#g' ${php74_location}/etc/php.ini
-        sed -i 's#;openssl.cafile=.*#openssl.cafile=/etc/pki/tls/certs/ca-bundle.crt#g' ${php74_location}/etc/php.ini
+        sed -i 's#;curl.cainfo =.*#curl.cainfo = /etc/pki/tls/certs/ca-bundle.crt#g' ${php80_location}/etc/php.ini
+        sed -i 's#;openssl.cafile=.*#openssl.cafile=/etc/pki/tls/certs/ca-bundle.crt#g' ${php80_location}/etc/php.ini
     elif [ -f /etc/ssl/certs/ca-certificates.crt ]; then
-        sed -i 's#;curl.cainfo =.*#curl.cainfo = /etc/ssl/certs/ca-certificates.crt#g' ${php74_location}/etc/php.ini
-        sed -i 's#;openssl.cafile=.*#openssl.cafile=/etc/ssl/certs/ca-certificates.crt#g' ${php74_location}/etc/php.ini
+        sed -i 's#;curl.cainfo =.*#curl.cainfo = /etc/ssl/certs/ca-certificates.crt#g' ${php80_location}/etc/php.ini
+        sed -i 's#;openssl.cafile=.*#openssl.cafile=/etc/ssl/certs/ca-certificates.crt#g' ${php80_location}/etc/php.ini
     fi
-    sed -i 's/disable_functions =.*/disable_functions = passthru,exec,system,chroot,chgrp,chown,shell_exec,popen,proc_open,pcntl_exec,ini_alter,ini_restore,dl,openlog,syslog,popepassthru,pcntl_alarm,pcntl_fork,pcntl_waitpid,pcntl_wait,pcntl_wifexited,pcntl_wifstopped,pcntl_wifsignaled,pcntl_wifcontinued,pcntl_wexitstatus,pcntl_wtermsig,pcntl_wstopsig,pcntl_signal,pcntl_signal_dispatch,pcntl_get_last_error,pcntl_strerror,pcntl_sigprocmask,pcntl_sigwaitinfo,pcntl_sigtimedwait,pcntl_exec,pcntl_getpriority,pcntl_setpriority,imap_open,apache_setenv/g' ${php74_location}/etc/php.ini
+    sed -i 's/disable_functions =.*/disable_functions = passthru,exec,system,chroot,chgrp,chown,shell_exec,popen,proc_open,pcntl_exec,ini_alter,ini_restore,dl,openlog,syslog,popepassthru,pcntl_alarm,pcntl_fork,pcntl_waitpid,pcntl_wait,pcntl_wifexited,pcntl_wifstopped,pcntl_wifsignaled,pcntl_wifcontinued,pcntl_wexitstatus,pcntl_wtermsig,pcntl_wstopsig,pcntl_signal,pcntl_signal_dispatch,pcntl_get_last_error,pcntl_strerror,pcntl_sigprocmask,pcntl_sigwaitinfo,pcntl_sigtimedwait,pcntl_exec,pcntl_getpriority,pcntl_setpriority,imap_open,apache_setenv/g' ${php80_location}/etc/php.ini
 
-    extension_dir=$(${php74_location}/bin/php-config --extension-dir)
-    cat > ${php74_location}/php.d/opcache.ini<<EOF
+    extension_dir=$(${php80_location}/bin/php-config --extension-dir)
+    cat > ${php80_location}/php.d/opcache.ini<<EOF
 [opcache]
 zend_extension=${extension_dir}/opcache.so
 opcache.enable_cli=1
@@ -294,13 +271,13 @@ opcache.save_comments=1
 EOF
 
     # php-fpm
-    cat > ${php74_location}/etc/default.conf<<EOF
+    cat > ${php80_location}/etc/default.conf<<EOF
 [global]
-    pid = ${php74_location}/var/run/default.pid
-    error_log = ${php74_location}/var/log/default.log
+    pid = ${php80_location}/var/run/default.pid
+    error_log = ${php80_location}/var/log/default.log
 [default]
     security.limit_extensions = .php .php3 .php4 .php5 .php7
-    listen = /tmp/${php74_filename}-default.sock
+    listen = /tmp/${php80_filename}-default.sock
     listen.owner = www
     listen.group = www
     listen.mode = 0660
@@ -313,36 +290,36 @@ EOF
     pm.min_spare_servers = 1
     pm.max_spare_servers = 3
 EOF
-    mkdir -p ${php74_location}/var/run
-    mkdir -p ${php74_location}/var/log
+    mkdir -p ${php80_location}/var/run
+    mkdir -p ${php80_location}/var/log
 
-    _start_php74
+    _start_php80
     _warn "Please add the following two lines to your httpd.conf"
     echo AddType application/x-httpd-php .php .phtml
     echo AddType application/x-httpd-php-source .phps
 }
 
-install_php74(){
+install_php80(){
     if [ $# -lt 1 ]; then
         echo "[Parameter Error]: php_location"
         exit 1
     fi
-    php74_location=${1}
+    php80_location=${1}
 
     _install_php_depend
 
-    CheckError "rm -fr ${php74_location}"
+    CheckError "rm -fr ${php80_location}"
     cd /tmp
-    _info "Downloading and Extracting ${php74_filename} files..."
-    DownloadFile  "${php74_filename}.tar.gz" "${php74_download_url}"
-    rm -fr ${php74_filename}
-    tar zxf ${php74_filename}.tar.gz
-    cd ${php74_filename}
-    _info "Install ${php74_filename} ..."
+    _info "Downloading and Extracting ${php80_filename} files..."
+    DownloadFile  "${php80_filename}.tar.gz" "${php80_download_url}"
+    rm -fr ${php80_filename}
+    tar zxf ${php80_filename}.tar.gz
+    cd ${php80_filename}
+    _info "Install ${php80_filename} ..."
     Is64bit && with_libdir="--with-libdir=lib64" || with_libdir=""
-    php_configure_args="--prefix=${php74_location} \
-    --with-config-file-path=${php74_location}/etc \
-    --with-config-file-scan-dir=${php74_location}/php.d \
+    php_configure_args="--prefix=${php80_location} \
+    --with-config-file-path=${php80_location}/etc \
+    --with-config-file-scan-dir=${php80_location}/php.d \
     --with-external-pcre=${pcre2_location} \
     --with-openssl=${openssl102_location} \
     ${with_libdir} \
@@ -364,12 +341,12 @@ install_php74(){
     --with-enchant=/usr \
     --with-readline \
     --with-tidy=/usr \
-    --with-xmlrpc \
     --with-xsl \
     --with-zip \
     --with-fpm-user=www \
     --with-fpm-group=www \
     --without-pear \
+    --without-iconv \
     --enable-mysqlnd \
     --enable-fpm \
     --enable-bcmath \
@@ -389,10 +366,10 @@ install_php74(){
     unset CPPFLAGS
     ldconfig
     CheckError "./configure ${php_configure_args}"
-    CheckError "parallel_make ZEND_EXTRA_LIBS='-liconv'"
+    CheckError "parallel_make"
     CheckError "make install"
-    _info "Config ${php74_filename}..."
+    _info "Config ${php80_filename}..."
     _config_php
-    _success "${php74_filename} install completed..."
-    rm -fr /tmp/${php74_filename}
+    _success "${php80_filename} install completed..."
+    rm -fr /tmp/${php80_filename}
 }
