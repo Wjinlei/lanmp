@@ -15,8 +15,10 @@ apache_filename="httpd-2.4.41"
 apache_download_url="http://ftp.jaist.ac.jp/pub/apache/httpd/httpd-2.4.41.tar.gz"
 
 # nginx
-nginx_filename="nginx-1.16.1"
-nginx_download_url="http://nginx.org/download/nginx-1.16.1.tar.gz"
+nginx116_filename="nginx-1.16.1"
+nginx116_download_url="http://nginx.org/download/nginx-1.16.1.tar.gz"
+nginx118_filename="nginx-1.18.0"
+nginx118_download_url="http://nginx.org/download/nginx-1.18.0.tar.gz"
 
 # pureftpd_filename
 pureftpd_filename="pure-ftpd-1.0.49"

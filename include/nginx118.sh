@@ -35,7 +35,7 @@ _start_nginx() {
     fi
 }
 
-install_nginx(){
+install_nginx118(){
     if [ $# -lt 1 ]; then
         echo "[Parameter Error]: nginx_location"
         exit 1
@@ -54,11 +54,11 @@ install_nginx(){
     DownloadFile "${openssl102_filename}.tar.gz" ${openssl102_download_url}
     rm -fr ${openssl102_filename}
     tar zxf ${openssl102_filename}.tar.gz
-    _info "Downloading and Extracting ${nginx_filename} files..."
-    DownloadFile "${nginx_filename}.tar.gz" ${nginx_download_url}
-    rm -fr ${nginx_filename}
-    tar zxf ${nginx_filename}.tar.gz
-    cd ${nginx_filename}
+    _info "Downloading and Extracting ${nginx118_filename} files..."
+    DownloadFile "${nginx118_filename}.tar.gz" ${nginx118_download_url}
+    rm -fr ${nginx118_filename}
+    tar zxf ${nginx118_filename}.tar.gz
+    cd ${nginx118_filename}
     nginx_configure_args="--prefix=${nginx_location} \
     --conf-path=${nginx_location}/etc/nginx.conf \
     --error-log-path=${nginx_location}/var/log/error.log \
@@ -82,20 +82,20 @@ install_nginx(){
     --with-http_gzip_static_module \
     --with-http_realip_module \
     --with-http_stub_status_module"
-    _info "Make Install ${nginx_filename}..."
+    _info "Make Install ${nginx118_filename}..."
     CheckError "./configure ${nginx_configure_args}"
     CheckError "parallel_make"
     CheckError "make install"
     mkdir -p ${nginx_location}/var/{log,run,lock,tmp}
     mkdir -p ${nginx_location}/var/tmp/{client,proxy,fastcgi,uwsgi}
     mkdir -p ${nginx_location}/etc/vhost
-    _info "Config ${nginx_filename}"
+    _info "Config ${nginx118_filename}"
     _config_nginx
     _start_nginx
-    _success "${nginx_filename} install completed..."
+    _success "${nginx118_filename} install completed..."
     rm -fr /tmp/${pcre_filename}
     rm -fr /tmp/${openssl102_filename}
-    rm -fr /tmp/${nginx_filename}
+    rm -fr /tmp/${nginx118_filename}
 }
 
 _config_nginx(){

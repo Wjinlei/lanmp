@@ -28,9 +28,13 @@ Options:
             include apache
             install_apache ${2}
             ;;
-        --install-nginx)
-            include nginx
-            install_nginx ${2}
+        --install-nginx116)
+            include nginx116
+            install_nginx116 ${2}
+            ;;
+        --install-nginx118)
+            include nginx118
+            install_nginx118 ${2}
             ;;
         --install-mysql55)
             include mysql55
