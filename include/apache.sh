@@ -59,6 +59,9 @@ _install_libxml2() {
     CheckError "make install"
     AddToEnv "${libxml2_location}"
     CreateLib64Dir "${libxml2_location}"
+    if ! grep -qE "^${libxml2_location}/lib" /etc/ld.so.conf.d/*.conf; then
+        echo "${libxml2_location}/lib" > /etc/ld.so.conf.d/libxml2.conf
+    fi
     ldconfig
     _success "${libxml2_filename} install completed..."
     rm -f /tmp/${libxml2_filename}.tar.gz
@@ -77,6 +80,9 @@ _install_curl(){
     CheckError "make install"
     AddToEnv "${curl102_location}"
     CreateLib64Dir "${curl102_location}"
+    if ! grep -qE "^${curl102_location}/lib" /etc/ld.so.conf.d/*.conf; then
+        echo "${curl102_location}/lib" > /etc/ld.so.conf.d/curl102.conf
+    fi
     ldconfig
     _success "${curl_filename} install completed..."
     rm -f /tmp/${curl_filename}.tar.gz

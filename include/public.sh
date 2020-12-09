@@ -94,14 +94,13 @@ InstallPack(){
     local command="$1"
     local depend=$(echo "$1" | awk '{print $4}')
     _info "Starting to install package ${depend}"
-    ${command} > /dev/null 2>/tmp/install_package.log
+    ${command} > /dev/null
     if [ $? -ne 0 ]; then
         _error "
 +------------------+
 |  ERROR DETECTED  |
 +------------------+
-Installation package ${depend} failed.
-Error Log is available at /tmp/install_package.log"
+Installation package ${depend} failed."
     fi
 }
 
@@ -111,14 +110,13 @@ CheckError(){
     if [[ $2 == "noOutput" ]]; then
         ${command} >/dev/null 2>&1
     else
-        ${command} 2>/tmp/install_error.log
+        ${command}
     fi
     if [ $? -ne 0 ]; then
         _error "
 +------------------+
 |  ERROR DETECTED  |
-+------------------+
-An error occurred,The Error Log is available at /tmp/install_error.log"
++------------------+"
     fi
 }
 

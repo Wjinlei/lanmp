@@ -22,24 +22,6 @@ go(){
             printf "Usage: $0 <Options> [Parameter...]
 Options:
 -h, --help  Print this help text and exit
-
---install-apache
---install-nginx
---install-mysql55
---install-mysql56
---install-mysql57
---install-mysql80
---install-php53
---install-php54
---install-php55
---install-php56
---install-php70
---install-php71
---install-php72
---install-php73
---install-pma
---install-pureftpd
---install-redis
 "
             ;;
         --install-apache)
@@ -97,6 +79,10 @@ Options:
         --install-php73)
             include php73
             install_php73 ${2}
+            ;;
+        --install-php74)
+            include php74
+            install_php74 ${2}
             ;;
         --install-pureftpd)
             include pure-ftpd

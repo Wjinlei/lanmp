@@ -69,8 +69,8 @@ php72_filename="php-7.2.27"
 php72_download_url="https://www.php.net/distributions/php-7.2.27.tar.gz"
 php73_filename="php-7.3.14"
 php73_download_url="https://www.php.net/distributions/php-7.3.14.tar.gz"
-php74_filename="php-7.4.3"
-php74_download_url="https://www.php.net/distributions/php-7.4.3.tar.gz"
+php74_filename="php-7.4.13"
+php74_download_url="https://www.php.net/distributions/php-7.4.13.tar.gz"
 
 # libiconv
 libiconv_filename="libiconv-1.16"
@@ -98,6 +98,18 @@ libmcrypt_download_url="https://sourceforge.net/projects/mcrypt/files/Libmcrypt/
 libzip_filename="libzip-1.3.2"
 libzip_download_url="https://libzip.org/download/libzip-1.3.2.tar.gz"
 
+#freetype2
+freetype_filename="freetype-2.8.1"
+freetype_download_url="https://download.savannah.gnu.org/releases/freetype/freetype-2.8.1.tar.gz"
+
+# apr
+apr_filename="apr-1.7.0"
+apr_download_url="http://ftp.jaist.ac.jp/pub/apache/apr/apr-1.7.0.tar.gz"
+
+# apr-util
+apr_util_filename="apr-util-1.6.1"
+apr_util_download_url="http://ftp.jaist.ac.jp/pub/apache/apr/apr-util-1.6.1.tar.gz"
+
 # phpmyadmin
 phpmyadmin_filename="phpMyAdmin-4.6.6-all-languages"
 phpmyadmin_download_url="https://files.phpmyadmin.net/phpMyAdmin/4.6.6/phpMyAdmin-4.6.6-all-languages.tar.gz"
@@ -107,6 +119,9 @@ phpmyadmin_download_url="https://files.phpmyadmin.net/phpMyAdmin/4.6.6/phpMyAdmi
 pcre_location=/usr/local/pcre
 pcre_filename="pcre-8.43"
 pcre_download_url="https://ftp.pcre.org/pub/pcre/pcre-8.43.tar.gz"
+pcre2_location=/usr/local/pcre2
+pcre2_filename="pcre2-10.36"
+pcre2_download_url="ftp://ftp.pcre.org/pub/pcre/pcre2-10.36.tar.gz"
 
 # openssl
 openssl111_location=/usr/local/openssl111
@@ -119,8 +134,8 @@ openssl102_download_url="https://www.openssl.org/source/old/1.0.2/openssl-1.0.2u
 #curl
 curl102_location=/usr/local/curl102
 curl111_location=/usr/local/curl111
-curl_filename="curl-7.29.0"
-curl_download_url="https://curl.haxx.se/download/curl-7.29.0.tar.gz"
+curl_filename="curl-7.73.0"
+curl_download_url="https://curl.se/download/curl-7.73.0.tar.gz"
 
 #icu4c
 icu4c_location=/usr/local/icu4c
@@ -133,23 +148,10 @@ libxml2_location=/usr/local/libxml2
 libxml2_filename="libxml2-2.9.4"
 libxml2_download_url="ftp://xmlsoft.org/libxml2/libxml2-2.9.4.tar.gz"
 
-#freetype2
-freetype_location=/usr/local/freetype2
-freetype_filename="freetype-2.8.1"
-freetype_download_url="https://download.savannah.gnu.org/releases/freetype/freetype-2.8.1.tar.gz"
-
 # nghttp2
 nghttp2_location=/usr/local/nghttp2
 nghttp2_filename="nghttp2-1.40.0"
 nghttp2_download_url="https://github.com/nghttp2/nghttp2/releases/download/v1.40.0/nghttp2-1.40.0.tar.gz"
-
-# apr
-apr_filename="apr-1.7.0"
-apr_download_url="http://ftp.jaist.ac.jp/pub/apache/apr/apr-1.7.0.tar.gz"
-
-# apr-util
-apr_util_filename="apr-util-1.6.1"
-apr_util_download_url="http://ftp.jaist.ac.jp/pub/apache/apr/apr-util-1.6.1.tar.gz"
 
 # Other
 mysql_port=3306
