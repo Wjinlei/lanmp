@@ -66,6 +66,8 @@ _install_php_depend(){
     _install_openssl102
     _install_pcre2
     _install_libiconv
+    _install_icu4c
+    _install_libxml2
     _install_re2c
     _install_curl
     _success "Install dependencies packages for PHP completed..."
@@ -112,6 +114,42 @@ _install_pcre2(){
     _success "${pcre2_filename} install completed..."
     rm -f /tmp/${pcre2_filename}.tar.gz
     rm -fr /tmp/${pcre2_filename}
+}
+
+_install_icu4c() {
+    cd /tmp
+    _info "${icu4c_filename} install start..."
+    rm -fr ${icu4c_dirname}
+    DownloadFile "${icu4c_filename}.tgz" "${icu4c_download_url}"
+    tar zxf ${icu4c_filename}.tgz
+    cd ${icu4c_dirname}/source
+    CheckError "./configure --prefix=${icu4c_location}"
+    CheckError "parallel_make"
+    CheckError "make install"
+    AddToEnv "${icu4c_location}"
+    CreateLib64Dir "${icu4c_location}"
+    export PKG_CONFIG_PATH=${icu4c_location}/lib/pkgconfig:$PKG_CONFIG_PATH
+    _success "${icu4c_filename} install completed..."
+    rm -f /tmp/${icu4c_filename}.tgz
+    rm -fr /tmp/${icu4c_dirname}
+}
+
+_install_libxml2() {
+    cd /tmp
+    _info "${libxml2_filename} install start..."
+    rm -fr ${libxml2_filename}
+    DownloadFile "${libxml2_filename}.tar.gz" "${libxml2_download_url}"
+    tar zxf ${libxml2_filename}.tar.gz
+    cd ${libxml2_filename}
+    CheckError "./configure --prefix=${libxml2_location} --with-icu=${icu4c_location}"
+    CheckError "parallel_make"
+    CheckError "make install"
+    AddToEnv "${libxml2_location}"
+    CreateLib64Dir "${libxml2_location}"
+    export PKG_CONFIG_PATH=${libxml2_location}/lib/pkgconfig:$PKG_CONFIG_PATH
+    _success "${libxml2_filename} install completed..."
+    rm -f /tmp/${libxml2_filename}.tar.gz
+    rm -fr /tmp/${libxml2_filename}
 }
 
 _install_curl(){
