@@ -68,6 +68,7 @@ _install_php_depend(){
     _install_re2c
     _install_icu4c
     _install_libxml2
+    _install_libiconv
     _install_curl
     _success "Install dependencies packages for PHP completed..."
     # Fixed unixODBC issue
@@ -167,6 +168,28 @@ _install_curl(){
     _success "${curl_filename} install completed..."
     rm -f /tmp/${curl_filename}.tar.gz
     rm -fr /tmp/${curl_filename}
+}
+
+_install_libiconv(){
+    cd /tmp
+    _info "${libiconv_filename} install start..."
+    DownloadFile "${libiconv_filename}.tar.gz" "${libiconv_download_url}"
+    rm -fr ${libiconv_filename}
+    tar zxf ${libiconv_filename}.tar.gz
+    DownloadFile "${libiconv_patch_filename}.tar.gz" "${libiconv_patch_download_url}"
+    rm -f ${libiconv_patch_filename}.patch
+    tar zxf ${libiconv_patch_filename}.tar.gz
+    patch -d ${libiconv_filename} -p0 < ${libiconv_patch_filename}.patch
+    cd ${libiconv_filename}
+    CheckError "./configure --prefix=${libiconv_location}"
+    CheckError "parallel_make"
+    CheckError "make install"
+    export PKG_CONFIG_PATH=${libiconv_location}/lib/pkgconfig:$PKG_CONFIG_PATH
+    _success "${libiconv_filename} install completed..."
+    rm -f /tmp/${libiconv_filename}.tar.gz
+    rm -f /tmp/${libiconv_patch_filename}.tar.gz
+    rm -f /tmp/${libiconv_patch_filename}.patch
+    rm -fr /tmp/${libiconv_filename}
 }
 
 _install_re2c(){
@@ -383,8 +406,8 @@ install_php80(){
     --with-zip \
     --with-fpm-user=www \
     --with-fpm-group=www \
+    --with-iconv=${libiconv_location} \
     --without-pear \
-    --without-iconv \
     --enable-mysqlnd \
     --enable-fpm \
     --enable-bcmath \
@@ -404,7 +427,7 @@ install_php80(){
     unset CPPFLAGS
     ldconfig
     CheckError "./configure ${php_configure_args}"
-    CheckError "parallel_make"
+    CheckError "parallel_make ZEND_EXTRA_LIBS='-liconv'"
     CheckError "make install"
     _info "Config ${php80_filename}..."
     _config_php

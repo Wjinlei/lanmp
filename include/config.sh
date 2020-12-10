@@ -77,6 +77,7 @@ php80_filename="php-8.0.0"
 php80_download_url="https://www.php.net/distributions/php-8.0.0.tar.gz"
 
 # libiconv
+libiconv_location=/usr/local/libiconv
 libiconv_filename="libiconv-1.16"
 libiconv_download_url="https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.16.tar.gz"
 libiconv_patch_filename="libiconv-1.16.glibc"

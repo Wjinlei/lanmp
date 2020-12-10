@@ -65,10 +65,10 @@ _install_php_depend(){
     fi
     _install_openssl102
     _install_pcre2
-    _install_libiconv
+    _install_re2c
     _install_icu4c
     _install_libxml2
-    _install_re2c
+    _install_libiconv
     _install_curl
     _success "Install dependencies packages for PHP completed..."
     # Fixed unixODBC issue
@@ -181,10 +181,10 @@ _install_libiconv(){
     tar zxf ${libiconv_patch_filename}.tar.gz
     patch -d ${libiconv_filename} -p0 < ${libiconv_patch_filename}.patch
     cd ${libiconv_filename}
-    CheckError "./configure"
+    CheckError "./configure --prefix=${libiconv_location}"
     CheckError "parallel_make"
     CheckError "make install"
-    ldconfig
+    export PKG_CONFIG_PATH=${libiconv_location}/lib/pkgconfig:$PKG_CONFIG_PATH
     _success "${libiconv_filename} install completed..."
     rm -f /tmp/${libiconv_filename}.tar.gz
     rm -f /tmp/${libiconv_patch_filename}.tar.gz
@@ -407,6 +407,7 @@ install_php74(){
     --with-zip \
     --with-fpm-user=www \
     --with-fpm-group=www \
+    --with-iconv=${libiconv_location} \
     --without-pear \
     --enable-mysqlnd \
     --enable-fpm \
