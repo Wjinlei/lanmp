@@ -174,7 +174,7 @@ _start_apache() {
     fi
 }
 
-install_apache(){
+install_apache2446(){
     if [ $# -lt 1 ]; then
         echo "[Parameter Error]: apache_location"
         exit 1
@@ -185,10 +185,10 @@ install_apache(){
 
     CheckError "rm -fr ${apache_location}"
     cd /tmp
-    _info "Downloading and Extracting ${apache_filename} files..."
-    DownloadFile "${apache_filename}.tar.gz" ${apache_download_url}
-    rm -fr ${apache_filename}
-    tar zxf ${apache_filename}.tar.gz
+    _info "Downloading and Extracting ${apache2446_filename} files..."
+    DownloadFile "${apache2446_filename}.tar.gz" ${apache2446_download_url}
+    rm -fr ${apache2446_filename}
+    tar zxf ${apache2446_filename}.tar.gz
     _info "Downloading and Extracting ${apr_filename} files..."
     DownloadFile "${apr_filename}.tar.gz" ${apr_download_url}
     rm -fr ${apr_filename}
@@ -197,10 +197,10 @@ install_apache(){
     DownloadFile "${apr_util_filename}.tar.gz" ${apr_util_download_url}
     rm -fr ${apr_util_filename}
     tar zxf ${apr_util_filename}.tar.gz
-    cd ${apache_filename}
+    cd ${apache2446_filename}
     mv /tmp/${apr_filename} srclib/apr
     mv /tmp/${apr_util_filename} srclib/apr-util
-    _info "Make Install ${apache_filename}..."
+    _info "Make Install ${apache2446_filename}..."
     apache_configure_args="--prefix=${apache_location} \
     --bindir=${apache_location}/bin \
     --sbindir=${apache_location}/bin \
@@ -220,11 +220,11 @@ install_apache(){
     CheckError "parallel_make"
     CheckError "make install"
     unset LDFLAGS
-    _info "Config ${apache_filename}"
+    _info "Config ${apache2446_filename}"
     _config_apache
     _start_apache
-    _success "${apache_filename} install completed..."
-    rm -fr /tmp/${apache_filename}
+    _success "${apache2446_filename} install completed..."
+    rm -fr /tmp/${apache2446_filename}
 }
 
 _config_apache(){

@@ -24,9 +24,13 @@ Options:
 -h, --help  Print this help text and exit
 "
             ;;
-        --install-apache)
-            include apache
-            install_apache ${2}
+        --install-apache2441)
+            include apache2441
+            install_apache2441 ${2}
+            ;;
+        --install-apache2446)
+            include apache2446
+            install_apache2446 ${2}
             ;;
         --install-nginx116)
             include nginx116

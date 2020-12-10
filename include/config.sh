@@ -11,8 +11,10 @@ download_sysv_url="https://d.hws.com/linux/debug/script/init.d/"
 parallel_compile=1
 
 # apache
-apache_filename="httpd-2.4.41"
-apache_download_url="http://ftp.jaist.ac.jp/pub/apache/httpd/httpd-2.4.41.tar.gz"
+apache2441_filename="httpd-2.4.41"
+apache2441_download_url="http://ftp.jaist.ac.jp/pub/apache/httpd/httpd-2.4.41.tar.gz"
+apache2446_filename="httpd-2.4.46"
+apache2446_download_url="http://ftp.jaist.ac.jp/pub/apache/httpd/httpd-2.4.46.tar.gz"
 
 # nginx
 nginx116_filename="nginx-1.16.1"
