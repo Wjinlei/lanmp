@@ -199,6 +199,8 @@ _install_libiconv(){
     CheckError "./configure --prefix=${libiconv_location}"
     CheckError "parallel_make"
     CheckError "make install"
+    AddToEnv "${libiconv_location}"
+    CreateLib64Dir "${libiconv_location}"
     if ! grep -qE "^${libiconv_location}/lib" /etc/ld.so.conf.d/*.conf; then
         echo "${libiconv_location}/lib" > /etc/ld.so.conf.d/libiconv.conf
     fi
@@ -207,7 +209,6 @@ _install_libiconv(){
     rm -f /tmp/${libiconv_filename}.tar.gz
     rm -f /tmp/${libiconv_patch_filename}.tar.gz
     rm -f /tmp/${libiconv_patch_filename}.patch
-    rm -fr /tmp/${libiconv_filename}
 }
 
 _install_re2c(){
