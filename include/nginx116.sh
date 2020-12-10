@@ -74,6 +74,7 @@ install_nginx116(){
     --with-openssl=/tmp/${openssl102_filename} \
     --user=www \
     --group=www \
+    --with-stream \
     --with-threads \
     --with-http_ssl_module \
     --with-http_v2_module \
