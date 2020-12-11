@@ -317,7 +317,7 @@ _check_ram(){
     if [ ${ramsum} -lt 480 ]; then
         _error "Not enough memory. The installation needs memory: ${tram}MB*RAM + ${swap}MB*SWAP >= 480MB"
     fi
-    [ ${ramsum} -lt 600 ] && disable_fileinfo="--disable-fileinfo" || disable_fileinfo=""
+    [ ${ramsum} -lt 1024 ] && disable_fileinfo="--disable-fileinfo" || disable_fileinfo=""
 }
 
 AddToEnv(){
