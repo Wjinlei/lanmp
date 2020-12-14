@@ -57,6 +57,12 @@ mysql80_x86_64_download_url="https://cdn.mysql.com/Downloads/MySQL-8.0/${mysql80
 # php
 php52_filename="php-5.2.17"
 php52_download_url="http://museum.php.net/php5/php-5.2.17.tar.gz"
+php52_fpm_filename="php-5.2.17-fpm-0.5.14.diff.gz"
+php52_fpm_download_url="http://d.hws.com/linux/master/soft/php-5.2.17-fpm-0.5.14.diff.gz"
+php52_fixbug_nodec_filename="php-5.2.17-fixbug-node.c"
+php52_fixbug_nodec_download_url="http://d.hws.com/linux/master/soft/php-5.2.17-fixbug-node.c.tar.gz"
+php52_fixbug_gmpc_filename="php-5.2.17-fixbug-gmp.c"
+php52_fixbug_gmpc_download_url="http://d.hws.com/linux/master/soft/php-5.2.17-fixbug-gmp.c.tar.gz"
 php53_filename="php-5.3.29"
 php53_download_url="https://www.php.net/distributions/php-5.3.29.tar.gz"
 php54_filename="php-5.4.45"
@@ -77,6 +83,10 @@ php74_filename="php-7.4.13"
 php74_download_url="https://www.php.net/distributions/php-7.4.13.tar.gz"
 php80_filename="php-8.0.0"
 php80_download_url="https://www.php.net/distributions/php-8.0.0.tar.gz"
+
+#ZendOptimizer
+zend_optimizer_filename="ZendOptimizer-3.3.9-linux-glibc23-x86_64"
+zend_optimizer_download_url="http://d.hws.com/linux/master/soft/ZendOptimizer-3.3.9-linux-glibc23-x86_64.tar.gz"
 
 #Zend Loader
 zend_loader_php55_filename="zend-loader-php5.5-linux-x86_64"
