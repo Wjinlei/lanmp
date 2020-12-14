@@ -338,6 +338,18 @@ _config_php(){
     sed -i 's/disable_functions =.*/disable_functions = passthru,exec,system,chroot,chgrp,chown,shell_exec,popen,proc_open,pcntl_exec,ini_alter,ini_restore,dl,openlog,syslog,popepassthru,pcntl_alarm,pcntl_fork,pcntl_waitpid,pcntl_wait,pcntl_wifexited,pcntl_wifstopped,pcntl_wifsignaled,pcntl_wifcontinued,pcntl_wexitstatus,pcntl_wtermsig,pcntl_wstopsig,pcntl_signal,pcntl_signal_dispatch,pcntl_get_last_error,pcntl_strerror,pcntl_sigprocmask,pcntl_sigwaitinfo,pcntl_sigtimedwait,pcntl_exec,pcntl_getpriority,pcntl_setpriority,imap_open,apache_setenv/g' ${php56_location}/etc/php.ini
 
     extension_dir=$(${php56_location}/bin/php-config --extension-dir)
+
+    DownloadFile  "${zend_loader_php56_filename}.tar.gz" "${zend_loader_php56_download_url}"
+    tar zxf ${zend_loader_php56_filename}.tar.gz
+    cp -f ${zend_loader_php56_filename}/opcache.so ${extension_dir}
+    cp -f ${zend_loader_php56_filename}/ZendGuardLoader.so ${extension_dir}
+
+    cat > ${php56_location}/php.d/zendloader.ini<<EOF
+[ZendGuardLoader]
+zend_extension=${extension_dir}/ZendGuardLoader.so
+zend_loader.enable=1
+EOF
+
     cat > ${php56_location}/php.d/opcache.ini<<EOF
 [opcache]
 zend_extension=${extension_dir}/opcache.so

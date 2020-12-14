@@ -78,6 +78,12 @@ php74_download_url="https://www.php.net/distributions/php-7.4.13.tar.gz"
 php80_filename="php-8.0.0"
 php80_download_url="https://www.php.net/distributions/php-8.0.0.tar.gz"
 
+#Zend Loader
+zend_loader_php55_filename="zend-loader-php5.5-linux-x86_64"
+zend_loader_php55_download_url="http://d.hws.com/linux/master/soft/zend-loader-php5.5-linux-x86_64_update1.tar.gz"
+zend_loader_php56_filename="zend-loader-php5.6-linux-x86_64"
+zend_loader_php56_download_url="http://d.hws.com/linux/master/soft/zend-loader-php5.6-linux-x86_64_update1.tar.gz"
+
 # libiconv
 libiconv_location=/usr/local/libiconv
 libiconv_filename="libiconv-1.16"
