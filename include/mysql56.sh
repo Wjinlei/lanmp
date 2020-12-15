@@ -194,7 +194,12 @@ install_mysql56(){
         --basedir=${mysql_location} \
         --datadir=${mysql_location}/mysql_data --user=mysql"
     _config_mysql
-
+    AddToEnv "${mysql_location}"
+    CreateLib64Dir "${mysql_location}"
+    if ! grep -qE "^${mysql_location}/lib" /etc/ld.so.conf.d/*.conf; then
+        echo "${mysql_location}/lib" > /etc/ld.so.conf.d/mysql56.conf
+    fi
+    ldconfig
     echo "Root password:${mysql_pass}, Please keep it safe."
     _success "Install ${mysql56_filename} completed..."
     rm -fr /tmp/${mysql56_filename}

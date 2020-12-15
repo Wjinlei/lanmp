@@ -305,7 +305,8 @@ _install_freetype() {
 
 _start_php52() {
     CheckError "${php52_location}/sbin/php-fpm start"
-    cp ${php52_location}/sbin/php-fpm /etc/init.d/php52
+    DownloadUrl "/etc/init.d/php52" "${download_sysv_url}/php52"
+    sed -i "s|^prefix={php52_location}$|prefix=${php52_location}|g" /etc/init.d/php52
     CheckError "chmod +x /etc/init.d/php52"
     chkconfig --add php52 > /dev/null 2>&1
     update-rc.d -f php52 defaults > /dev/null 2>&1
@@ -317,7 +318,7 @@ _config_php(){
     mkdir -p ${php52_location}/{etc,php.d}
     cp -f php.ini-recommended ${php52_location}/etc/php.ini
 
-    sed -i 's/;default_charset =.*/default_charset = "UTF-8"/g' ${php52_location}/etc/php.ini
+    #sed -i 's/;default_charset =.*/default_charset = "UTF-8"/g' ${php52_location}/etc/php.ini
     sed -i 's/;always_populate_raw_post_data =.*/always_populate_raw_post_data = -1/g' ${php52_location}/etc/php.ini
     sed -i 's/post_max_size =.*/post_max_size = 100M/g' ${php52_location}/etc/php.ini
     sed -i 's/upload_max_filesize =.*/upload_max_filesize = 100M/g' ${php52_location}/etc/php.ini
@@ -440,6 +441,7 @@ install_php52(){
     tar zxf ${php52_fixbug_gmpc_filename}.tar.gz
     patch -d ${php52_filename} -p0 < ${php52_fixbug_gmpc_filename}.patch
 
+    ldconfig
     cd ${php52_filename}
     _info "Install ${php52_filename} ..."
     Is64bit && with_libdir="--with-libdir=lib64" || with_libdir=""
@@ -450,6 +452,10 @@ install_php52(){
     --with-pcre-dir=${pcre_location} \
     --with-openssl=${openssl102_location} \
     ${with_libdir} \
+    --with-mysql \
+    --with-mysqli \
+    --with-mysql-sock=/tmp/mysql.sock \
+    --with-pdo-mysql \
     --with-gd \
     --with-jpeg-dir \
     --with-png-dir \

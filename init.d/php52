@@ -12,7 +12,7 @@
 # Description:       php52 service script
 ### END INIT INFO
 
-prefix={php_location}
+prefix={php52_location}
 
 NAME=php-cgi
 BIN=$prefix/bin/$NAME

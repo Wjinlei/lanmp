@@ -194,7 +194,12 @@ install_mysql57(){
         --basedir=${mysql_location} \
         --datadir=${mysql_location}/mysql_data --user=mysql"
     _config_mysql
-
+    AddToEnv "${mysql_location}"
+    CreateLib64Dir "${mysql_location}"
+    if ! grep -qE "^${mysql_location}/lib" /etc/ld.so.conf.d/*.conf; then
+        echo "${mysql_location}/lib" > /etc/ld.so.conf.d/mysql57.conf
+    fi
+    ldconfig
     echo "Root password:${mysql_pass}, Please keep it safe."
     _success "Install ${mysql57_filename} completed..."
     rm -fr /tmp/${mysql57_filename}
