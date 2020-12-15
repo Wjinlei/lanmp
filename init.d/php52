@@ -1,0 +1,182 @@
+#!/bin/bash
+# chkconfig: 2345 55 25
+# description: php52 service script
+
+### BEGIN INIT INFO
+# Provides:          php52
+# Required-Start:    $all
+# Required-Stop:     $all
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: php52
+# Description:       php52 service script
+### END INIT INFO
+
+prefix={php_location}
+
+NAME=php-cgi
+BIN=$prefix/bin/$NAME
+PID_FILE=$prefix/logs/php-fpm.pid
+CONFIG_FILE=$prefix/etc/php-fpm.conf
+
+wait_for_pid () {
+    try=0
+    while test $try -lt 35 ; do
+        case "$1" in
+            'created')
+            if [ -f "$2" ] ; then
+                try=''
+                break
+            fi
+            ;;
+            'removed')
+            if [ ! -f "$2" ] ; then
+                try=''
+                break
+            fi
+            ;;
+        esac
+        echo -n .
+        try=`expr $try + 1`
+        sleep 1
+    done
+}
+
+start()
+{
+    echo -n "Starting $NAME..."
+    if [ -f $PID_FILE ];then
+        mPID=`cat $PID_FILE`
+        isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
+        if [ "$isRunning" != '' ];then
+            echo "$NAME (pid $mPID) already running."
+            exit 1
+        fi
+    fi
+    $BIN --fpm --fpm-config $CONFIG_FILE
+    if [ "$?" != 0 ] ; then
+        echo " failed"
+        exit 1
+    fi
+    wait_for_pid created $PID_FILE
+    if [ -n "$try" ] ; then
+        echo " failed"
+        exit 1
+    else
+        echo " done"
+    fi
+}
+
+stop()
+{
+    echo -n "Stoping $NAME... "
+    if [ -f $PID_FILE ];then
+        mPID=`cat $PID_FILE`
+        isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
+        if [ "$isRunning" = '' ];then
+            echo "$NAME is not running."
+            exit 1
+        fi
+    else
+        echo "PID file found, $NAME is not running ?"
+        exit 1
+    fi
+    kill -QUIT `cat $PID_FILE`
+    wait_for_pid removed $PID_FILE
+    if [ -n "$try" ] ; then
+        echo " failed"
+        exit 1
+    else
+        echo " done"
+    fi
+}
+
+restart(){
+    $0 stop
+    $0 start
+}
+
+reload() {
+    echo -n "Reload service $NAME... "
+    if [ -f $PID_FILE ];then
+        mPID=`cat $PID_FILE`
+        isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
+        if [ "$isRunning" = '' ];then
+            echo "$NAME is not running."
+            exit 1
+        fi
+    else
+        echo "PID file found, $NAME is not running ?"
+        exit 1
+    fi
+    kill -USR2 `cat $PID_FILE`
+    if [ "$?" != 0 ] ; then
+        echo " failed"
+        exit 1
+    else
+        echo " done"
+    fi
+}
+
+status(){
+    if [ -f $PID_FILE ];then
+        mPID=`cat $PID_FILE`
+        isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
+        if [ "$isRunning" != '' ];then
+            echo "$NAME (pid $mPID) is running."
+            exit 0
+        else
+            echo "$NAME already stopped."
+            exit 1
+        fi
+    else
+        echo "$NAME already stopped."
+        exit 1
+    fi
+}
+
+force-stop() {
+    echo -n "force-stop $NAME "
+    if [ -f $PID_FILE ];then
+        mPID=`cat $PID_FILE`
+        isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
+        if [ "$isRunning" = '' ];then
+            echo "$NAME is not running."
+            exit 1
+        fi
+    else
+        echo "PID file found, $NAME is not running ?"
+        exit 1
+    fi
+    kill -TERM `cat $PID_FILE`
+    wait_for_pid removed $PID_FILE
+    if [ -n "$try" ] ; then
+        echo " failed"
+        exit 1
+    else
+        echo " done"
+    fi
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+        restart
+        ;;
+    status)
+        status
+        ;;
+    reload)
+        reload
+        ;;
+    force-stop)
+        force-stop
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|restart|reload|status|force-stop}"
+esac
