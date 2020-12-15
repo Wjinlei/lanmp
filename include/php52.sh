@@ -47,6 +47,18 @@ _install_php_depend(){
             if [ -f /usr/lib/x86_64-linux-gnu/libXpm.so ] && [ ! -f /usr/lib/libXpm.so ]; then
                 ln -sf /usr/lib/x86_64-linux-gnu/libXpm.so /usr/lib64
             fi
+            if [ -f /usr/lib/x86_64-linux-gnu/libjpeg.a ] && [ ! -f /usr/lib/libjpeg.a ]; then
+                ln -sf /usr/lib/x86_64-linux-gnu/libjpeg.a /usr/lib64
+            fi
+            if [ -f /usr/lib/x86_64-linux-gnu/libjpeg.so ] && [ ! -f /usr/lib/libjpeg.so ]; then
+                ln -sf /usr/lib/x86_64-linux-gnu/libjpeg.so /usr/lib64
+            fi
+            if [ -f /usr/lib/x86_64-linux-gnu/libpng.a ] && [ ! -f /usr/lib/libpng.a ]; then
+                ln -sf /usr/lib/x86_64-linux-gnu/libpng.a /usr/lib64
+            fi
+            if [ -f /usr/lib/x86_64-linux-gnu/libpng.so ] && [ ! -f /usr/lib/libpng.so ]; then
+                ln -sf /usr/lib/x86_64-linux-gnu/libpng.so /usr/lib64
+            fi
         else
             if [ -f /usr/include/gmp-i386.h ]; then
                 ln -sf /usr/include/gmp-i386.h /usr/include/
@@ -59,6 +71,18 @@ _install_php_depend(){
             fi
             if [ -f /usr/lib/i386-linux-gnu/libXpm.so ] && [ ! -f /usr/lib/libXpm.so ]; then
                 ln -sf /usr/lib/i386-linux-gnu/libXpm.so /usr/lib
+            fi
+            if [ -f /usr/lib/x86_64-linux-gnu/libjpeg.a ] && [ ! -f /usr/lib/libjpeg.a ]; then
+                ln -sf /usr/lib/x86_64-linux-gnu/libjpeg.a /usr/lib
+            fi
+            if [ -f /usr/lib/x86_64-linux-gnu/libjpeg.so ] && [ ! -f /usr/lib/libjpeg.so ]; then
+                ln -sf /usr/lib/x86_64-linux-gnu/libjpeg.so /usr/lib
+            fi
+            if [ -f /usr/lib/x86_64-linux-gnu/libpng.a ] && [ ! -f /usr/lib/libpng.a ]; then
+                ln -sf /usr/lib/x86_64-linux-gnu/libpng.a /usr/lib
+            fi
+            if [ -f /usr/lib/x86_64-linux-gnu/libpng.so ] && [ ! -f /usr/lib/libpng.so ]; then
+                ln -sf /usr/lib/x86_64-linux-gnu/libpng.so /usr/lib
             fi
         fi
         _install_freetype
@@ -484,7 +508,6 @@ install_php52(){
     --with-mime-magic
     --without-pear \
     --enable-gd-native-ttf \
-    --enable-mysqlnd \
     --enable-bcmath \
     --enable-fastcgi \
     --enable-fpm \
