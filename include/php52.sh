@@ -441,7 +441,7 @@ install_php52(){
     tar zxf ${php52_fixbug_gmpc_filename}.tar.gz
     patch -d ${php52_filename} -p0 < ${php52_fixbug_gmpc_filename}.patch
 
-    ldconfig
+    mysql_location=$(cat /tmp/mysql56.info)
     cd ${php52_filename}
     _info "Install ${php52_filename} ..."
     Is64bit && with_libdir="--with-libdir=lib64" || with_libdir=""
@@ -452,10 +452,10 @@ install_php52(){
     --with-pcre-dir=${pcre_location} \
     --with-openssl=${openssl102_location} \
     ${with_libdir} \
-    --with-mysql \
-    --with-mysqli \
+    --with-mysql=${mysql_location} \
+    --with-mysqli=${mysql_location}/bin/mysql_config \
     --with-mysql-sock=/tmp/mysql.sock \
-    --with-pdo-mysql \
+    --with-pdo-mysql=${mysql_location} \
     --with-gd \
     --with-jpeg-dir \
     --with-png-dir \
@@ -480,8 +480,9 @@ install_php52(){
     --with-fpm-user=www \
     --with-fpm-group=www \
     --with-iconv=${libiconv_location} \
-    --without-pear \
     --with-mcrypt \
+    --with-mime-magic
+    --without-pear \
     --enable-gd-native-ttf \
     --enable-mysqlnd \
     --enable-bcmath \
