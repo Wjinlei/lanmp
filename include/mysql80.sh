@@ -135,7 +135,7 @@ open-files-limit               = ${open_files_limit}
 table-open-cache               = ${table_open_cache}
 
 # SAFETY #
-max-allowed-packet             = 1024M
+max-allowed-packet             = 10G
 max-connect-errors             = 1000000
 
 # BINLOG
