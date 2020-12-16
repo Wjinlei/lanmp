@@ -197,7 +197,7 @@ install_mysql57(){
     _config_mysql
     AddToEnv "${mysql_location}"
     CreateLib64Dir "${mysql_location}"
-    echo $mysql_location > /tmp/mysql57.info
+    echo $mysql_location > /tmp/mysql.info
     echo "Root password:${mysql_pass}, Please keep it safe."
     _success "Install ${mysql57_filename} completed..."
     rm -fr /tmp/${mysql57_filename}

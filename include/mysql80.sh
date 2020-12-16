@@ -197,7 +197,7 @@ install_mysql80(){
     _config_mysql
     AddToEnv "${mysql_location}"
     CreateLib64Dir "${mysql_location}"
-    echo $mysql_location > /tmp/mysql80.info
+    echo $mysql_location > /tmp/mysql.info
     echo "Root password:${mysql_pass}, Please keep it safe."
     _success "Install ${mysql80_filename} completed..."
     rm -fr /tmp/${mysql80_filename}

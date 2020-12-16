@@ -465,7 +465,7 @@ install_php52(){
     tar zxf ${php52_fixbug_gmpc_filename}.tar.gz
     patch -d ${php52_filename} -p0 < ${php52_fixbug_gmpc_filename}.patch
 
-    mysql_location=$(cat /tmp/mysql56.info)
+    mysql_location=$(cat /tmp/mysql.info)
     cd ${php52_filename}
     _info "Install ${php52_filename} ..."
     Is64bit && with_libdir="--with-libdir=lib64" || with_libdir=""
