@@ -56,6 +56,10 @@ Options:
             include mysql80
             install_mysql80 ${2} ${3} ${4}
             ;;
+        --install-mariadb1058)
+            include mariadb1058
+            install_mariadb1058 ${2} ${3} ${4}
+            ;;
         --install-php52)
             include php52
             install_php52 ${2}

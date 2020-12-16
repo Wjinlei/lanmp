@@ -54,6 +54,12 @@ mysql80_i686_download_url="https://cdn.mysql.com/Downloads/MySQL-8.0/${mysql80_i
 mysql80_x86_64_filename="mysql-8.0.19-linux-glibc2.12-x86_64"
 mysql80_x86_64_download_url="https://cdn.mysql.com/Downloads/MySQL-8.0/${mysql80_x86_64_filename}.tar.xz"
 
+# mariadb
+mariadb1058_i686_filename="mariadb-10.5.8-linux-i686"
+mariadb1058_i686_download_url="http://d.hws.com/linux/master/soft/mariadb-10.5.8-linux-i686.tar.gz"
+mariadb1058_x86_64_filename="mariadb-10.5.8-linux-x86_64"
+mariadb1058_x86_64_download_url="http://d.hws.com/linux/master/soft/mariadb-10.5.8-linux-x86_64.tar.gz"
+
 # php
 php52_filename="php-5.2.17"
 php52_download_url="http://museum.php.net/php5/php-5.2.17.tar.gz"
