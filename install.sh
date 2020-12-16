@@ -56,6 +56,10 @@ Options:
             include mysql80
             install_mysql80 ${2} ${3} ${4}
             ;;
+        --install-mariadb10417)
+            include mariadb10417
+            install_mariadb10417 ${2} ${3} ${4}
+            ;;
         --install-mariadb1058)
             include mariadb1058
             install_mariadb1058 ${2} ${3} ${4}

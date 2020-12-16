@@ -59,6 +59,10 @@ mariadb1058_i686_filename="mariadb-10.5.8-linux-i686"
 mariadb1058_i686_download_url="http://d.hws.com/linux/master/soft/mariadb-10.5.8-linux-i686.tar.gz"
 mariadb1058_x86_64_filename="mariadb-10.5.8-linux-x86_64"
 mariadb1058_x86_64_download_url="http://d.hws.com/linux/master/soft/mariadb-10.5.8-linux-x86_64.tar.gz"
+mariadb10417_i686_filename="mariadb-10.4.17-linux-i686"
+mariadb10417_i686_download_url="http://d.hws.com/linux/master/soft/mariadb-10.4.17-linux-i686.tar.gz"
+mariadb10417_x86_64_filename="mariadb-10.4.17-linux-x86_64"
+mariadb10417_x86_64_download_url="http://d.hws.com/linux/master/soft/mariadb-10.4.17-linux-x86_64.tar.gz"
 
 # php
 php52_filename="php-5.2.17"
