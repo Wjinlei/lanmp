@@ -104,6 +104,7 @@ _create_mysql_config(){
 [client]
 port                           = ${mysql_port}
 socket                         = /tmp/mysql.sock
+max-allowed-packet             = 10240M
 
 [mysqld]
 basedir                        = ${mysql_location}
@@ -135,7 +136,7 @@ open-files-limit               = ${open_files_limit}
 table-open-cache               = ${table_open_cache}
 
 # SAFETY #
-max-allowed-packet             = 10G
+max-allowed-packet             = 10240M
 max-connect-errors             = 1000000
 
 # BINLOG
