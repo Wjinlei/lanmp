@@ -52,16 +52,15 @@ _config_mysql(){
         CheckError "/etc/init.d/mysqld restart"
     fi
     ${mysql_location}/bin/mysql -uroot -S /tmp/mysql.sock \
-        -e "GRANT ALL PRIVILEGES ON *.* to root@'127.0.0.1' IDENTIFIED BY \"${mysql_pass}\" WITH GRANT OPTION;"
+        -e "CREATE USER root@'127.0.0.1' IDENTIFIED BY \"${mysql_pass}\";"
     ${mysql_location}/bin/mysql -uroot -S /tmp/mysql.sock \
-        -e "GRANT ALL PRIVILEGES ON *.* to root@'localhost' IDENTIFIED BY \"${mysql_pass}\" WITH GRANT OPTION;"
-    ${mysql_location}/bin/mysql -uroot -p${mysql_pass} -S /tmp/mysql.sock <<EOF
-    DROP DATABASE IF EXISTS test;
-    DELETE FROM mysql.user WHERE NOT (user='root');
-    DELETE FROM mysql.db WHERE user='';
-    DELETE FROM mysql.user WHERE user="root" AND host="%";
-    FLUSH PRIVILEGES;
-EOF
+        -e "ALTER USER root@'localhost' IDENTIFIED BY \"${mysql_pass}\";"
+    ${mysql_location}/bin/mysql -uroot -p${mysql_pass} -S /tmp/mysql.sock \
+        -e "GRANT ALL PRIVILEGES ON *.* to root@'127.0.0.1' WITH GRANT OPTION;" >/dev/null 2>&1
+    ${mysql_location}/bin/mysql -uroot -p${mysql_pass} -S /tmp/mysql.sock \
+        -e "GRANT ALL PRIVILEGES ON *.* to root@'localhost' WITH GRANT OPTION;" >/dev/null 2>&1
+    ${mysql_location}/bin/mysql -uroot -p${mysql_pass} -S /tmp/mysql.sock \
+        -e "FLUSH PRIVILEGES;" >/dev/null 2>&1
     CheckError "/etc/init.d/mysqld restart"
 }
 
