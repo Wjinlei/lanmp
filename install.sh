@@ -112,9 +112,13 @@ Options:
             include pure-ftpd
             install_pure-ftpd ${2} ${3}
             ;;
-        --install-redis)
-            include redis
-            install_redis ${2} ${3}
+        --install-redis506)
+            include redis506
+            install_redis506 ${2} ${3}
+            ;;
+        --install-redis609)
+            include redis609
+            install_redis609 ${2} ${3}
             ;;
         --install-pma)
             include pma

@@ -27,8 +27,10 @@ pureftpd_filename="pure-ftpd-1.0.49"
 pureftpd_download_url="https://download.pureftpd.org/pub/pure-ftpd/releases/pure-ftpd-1.0.49.tar.gz"
 
 # redis
-redis_filename="redis-5.0.6"
-redis_download_url="http://download.redis.io/releases/redis-5.0.6.tar.gz"
+redis506_filename="redis-5.0.6"
+redis506_download_url="http://download.redis.io/releases/redis-5.0.6.tar.gz"
+redis609_filename="redis-6.0.9"
+redis609_download_url="http://download.redis.io/releases/redis-6.0.9.tar.gz"
 
 # php-redis
 php_redis4_filename="redis-4.3.0"
