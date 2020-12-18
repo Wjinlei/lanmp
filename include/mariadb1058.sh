@@ -61,9 +61,6 @@ _config_mysql(){
         -e "GRANT ALL PRIVILEGES ON *.* to root@'localhost' WITH GRANT OPTION;" >/dev/null 2>&1
     ${mysql_location}/bin/mysql -uroot -p${mysql_pass} -S /tmp/mysql.sock <<EOF
     DROP DATABASE IF EXISTS test;
-    DELETE FROM mysql.user WHERE NOT (user='root');
-    DELETE FROM mysql.db WHERE user='';
-    DELETE FROM mysql.user WHERE user="root" AND host="%";
     FLUSH PRIVILEGES;
 EOF
     CheckError "/etc/init.d/mysqld restart"
