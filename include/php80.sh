@@ -215,6 +215,7 @@ _install_libiconv(){
     fi
     ldconfig
     _success "${libiconv_filename} install completed..."
+    rm -fr /tmp/${libiconv_filename}
     rm -f /tmp/${libiconv_filename}.tar.gz
     rm -f /tmp/${libiconv_patch_filename}.tar.gz
     rm -f /tmp/${libiconv_patch_filename}.patch
