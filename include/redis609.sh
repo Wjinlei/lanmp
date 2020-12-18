@@ -1,3 +1,18 @@
+_install_depend(){
+    _info "Starting to install dependencies packages for Redis..."
+    if [ "${PM}" = "yum" ];then
+        local yum_depends=(
+            centos-release-scl devtoolset-9-gcc devtoolset-9-gcc-c++ devtoolset-9-binutils
+        )
+        for depend in ${yum_depends[@]}
+        do
+            InstallPack "yum -y install ${depend}"
+        done
+        source /opt/rh/devtoolset-9/enable
+        _success "Install dependencies packages for Redis completed..."
+    fi
+}
+
 _start_redis() {
     CheckError "${redis_location}/bin/redis-server ${redis_location}/etc/redis.conf"
     wait_for_pid created ${redis_location}/var/run/redis.pid
@@ -25,6 +40,8 @@ install_redis609(){
     if [ $# -ge 2 ]; then
         redis_port=${2}
     fi
+
+    _install_depend
 
     mkdir -p ${redis_location}
     CheckError "rm -fr ${redis_location}"
