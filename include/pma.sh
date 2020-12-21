@@ -18,7 +18,7 @@ install_pma(){
     CheckError "rm -fr ${pma_location}/setup"
 
     # 下载配置文件
-    DownloadUrl "phpMyAdmin.conf.tar.gz" "https://d.hws.com/linux/debug/conf/phpMyAdmin.conf.tar.gz"
+    DownloadUrl "phpMyAdmin.conf.tar.gz" "${phpmyadmin_conf_download_url}"
     CheckError "tar zxf phpMyAdmin.conf.tar.gz"
     CheckError "rm -f ${pma_location}/config.inc.php"
     CheckError "mv config.inc.php ${pma_location}/config.inc.php"

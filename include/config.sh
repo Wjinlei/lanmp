@@ -5,7 +5,7 @@ var=/var/hwsmaster
 
 # download Url
 download_root_url="https://d.hws.com/linux/master/soft/"
-download_sysv_url="https://d.hws.com/linux/debug/script/init.d/"
+download_sysv_url="https://d.hws.com/linux/master/script/init.d/"
 
 # parallel compile option,1:enable,0:disable
 parallel_compile=1
@@ -148,6 +148,7 @@ apr_util_download_url="http://ftp.jaist.ac.jp/pub/apache/apr/apr-util-1.6.1.tar.
 # phpmyadmin
 phpmyadmin_filename="phpMyAdmin-4.6.6-all-languages"
 phpmyadmin_download_url="https://files.phpmyadmin.net/phpMyAdmin/4.6.6/phpMyAdmin-4.6.6-all-languages.tar.gz"
+phpmyadmin_conf_download_url="https://d.hws.com/linux/master/conf/phpMyAdmin.conf.tar.gz"
 
 # depends
 # pcre
