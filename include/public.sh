@@ -297,18 +297,18 @@ parallel_make(){
 }
 
 GetOsInfo(){
-    cname=$( awk -F: '/model name/ {name=$2} END {print name}' /proc/cpuinfo | sed 's/^[ \t]*//;s/[ \t]*$//' )
-    cores=$( awk -F: '/model name/ {core++} END {print core}' /proc/cpuinfo )
-    freq=$( awk -F: '/cpu MHz/ {freq=$2} END {print freq}' /proc/cpuinfo | sed 's/^[ \t]*//;s/[ \t]*$//' )
+    #cname=$( awk -F: '/model name/ {name=$2} END {print name}' /proc/cpuinfo | sed 's/^[ \t]*//;s/[ \t]*$//' )
+    #cores=$( awk -F: '/model name/ {core++} END {print core}' /proc/cpuinfo )
+    #freq=$( awk -F: '/cpu MHz/ {freq=$2} END {print freq}' /proc/cpuinfo | sed 's/^[ \t]*//;s/[ \t]*$//' )
     tram=$( free -m | awk '/Mem/ {print $2}' )
     swap=$( free -m | awk '/Swap/ {print $2}' )
-    up=$( awk '{a=$1/86400;b=($1%86400)/3600;c=($1%3600)/60;d=$1%60} {printf("%ddays, %d:%d:%d\n",a,b,c,d)}' /proc/uptime )
-    load=$( w | head -1 | awk -F'load average:' '{print $2}' | sed 's/^[ \t]*//;s/[ \t]*$//' )
-    opsy=$( GetRelease )
-    arch=$( uname -m )
-    lbit=$( getconf LONG_BIT )
-    host=$( hostname )
-    kern=$( uname -r )
+    #up=$( awk '{a=$1/86400;b=($1%86400)/3600;c=($1%3600)/60;d=$1%60} {printf("%ddays, %d:%d:%d\n",a,b,c,d)}' /proc/uptime )
+    #load=$( w | head -1 | awk -F'load average:' '{print $2}' | sed 's/^[ \t]*//;s/[ \t]*$//' )
+    #opsy=$( GetRelease )
+    #arch=$( uname -m )
+    #lbit=$( getconf LONG_BIT )
+    #host=$( hostname )
+    #kern=$( uname -r )
     ramsum=$( expr $tram + $swap )
 }
 
