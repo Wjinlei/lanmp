@@ -508,6 +508,7 @@ install_php52(){
     --with-mcrypt \
     --with-mime-magic
     --without-pear \
+    --disable-phar \
     --enable-gd-native-ttf \
     --enable-bcmath \
     --enable-fastcgi \

@@ -445,6 +445,7 @@ install_php54(){
     --with-fpm-group=www \
     --with-iconv=${libiconv_location} \
     --without-pear \
+    --disable-phar \
     --with-mcrypt \
     --enable-gd-native-ttf \
     --enable-mysqlnd \

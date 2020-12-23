@@ -437,6 +437,7 @@ install_php80(){
     --with-fpm-group=www \
     --with-iconv=${libiconv_location} \
     --without-pear \
+    --disable-phar \
     --enable-mysqlnd \
     --enable-fpm \
     --enable-bcmath \
