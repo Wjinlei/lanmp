@@ -4,8 +4,8 @@ load_config(){
 var=/var/hwsmaster
 
 # download Url
-download_root_url="https://d.hws.com/linux/master/soft/"
-download_sysv_url="https://d.hws.com/linux/master/script/init.d/"
+download_root_url="http://d.hws.com/linux/master/soft/"
+download_sysv_url="http://d.hws.com/linux/master/script/init.d/"
 
 # parallel compile option,1:enable,0:disable
 parallel_compile=1
@@ -58,23 +58,23 @@ mysql80_x86_64_download_url="https://cdn.mysql.com/Downloads/MySQL-8.0/${mysql80
 
 # mariadb
 mariadb1058_i686_filename="mariadb-10.5.8-linux-i686"
-mariadb1058_i686_download_url="https://d.hws.com/linux/master/soft/mariadb-10.5.8-linux-i686.tar.gz"
+mariadb1058_i686_download_url="http://d.hws.com/linux/master/soft/mariadb-10.5.8-linux-i686.tar.gz"
 mariadb1058_x86_64_filename="mariadb-10.5.8-linux-x86_64"
-mariadb1058_x86_64_download_url="https://d.hws.com/linux/master/soft/mariadb-10.5.8-linux-x86_64.tar.gz"
+mariadb1058_x86_64_download_url="http://d.hws.com/linux/master/soft/mariadb-10.5.8-linux-x86_64.tar.gz"
 mariadb10417_i686_filename="mariadb-10.4.17-linux-i686"
-mariadb10417_i686_download_url="https://d.hws.com/linux/master/soft/mariadb-10.4.17-linux-i686.tar.gz"
+mariadb10417_i686_download_url="http://d.hws.com/linux/master/soft/mariadb-10.4.17-linux-i686.tar.gz"
 mariadb10417_x86_64_filename="mariadb-10.4.17-linux-x86_64"
-mariadb10417_x86_64_download_url="https://d.hws.com/linux/master/soft/mariadb-10.4.17-linux-x86_64.tar.gz"
+mariadb10417_x86_64_download_url="http://d.hws.com/linux/master/soft/mariadb-10.4.17-linux-x86_64.tar.gz"
 
 # php
 php52_filename="php-5.2.17"
 php52_download_url="http://museum.php.net/php5/php-5.2.17.tar.gz"
 php52_fpm_filename="php-5.2.17-fpm-0.5.14.diff.gz"
-php52_fpm_download_url="https://d.hws.com/linux/master/soft/php-5.2.17-fpm-0.5.14.diff.gz"
+php52_fpm_download_url="http://d.hws.com/linux/master/soft/php-5.2.17-fpm-0.5.14.diff.gz"
 php52_fixbug_nodec_filename="php-5.2.17-fixbug-node.c"
-php52_fixbug_nodec_download_url="https://d.hws.com/linux/master/soft/php-5.2.17-fixbug-node.c.tar.gz"
+php52_fixbug_nodec_download_url="http://d.hws.com/linux/master/soft/php-5.2.17-fixbug-node.c.tar.gz"
 php52_fixbug_gmpc_filename="php-5.2.17-fixbug-gmp.c"
-php52_fixbug_gmpc_download_url="https://d.hws.com/linux/master/soft/php-5.2.17-fixbug-gmp.c.tar.gz"
+php52_fixbug_gmpc_download_url="http://d.hws.com/linux/master/soft/php-5.2.17-fixbug-gmp.c.tar.gz"
 php53_filename="php-5.3.29"
 php53_download_url="https://www.php.net/distributions/php-5.3.29.tar.gz"
 php54_filename="php-5.4.45"
@@ -98,13 +98,13 @@ php80_download_url="https://www.php.net/distributions/php-8.0.0.tar.gz"
 
 #ZendOptimizer
 zend_optimizer_filename="ZendOptimizer-3.3.9-linux-glibc23-x86_64"
-zend_optimizer_download_url="https://d.hws.com/linux/master/soft/ZendOptimizer-3.3.9-linux-glibc23-x86_64.tar.gz"
+zend_optimizer_download_url="http://d.hws.com/linux/master/soft/ZendOptimizer-3.3.9-linux-glibc23-x86_64.tar.gz"
 
 #Zend Loader
 zend_loader_php55_filename="zend-loader-php5.5-linux-x86_64"
-zend_loader_php55_download_url="https://d.hws.com/linux/master/soft/zend-loader-php5.5-linux-x86_64_update1.tar.gz"
+zend_loader_php55_download_url="http://d.hws.com/linux/master/soft/zend-loader-php5.5-linux-x86_64_update1.tar.gz"
 zend_loader_php56_filename="zend-loader-php5.6-linux-x86_64"
-zend_loader_php56_download_url="https://d.hws.com/linux/master/soft/zend-loader-php5.6-linux-x86_64_update1.tar.gz"
+zend_loader_php56_download_url="http://d.hws.com/linux/master/soft/zend-loader-php5.6-linux-x86_64_update1.tar.gz"
 
 # libiconv
 libiconv_location=/usr/local/libiconv
@@ -148,7 +148,7 @@ apr_util_download_url="http://ftp.jaist.ac.jp/pub/apache/apr/apr-util-1.6.1.tar.
 # phpmyadmin
 phpmyadmin_filename="phpMyAdmin-4.6.6-all-languages"
 phpmyadmin_download_url="https://files.phpmyadmin.net/phpMyAdmin/4.6.6/phpMyAdmin-4.6.6-all-languages.tar.gz"
-phpmyadmin_conf_download_url="https://d.hws.com/linux/master/conf/phpMyAdmin.conf.tar.gz"
+phpmyadmin_conf_download_url="http://d.hws.com/linux/master/conf/phpMyAdmin.conf.tar.gz"
 
 # depends
 # pcre

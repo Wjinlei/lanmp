@@ -10,7 +10,7 @@ include(){
     if [[ -s ${cur_dir}/include/${include}.sh ]];then
         . ${cur_dir}/include/${include}.sh
     else
-        wget -P include https://d.hws.com/linux/master/script/include/${include}.sh >/dev/null 2>&1
+        wget --no-check-certificate -cv -t3 -T60 -P include http://d.hws.com/linux/master/script/include/${include}.sh >/dev/null 2>&1
         if [ "$?" -ne 0 ]; then
             echo "Error: ${cur_dir}/include/${include}.sh not found, shell can not be executed."
             exit 1
