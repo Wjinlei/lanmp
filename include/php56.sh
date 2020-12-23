@@ -364,8 +364,8 @@ _config_php(){
 
     extension_dir=$(${php56_location}/bin/php-config --extension-dir)
 
-    DownloadFile  "${zend_loader_php56_filename}.tar.gz" "${zend_loader_php56_download_url}"
-    tar zxf ${zend_loader_php56_filename}.tar.gz
+    DownloadFile  "${zend_loader_php56_filename}_update1.tar.gz" "${zend_loader_php56_download_url}"
+    tar zxf ${zend_loader_php56_filename}_update1.tar.gz
     cp -f ${zend_loader_php56_filename}/opcache.so ${extension_dir}
     cp -f ${zend_loader_php56_filename}/ZendGuardLoader.so ${extension_dir}
 
