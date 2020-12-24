@@ -41,22 +41,22 @@ _install_php_depend(){
                 ln -sf /usr/include/x86_64-linux-gnu/gmp.h /usr/include/
             fi
 
-            if [ -f /usr/lib/x86_64-linux-gnu/libXpm.a ] && [ ! -f /usr/lib/libXpm.a ]; then
+            if [ -f /usr/lib/x86_64-linux-gnu/libXpm.a ] && [ ! -f /usr/lib64/libXpm.a ]; then
                 ln -sf /usr/lib/x86_64-linux-gnu/libXpm.a /usr/lib64
             fi
-            if [ -f /usr/lib/x86_64-linux-gnu/libXpm.so ] && [ ! -f /usr/lib/libXpm.so ]; then
+            if [ -f /usr/lib/x86_64-linux-gnu/libXpm.so ] && [ ! -f /usr/lib64/libXpm.so ]; then
                 ln -sf /usr/lib/x86_64-linux-gnu/libXpm.so /usr/lib64
             fi
-            if [ -f /usr/lib/x86_64-linux-gnu/libjpeg.a ] && [ ! -f /usr/lib/libjpeg.a ]; then
+            if [ -f /usr/lib/x86_64-linux-gnu/libjpeg.a ] && [ ! -f /usr/lib64/libjpeg.a ]; then
                 ln -sf /usr/lib/x86_64-linux-gnu/libjpeg.a /usr/lib64
             fi
-            if [ -f /usr/lib/x86_64-linux-gnu/libjpeg.so ] && [ ! -f /usr/lib/libjpeg.so ]; then
+            if [ -f /usr/lib/x86_64-linux-gnu/libjpeg.so ] && [ ! -f /usr/lib64/libjpeg.so ]; then
                 ln -sf /usr/lib/x86_64-linux-gnu/libjpeg.so /usr/lib64
             fi
-            if [ -f /usr/lib/x86_64-linux-gnu/libpng.a ] && [ ! -f /usr/lib/libpng.a ]; then
+            if [ -f /usr/lib/x86_64-linux-gnu/libpng.a ] && [ ! -f /usr/lib64/libpng.a ]; then
                 ln -sf /usr/lib/x86_64-linux-gnu/libpng.a /usr/lib64
             fi
-            if [ -f /usr/lib/x86_64-linux-gnu/libpng.so ] && [ ! -f /usr/lib/libpng.so ]; then
+            if [ -f /usr/lib/x86_64-linux-gnu/libpng.so ] && [ ! -f /usr/lib64/libpng.so ]; then
                 ln -sf /usr/lib/x86_64-linux-gnu/libpng.so /usr/lib64
             fi
         else
