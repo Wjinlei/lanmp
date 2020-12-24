@@ -114,12 +114,31 @@ _install_openssl102(){
     CheckError "./config --prefix=${openssl102_location} --openssldir=${openssl102_location} -fPIC shared zlib"
     CheckError "parallel_make"
     CheckError "make install"
+
+    #Debian8
+    if Is64bit; then
+        if [ -f /usr/lib/x86_64-linux-gnu/libssl.so.1.0.0 ]; then
+            ln -sf ${openssl102_location}/lib/libssl.so.1.0.0 /usr/lib/x86_64-linux-gnu
+        fi
+        if [ -f /usr/lib/x86_64-linux-gnu/libcrypto.so.1.0.0 ]; then
+            ln -sf ${openssl102_location}/lib/libcrypto.so.1.0.0 /usr/lib/x86_64-linux-gnu
+        fi
+    else
+        if [ -f /usr/lib/i386-linux-gnu/libssl.so.1.0.0 ]; then
+            ln -sf ${openssl102_location}/lib/libssl.so.1.0.0 /usr/lib/i386-linux-gnu
+        fi
+        if [ -f /usr/lib/i386-linux-gnu/libcrypto.so.1.0.0 ]; then
+            ln -sf ${openssl102_location}/lib/libcrypto.so.1.0.0 /usr/lib/i386-linux-gnu
+        fi
+    fi
+
     AddToEnv "${openssl102_location}"
     CreateLib64Dir "${openssl102_location}"
     if ! grep -qE "^${openssl102_location}/lib" /etc/ld.so.conf.d/*.conf; then
         echo "${openssl102_location}/lib" > /etc/ld.so.conf.d/openssl102.conf
     fi
     ldconfig
+
     _success "${openssl102_filename} install completed..."
     rm -f /tmp/${openssl102_filename}.tar.gz
     rm -fr /tmp/${openssl102_filename}
@@ -364,9 +383,16 @@ _config_php(){
     extension_dir=$(${php52_location}/bin/php-config --extension-dir)
     mkdir -p $extension_dir
 
-    DownloadFile  "${zend_optimizer_filename}.tar.gz" "${zend_optimizer_download_url}"
-    tar zxf ${zend_optimizer_filename}.tar.gz
-    cp -f ${zend_optimizer_filename}/data/5_2_x_comp/ZendOptimizer.so ${extension_dir}
+    Is64bit && sys_bit=x86_64 || sys_bit=i686
+    if [ "${sys_bit}" == "x86_64" ]; then
+        DownloadFile  "${zend_optimizer_x86_64_filename}.tar.gz" "${zend_optimizer_x86_64_download_url}"
+        tar zxf ${zend_optimizer_x86_64_filename}.tar.gz
+        cp -f ${zend_optimizer_x86_64_filename}/data/5_2_x_comp/ZendOptimizer.so ${extension_dir}
+    elif [ "${sys_bit}" == "i686" ]; then
+        DownloadFile  "${zend_optimizer_i386_filename}.tar.gz" "${zend_optimizer_i386_download_url}"
+        tar zxf ${zend_optimizer_i386_filename}.tar.gz
+        cp -f ${zend_optimizer_i386_filename}/data/5_2_x_comp/ZendOptimizer.so ${extension_dir}
+    fi
 
     cat > ${php52_location}/php.d/zendOptimizer.ini<<EOF
 [ZendOptimizer]

@@ -114,9 +114,28 @@ _install_openssl102(){
     CheckError "./config --prefix=${openssl102_location} --openssldir=${openssl102_location} -fPIC shared zlib"
     CheckError "parallel_make"
     CheckError "make install"
+
+    #Debian8
+    if Is64bit; then
+        if [ -f /usr/lib/x86_64-linux-gnu/libssl.so.1.0.0 ]; then
+            ln -sf ${openssl102_location}/lib/libssl.so.1.0.0 /usr/lib/x86_64-linux-gnu
+        fi
+        if [ -f /usr/lib/x86_64-linux-gnu/libcrypto.so.1.0.0 ]; then
+            ln -sf ${openssl102_location}/lib/libcrypto.so.1.0.0 /usr/lib/x86_64-linux-gnu
+        fi
+    else
+        if [ -f /usr/lib/i386-linux-gnu/libssl.so.1.0.0 ]; then
+            ln -sf ${openssl102_location}/lib/libssl.so.1.0.0 /usr/lib/i386-linux-gnu
+        fi
+        if [ -f /usr/lib/i386-linux-gnu/libcrypto.so.1.0.0 ]; then
+            ln -sf ${openssl102_location}/lib/libcrypto.so.1.0.0 /usr/lib/i386-linux-gnu
+        fi
+    fi
+
     AddToEnv "${openssl102_location}"
     CreateLib64Dir "${openssl102_location}"
     export PKG_CONFIG_PATH=${openssl102_location}/lib/pkgconfig:$PKG_CONFIG_PATH
+
     _success "${openssl102_filename} install completed..."
     rm -f /tmp/${openssl102_filename}.tar.gz
     rm -fr /tmp/${openssl102_filename}

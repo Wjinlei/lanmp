@@ -97,14 +97,20 @@ php80_filename="php-8.0.0"
 php80_download_url="https://www.php.net/distributions/php-8.0.0.tar.gz"
 
 #ZendOptimizer
-zend_optimizer_filename="ZendOptimizer-3.3.9-linux-glibc23-x86_64"
-zend_optimizer_download_url="http://d.hws.com/linux/master/soft/ZendOptimizer-3.3.9-linux-glibc23-x86_64.tar.gz"
+zend_optimizer_i386_filename="ZendOptimizer-3.3.9-linux-glibc23-i386"
+zend_optimizer_i386_download_url="http://d.hws.com/linux/master/soft/ZendOptimizer-3.3.9-linux-glibc23-i386.tar.gz"
+zend_optimizer_x86_64_filename="ZendOptimizer-3.3.9-linux-glibc23-x86_64"
+zend_optimizer_x86_64_download_url="http://d.hws.com/linux/master/soft/ZendOptimizer-3.3.9-linux-glibc23-x86_64.tar.gz"
 
 #Zend Loader
-zend_loader_php55_filename="zend-loader-php5.5-linux-x86_64"
-zend_loader_php55_download_url="http://d.hws.com/linux/master/soft/zend-loader-php5.5-linux-x86_64_update1.tar.gz"
-zend_loader_php56_filename="zend-loader-php5.6-linux-x86_64"
-zend_loader_php56_download_url="http://d.hws.com/linux/master/soft/zend-loader-php5.6-linux-x86_64_update1.tar.gz"
+zend_loader_php55_i386_filename="zend-loader-php5.5-linux-i386"
+zend_loader_php55_i386_download_url="http://d.hws.com/linux/master/soft/zend-loader-php5.5-linux-i386_update1.tar.gz"
+zend_loader_php56_i386_filename="zend-loader-php5.6-linux-i386"
+zend_loader_php56_i386_download_url="http://d.hws.com/linux/master/soft/zend-loader-php5.6-linux-i386_update1.tar.gz"
+zend_loader_php55_x86_64_filename="zend-loader-php5.5-linux-x86_64"
+zend_loader_php55_x86_64_download_url="http://d.hws.com/linux/master/soft/zend-loader-php5.5-linux-x86_64_update1.tar.gz"
+zend_loader_php56_x86_64_filename="zend-loader-php5.6-linux-x86_64"
+zend_loader_php56_x86_64_download_url="http://d.hws.com/linux/master/soft/zend-loader-php5.6-linux-x86_64_update1.tar.gz"
 
 # libiconv
 libiconv_location=/usr/local/libiconv
