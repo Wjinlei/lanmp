@@ -117,7 +117,7 @@ _install_openssl102(){
     DownloadFile "${openssl102_filename}.tar.gz" "${openssl102_download_url}"
     tar zxf ${openssl102_filename}.tar.gz
     cd ${openssl102_filename}
-    CheckError "./config --prefix=${openssl102_location} -fPIC shared zlib"
+    CheckError "./config --prefix=${openssl102_location} --openssldir=${openssl102_location} -fPIC shared zlib"
     CheckError "parallel_make"
     CheckError "make install"
     AddToEnv "${openssl102_location}"
