@@ -180,9 +180,13 @@ _install_tools(){
         do
             InstallPack "yum -y install ${depend}"
         done
-        dnf -y install dnf-plugins-core >/dev/null 2>&1 && dnf config-manager --enable PowerTools >/dev/null 2>&1
-        dnf -y install chrony >/dev/null 2>&1
+        # Centos8, 开启PowerTools仓库
+        dnf -y install dnf-plugins-core >/dev/null 2>&1
+        dnf config-manager --enable powertools >/dev/null 2>&1
+        dnf config-manager --enable PowerTools >/dev/null 2>&1
+        # 安装时间同步工具
         yum -y install ntpdate >/dev/null 2>&1
+        dnf -y install chrony >/dev/null 2>&1
     elif [ "${PM}" = "apt-get" ];then
         apt_depends=(
             apt-utils
