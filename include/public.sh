@@ -197,7 +197,6 @@ _install_tools(){
         dnf -y install chrony >/dev/null 2>&1
     elif [ "${PM}" = "apt-get" ];then
         apt_depends=(
-            apt-utils
             gcc
             g++
             make
