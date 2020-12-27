@@ -154,11 +154,11 @@ _disable_selinux(){
 }
 
 _set_envs() {
-    cat >envs.sh <<EOF
+    cat >envs<<EOF
 #!bin/bash
 umask 022
 EOF
-    source envs.sh
+    source envs
 }
 
 _install_tools(){
