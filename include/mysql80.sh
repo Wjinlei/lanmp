@@ -33,7 +33,6 @@ _install_mysql_depend(){
     fi
     id -u mysql >/dev/null 2>&1
     [ $? -ne 0 ] && useradd -M -U mysql -r -d /dev/null -s /sbin/nologin
-    mkdir -p ${mysql_location}
     _info "Install dependencies packages for MySQL completed..."
 }
 
@@ -177,19 +176,19 @@ install_mysql80(){
         mysql80_filename=${mysql80_x86_64_filename}
         _info "Downloading and Extracting ${mysql80_filename} files..."
         DownloadFile "${mysql80_filename}.tar.xz" ${mysql80_x86_64_download_url}
-        rm -fr ${mysql80_filename}
+        CheckError "rm -fr ${mysql80_filename}"
         tar Jxf ${mysql80_filename}.tar.xz
     elif [ "${sys_bit}" == "i686" ]; then
         mysql80_filename=${mysql80_i686_filename}
         _info "Downloading and Extracting ${mysql80_filename} files..."
         DownloadFile "${mysql80_filename}.tar.xz" ${mysql80_i686_download_url}
-        rm -fr ${mysql80_filename}
+        CheckError "rm -fr ${mysql80_filename}"
         tar Jxf ${mysql80_filename}.tar.xz
     fi
     _info "Moving ${mysql80_filename} files..."
-    mv -f ${mysql80_filename} ${mysql_location}
+    CheckError "mv ${mysql80_filename} ${mysql_location}"
     _create_mysql_config
-    chown -R mysql:mysql ${mysql_location}
+    CheckError "chown -R mysql:mysql ${mysql_location}"
     _info "Init MySQL..."
     CheckError "${mysql_location}/bin/mysqld --initialize-insecure \
         --basedir=${mysql_location} \

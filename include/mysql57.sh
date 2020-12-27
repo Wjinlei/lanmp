@@ -33,7 +33,6 @@ _install_mysql_depend(){
     fi
     id -u mysql >/dev/null 2>&1
     [ $? -ne 0 ] && useradd -M -U mysql -r -d /dev/null -s /sbin/nologin
-    mkdir -p ${mysql_location}
     _info "Install dependencies packages for MySQL completed..."
 }
 
@@ -177,19 +176,19 @@ install_mysql57(){
         mysql57_filename=${mysql57_x86_64_filename}
         _info "Downloading and Extracting ${mysql57_filename} files..."
         DownloadFile "${mysql57_filename}.tar.gz" ${mysql57_x86_64_download_url}
-        rm -fr ${mysql57_filename}
+        CheckError "rm -fr ${mysql57_filename}"
         tar zxf ${mysql57_filename}.tar.gz
     elif [ "${sys_bit}" == "i686" ]; then
         mysql57_filename=${mysql57_i686_filename}
         _info "Downloading and Extracting ${mysql57_filename} files..."
         DownloadFile "${mysql57_filename}.tar.gz" ${mysql57_i686_download_url}
-        rm -fr ${mysql57_filename}
+        CheckError "rm -fr ${mysql57_filename}"
         tar zxf ${mysql57_filename}.tar.gz
     fi
     _info "Moving ${mysql57_filename} files..."
-    mv -f ${mysql57_filename} ${mysql_location}
+    CheckError "mv ${mysql57_filename} ${mysql_location}"
     _create_mysql_config
-    chown -R mysql:mysql ${mysql_location}
+    CheckError "chown -R mysql:mysql ${mysql_location}"
     _info "Init MySQL..."
     CheckError "${mysql_location}/bin/mysqld --initialize-insecure \
         --basedir=${mysql_location} \

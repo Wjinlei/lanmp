@@ -153,6 +153,14 @@ _disable_selinux(){
     fi
 }
 
+_set_envs() {
+    cat >envs.sh <<EOF
+#!bin/bash
+umask 022
+EOF
+    source envs.sh
+}
+
 _install_tools(){
     _info "Starting to install development tools..."
     if [ "${PM}" = "yum" ];then
@@ -397,6 +405,7 @@ CheckInstalled(){
 }
 
 InstallPreSetting(){
+    _set_envs
     _check_ram
     _disable_selinux
     _get_package_manager

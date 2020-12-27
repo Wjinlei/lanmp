@@ -33,7 +33,6 @@ _install_mysql_depend(){
     fi
     id -u mysql >/dev/null 2>&1
     [ $? -ne 0 ] && useradd -M -U mysql -r -d /dev/null -s /sbin/nologin
-    mkdir -p ${mysql_location}
     _info "Install dependencies packages for MySQL completed..."
 }
 
@@ -177,19 +176,19 @@ install_mysql55(){
         mysql55_filename=${mysql55_x86_64_filename}
         _info "Downloading and Extracting ${mysql55_filename} files..."
         DownloadFile "${mysql55_filename}.tar.gz" ${mysql55_x86_64_download_url}
-        rm -fr ${mysql55_filename}
+        CheckError "rm -fr ${mysql55_filename}"
         tar zxf ${mysql55_filename}.tar.gz
     elif [ "${sys_bit}" == "i686" ]; then
         mysql55_filename=${mysql55_i686_filename}
         _info "Downloading and Extracting ${mysql55_filename} files..."
         DownloadFile "${mysql55_filename}.tar.gz" ${mysql55_i686_download_url}
-        rm -fr ${mysql55_filename}
+        CheckError "rm -fr ${mysql55_filename}"
         tar zxf ${mysql55_filename}.tar.gz
     fi
     _info "Moving ${mysql55_filename} files..."
-    mv -f ${mysql55_filename} ${mysql_location}
+    CheckError "mv ${mysql55_filename} ${mysql_location}"
     _create_mysql_config
-    chown -R mysql:mysql ${mysql_location}
+    CheckError "chown -R mysql:mysql ${mysql_location}"
     _info "Init MySQL..."
     CheckError "${mysql_location}/scripts/mysql_install_db \
         --basedir=${mysql_location} \

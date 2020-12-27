@@ -33,7 +33,6 @@ _install_mysql_depend(){
     fi
     id -u mysql >/dev/null 2>&1
     [ $? -ne 0 ] && useradd -M -U mysql -r -d /dev/null -s /sbin/nologin
-    mkdir -p ${mysql_location}
     _info "Install dependencies packages for MariaDB completed..."
 }
 
@@ -178,19 +177,19 @@ install_mariadb10417(){
         mariadb10417_filename=${mariadb10417_x86_64_filename}
         _info "Downloading and Extracting ${mariadb10417_filename} files..."
         DownloadFile "${mariadb10417_filename}.tar.gz" ${mariadb10417_x86_64_download_url}
-        rm -fr ${mariadb10417_filename}
+        CheckError "rm -fr ${mariadb10417_filename}"
         tar zxf ${mariadb10417_filename}.tar.gz
     elif [ "${sys_bit}" == "i686" ]; then
         mariadb10417_filename=${mariadb10417_i686_filename}
         _info "Downloading and Extracting ${mariadb10417_filename} files..."
         DownloadFile "${mariadb10417_filename}.tar.gz" ${mariadb10417_i686_download_url}
-        rm -fr ${mariadb10417_filename}
+        CheckError "rm -fr ${mariadb10417_filename}"
         tar zxf ${mariadb10417_filename}.tar.gz
     fi
     _info "Moving ${mariadb10417_filename} files..."
-    mv -f ${mariadb10417_filename} ${mysql_location}
+    CheckError "mv ${mariadb10417_filename} ${mysql_location}"
     _create_mysql_config
-    chown -R mysql:mysql ${mysql_location}
+    CheckError "chown -R mysql:mysql ${mysql_location}"
     _info "Init MariaDB..."
     CheckError "${mysql_location}/scripts/mysql_install_db \
         --basedir=${mysql_location} \
