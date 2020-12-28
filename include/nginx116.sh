@@ -199,6 +199,30 @@ ${var}/default/wwwlogs/*.log {
         [ ! -f ${nginx_location}/var/run/nginx.pid ] || kill -USR1 \`cat ${nginx_location}/var/run/nginx.pid\`
     endscript
 }
+
+${var}/default/wwwlogs/nginx/*.log {
+    daily
+    rotate 30
+    missingok
+    notifempty
+    compress
+    sharedscripts
+    postrotate
+        [ ! -f ${nginx_location}/var/run/nginx.pid ] || kill -USR1 \`cat ${nginx_location}/var/run/nginx.pid\`
+    endscript
+}
+
+${var}/wwwlogs/*.log {
+    daily
+    rotate 30
+    missingok
+    notifempty
+    compress
+    sharedscripts
+    postrotate
+        [ ! -f ${nginx_location}/var/run/nginx.pid ] || kill -USR1 \`cat ${nginx_location}/var/run/nginx.pid\`
+    endscript
+}
 EOF
     # 授权
     mkdir -p ${var}/wwwlogs

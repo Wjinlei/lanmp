@@ -310,6 +310,30 @@ ${var}/default/wwwlogs/*.log {
         [ ! -f ${apache_location}/logs/httpd.pid ] || kill -USR1 \`cat ${apache_location}/logs/httpd.pid\`
     endscript
 }
+
+${var}/default/wwwlogs/apache/*.log {
+    daily
+    rotate 30
+    missingok
+    notifempty
+    compress
+    sharedscripts
+    postrotate
+        [ ! -f ${apache_location}/logs/httpd.pid ] || kill -USR1 \`cat ${apache_location}/logs/httpd.pid\`
+    endscript
+}
+
+${var}/wwwlogs/*.log {
+    daily
+    rotate 30
+    missingok
+    notifempty
+    compress
+    sharedscripts
+    postrotate
+        [ ! -f ${apache_location}/logs/httpd.pid ] || kill -USR1 \`cat ${apache_location}/logs/httpd.pid\`
+    endscript
+}
 EOF
 
 # httpd modules array
