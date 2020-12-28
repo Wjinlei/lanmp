@@ -174,8 +174,21 @@ http {
 EOF
 
     # 定期清理日志
-    cat > /etc/logrotate.d/hws_nginx_log <<EOF
-${nginx_location}/logs/*log {
+    cat > /etc/logrotate.d/nginx-logs <<EOF
+${nginx_location}/var/log/*.log {
+    daily
+    rotate 30
+    missingok
+    notifempty
+    compress
+    sharedscripts
+    postrotate
+        [ ! -f ${nginx_location}/var/run/nginx.pid ] || kill -USR1 \`cat ${nginx_location}/var/run/nginx.pid\`
+    endscript
+}
+EOF
+    cat > /etc/logrotate.d/nginx-wwwlogs <<EOF
+${var}/default/wwwlogs/*.log {
     daily
     rotate 30
     missingok

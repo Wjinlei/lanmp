@@ -285,8 +285,21 @@ _config_apache(){
 #EOF
 
     # 定期清理日志
-    cat > /etc/logrotate.d/hws_apache_log <<EOF
-${apache_location}/logs/*log {
+    cat > /etc/logrotate.d/apache-logs <<EOF
+${apache_location}/logs/*.log {
+    daily
+    rotate 30
+    missingok
+    notifempty
+    compress
+    sharedscripts
+    postrotate
+        [ ! -f ${apache_location}/logs/httpd.pid ] || kill -USR1 \`cat ${apache_location}/logs/httpd.pid\`
+    endscript
+}
+EOF
+    cat > /etc/logrotate.d/apache-wwwlogs <<EOF
+${var}/default/wwwlogs/*.log {
     daily
     rotate 30
     missingok
