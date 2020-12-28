@@ -219,10 +219,6 @@ _install_curl(){
     CheckError "make install"
     AddToEnv "${curl102_location}"
     CreateLib64Dir "${curl102_location}"
-    if ! grep -qE "^${curl102_location}/lib" /etc/ld.so.conf.d/*.conf; then
-        echo "${curl102_location}/lib" > /etc/ld.so.conf.d/curl102.conf
-    fi
-    ldconfig
     _success "${curl_filename} install completed..."
     rm -f /tmp/${curl_filename}.tar.gz
     rm -fr /tmp/${curl_filename}
