@@ -257,6 +257,7 @@ _install_tools(){
     _check_command_exist "tar"
     _check_command_exist "chattr"
     _check_command_exist "lsattr"
+    _check_command_exist "free"
 }
 
 
@@ -283,6 +284,7 @@ _set_timezone() {
 }
 
 _sync_time() {
+    _set_timezone
     _info "Starting to sync time..."
     ntpdate -bv cn.pool.ntp.org >/dev/null 2>&1
     chronyc -a makestep >/dev/null 2>&1
@@ -405,10 +407,9 @@ CheckInstalled(){
 
 InstallPreSetting(){
     _set_envs
-    _check_ram
     _disable_selinux
     _get_package_manager
-    _set_timezone
     _install_tools
+    _check_ram
     _sync_time
 }
