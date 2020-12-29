@@ -67,8 +67,8 @@ DownloadUrl(){
 }
 
 _get_package_manager(){
-    yum >/dev/null 2>&1 
-    if [ "$?" -ne 127 ]; then 
+    yum >/dev/null 2>&1
+    if [ "$?" -ne 127 ]; then
         PM="yum"
     else
         apt-get >/dev/null 2>&1
