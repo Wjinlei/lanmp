@@ -1,3 +1,21 @@
+#!/usr/bin/env bash
+export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+cur_dir=$(pwd)
+
+include(){
+    local include=${1}
+    if [[ -s ${cur_dir}/tmps/include/${include}.sh ]];then
+        . ${cur_dir}/tmps/include/${include}.sh
+    else
+        wget --no-check-certificate -cv -t3 -T60 -P tmps/include http://d.hws.com/linux/master/script/include/${include}.sh >/dev/null 2>&1
+        if [ "$?" -ne 0 ]; then
+            echo "Error: ${cur_dir}/tmps/include/${include}.sh not found, shell can not be executed."
+            exit 1
+        fi
+        . ${cur_dir}/tmps/include/${include}.sh
+    fi
+}
+
 _install_apache_depend(){
     _info "Starting to install dependencies packages for Apache..."
     if [ "${PM}" = "yum" ];then
@@ -417,3 +435,17 @@ EOF
     mkdir -p ${var}/default/wwwconf/apache
     chown -R www:www ${apache_location}
 }
+
+main() {
+    include config
+    include public
+    load_config
+    IsRoot
+    InstallPreSetting
+    install_apache2446 ${1}
+}
+echo "The installation log will be written to /tmp/install.log"
+echo "Use tail -f /tmp/install.log to view dynamically"
+rm -fr ${cur_dir}/tmps
+main "$@" > /tmp/install.log 2>&1
+rm -fr ${cur_dir}/tmps

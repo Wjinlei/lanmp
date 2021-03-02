@@ -1,3 +1,21 @@
+#!/usr/bin/env bash
+export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+cur_dir=$(pwd)
+
+include(){
+    local include=${1}
+    if [[ -s ${cur_dir}/tmps/include/${include}.sh ]];then
+        . ${cur_dir}/tmps/include/${include}.sh
+    else
+        wget --no-check-certificate -cv -t3 -T60 -P tmps/include http://d.hws.com/linux/master/script/include/${include}.sh >/dev/null 2>&1
+        if [ "$?" -ne 0 ]; then
+            echo "Error: ${cur_dir}/tmps/include/${include}.sh not found, shell can not be executed."
+            exit 1
+        fi
+        . ${cur_dir}/tmps/include/${include}.sh
+    fi
+}
+
 _install_mysql_depend(){
     _info "Starting to install dependencies packages for MySQL..."
     if [ "${PM}" = "yum" ];then
@@ -51,16 +69,15 @@ _config_mysql(){
         CheckError "/etc/init.d/mysqld restart"
     fi
     ${mysql_location}/bin/mysql -uroot -S /tmp/mysql.sock \
-        -e "GRANT ALL PRIVILEGES ON *.* to root@'127.0.0.1' IDENTIFIED BY \"${mysql_pass}\" WITH GRANT OPTION;"
+        -e "CREATE USER root@'127.0.0.1' IDENTIFIED WITH mysql_native_password BY \"${mysql_pass}\";"
     ${mysql_location}/bin/mysql -uroot -S /tmp/mysql.sock \
-        -e "GRANT ALL PRIVILEGES ON *.* to root@'localhost' IDENTIFIED BY \"${mysql_pass}\" WITH GRANT OPTION;"
-    ${mysql_location}/bin/mysql -uroot -p${mysql_pass} -S /tmp/mysql.sock <<EOF
-    DROP DATABASE IF EXISTS test;
-    DELETE FROM mysql.user WHERE NOT (user='root');
-    DELETE FROM mysql.db WHERE user='';
-    DELETE FROM mysql.user WHERE user="root" AND host="%";
-    FLUSH PRIVILEGES;
-EOF
+        -e "ALTER USER root@'localhost' IDENTIFIED WITH mysql_native_password BY \"${mysql_pass}\";"
+    ${mysql_location}/bin/mysql -uroot -p${mysql_pass} -S /tmp/mysql.sock \
+        -e "GRANT ALL PRIVILEGES ON *.* to root@'127.0.0.1' WITH GRANT OPTION;" >/dev/null 2>&1
+    ${mysql_location}/bin/mysql -uroot -p${mysql_pass} -S /tmp/mysql.sock \
+        -e "GRANT ALL PRIVILEGES ON *.* to root@'localhost' WITH GRANT OPTION;" >/dev/null 2>&1
+    ${mysql_location}/bin/mysql -uroot -p${mysql_pass} -S /tmp/mysql.sock \
+        -e "FLUSH PRIVILEGES;" >/dev/null 2>&1
     CheckError "/etc/init.d/mysqld restart"
 }
 
@@ -118,6 +135,7 @@ collation-server               = utf8mb4_unicode_ci
 skip_name_resolve
 skip-external-locking
 log-error                      = ${mysql_location}/mysql_data/mysql-error.log
+default_authentication_plugin  = mysql_native_password
 
 # INNODB #
 innodb-log-files-in-group      = 2
@@ -142,7 +160,7 @@ max-connect-errors             = 1000000
 log-bin                        = mysql-bin
 log-bin-index                  = mysql-bin.index
 sync-binlog                    = 1
-expire-logs-days               = 3
+binlog_expire_logs_seconds     = 259200
 
 # REPLICATION
 relay-log                      = relay-bin
@@ -154,7 +172,7 @@ slave-net-timeout              = 60
 EOF
 }
 
-install_mysql56(){
+install_mysql80(){
     if [ $# -lt 2 ]; then
         echo "[Parameter Error]: mysql_location password [default_port]"
         exit 1
@@ -173,24 +191,24 @@ install_mysql56(){
     Is64bit && sys_bit=x86_64 || sys_bit=i686
     cd /tmp
     if [ "${sys_bit}" == "x86_64" ]; then
-        mysql56_filename=${mysql56_x86_64_filename}
-        _info "Downloading and Extracting ${mysql56_filename} files..."
-        DownloadFile "${mysql56_filename}.tar.gz" ${mysql56_x86_64_download_url}
-        CheckError "rm -fr ${mysql56_filename}"
-        tar zxf ${mysql56_filename}.tar.gz
+        mysql80_filename=${mysql80_x86_64_filename}
+        _info "Downloading and Extracting ${mysql80_filename} files..."
+        DownloadFile "${mysql80_filename}.tar.xz" ${mysql80_x86_64_download_url}
+        CheckError "rm -fr ${mysql80_filename}"
+        tar Jxf ${mysql80_filename}.tar.xz
     elif [ "${sys_bit}" == "i686" ]; then
-        mysql56_filename=${mysql56_i686_filename}
-        _info "Downloading and Extracting ${mysql56_filename} files..."
-        DownloadFile "${mysql56_filename}.tar.gz" ${mysql56_i686_download_url}
-        CheckError "rm -fr ${mysql56_filename}"
-        tar zxf ${mysql56_filename}.tar.gz
+        mysql80_filename=${mysql80_i686_filename}
+        _info "Downloading and Extracting ${mysql80_filename} files..."
+        DownloadFile "${mysql80_filename}.tar.xz" ${mysql80_i686_download_url}
+        CheckError "rm -fr ${mysql80_filename}"
+        tar Jxf ${mysql80_filename}.tar.xz
     fi
-    _info "Moving ${mysql56_filename} files..."
-    CheckError "mv ${mysql56_filename} ${mysql_location}"
+    _info "Moving ${mysql80_filename} files..."
+    CheckError "mv ${mysql80_filename} ${mysql_location}"
     _create_mysql_config
     CheckError "chown -R mysql:mysql ${mysql_location}"
     _info "Init MySQL..."
-    CheckError "${mysql_location}/scripts/mysql_install_db \
+    CheckError "${mysql_location}/bin/mysqld --initialize-insecure \
         --basedir=${mysql_location} \
         --datadir=${mysql_location}/mysql_data --user=mysql"
     _config_mysql
@@ -198,6 +216,20 @@ install_mysql56(){
     CreateLib64Dir "${mysql_location}"
     echo $mysql_location > /tmp/mysql.info
     echo "Root password:${mysql_pass}, Please keep it safe."
-    _success "Install ${mysql56_filename} completed..."
-    rm -fr /tmp/${mysql56_filename}
+    _success "Install ${mysql80_filename} completed..."
+    rm -fr /tmp/${mysql80_filename}
 }
+
+main() {
+    include config
+    include public
+    load_config
+    IsRoot
+    InstallPreSetting
+    install_mysql80 ${1} ${2} ${3}
+}
+echo "The installation log will be written to /tmp/install.log"
+echo "Use tail -f /tmp/install.log to view dynamically"
+rm -fr ${cur_dir}/tmps
+main "$@" > /tmp/install.log 2>&1
+rm -fr ${cur_dir}/tmps

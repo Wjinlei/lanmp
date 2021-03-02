@@ -1,3 +1,21 @@
+#!/usr/bin/env bash
+export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+cur_dir=$(pwd)
+
+include(){
+    local include=${1}
+    if [[ -s ${cur_dir}/tmps/include/${include}.sh ]];then
+        . ${cur_dir}/tmps/include/${include}.sh
+    else
+        wget --no-check-certificate -cv -t3 -T60 -P tmps/include http://d.hws.com/linux/master/script/include/${include}.sh >/dev/null 2>&1
+        if [ "$?" -ne 0 ]; then
+            echo "Error: ${cur_dir}/tmps/include/${include}.sh not found, shell can not be executed."
+            exit 1
+        fi
+        . ${cur_dir}/tmps/include/${include}.sh
+    fi
+}
+
 _install_php_depend(){
     _info "Starting to install dependencies packages for PHP..."
     if [ "${PM}" = "yum" ];then
@@ -101,7 +119,7 @@ _install_php_depend(){
     fi
     id -u www >/dev/null 2>&1
     [ $? -ne 0 ] && useradd -M -U www -r -d /dev/null -s /sbin/nologin
-    mkdir -p ${php72_location}
+    mkdir -p ${php55_location}
 }
 
 _install_openssl102(){
@@ -342,43 +360,63 @@ _install_freetype() {
     rm -fr /tmp/${freetype_filename}
 }
 
-_start_php72() {
-    CheckError "${php72_location}/sbin/php-fpm --daemonize \
-        --fpm-config ${php72_location}/etc/default.conf \
-        --pid ${php72_location}/var/run/default.pid"
-    DownloadUrl "/etc/init.d/php72" "${download_sysv_url}/php-fpm"
-    sed -i "s|^prefix={php-fpm_location}$|prefix=${php72_location}|g" /etc/init.d/php72
-    CheckError "chmod +x /etc/init.d/php72"
-    chkconfig --add php72 > /dev/null 2>&1
-    update-rc.d -f php72 defaults > /dev/null 2>&1
-    CheckError "/etc/init.d/php72 restart"
+_start_php55() {
+    CheckError "${php55_location}/sbin/php-fpm --daemonize \
+        --fpm-config ${php55_location}/etc/default.conf \
+        --pid ${php55_location}/var/run/default.pid"
+    DownloadUrl "/etc/init.d/php55" "${download_sysv_url}/php-fpm"
+    sed -i "s|^prefix={php-fpm_location}$|prefix=${php55_location}|g" /etc/init.d/php55
+    CheckError "chmod +x /etc/init.d/php55"
+    chkconfig --add php55 > /dev/null 2>&1
+    update-rc.d -f php55 defaults > /dev/null 2>&1
+    CheckError "/etc/init.d/php55 restart"
 }
 
 _config_php(){
     # php.ini
-    mkdir -p ${php72_location}/{etc,php.d}
-    cp -f php.ini-production ${php72_location}/etc/php.ini
+    mkdir -p ${php55_location}/{etc,php.d}
+    cp -f php.ini-production ${php55_location}/etc/php.ini
 
-    sed -i 's/default_charset =.*/default_charset = "UTF-8"/g' ${php72_location}/etc/php.ini
-    sed -i 's/;always_populate_raw_post_data =.*/always_populate_raw_post_data = -1/g' ${php72_location}/etc/php.ini
-    sed -i 's/post_max_size =.*/post_max_size = 100M/g' ${php72_location}/etc/php.ini
-    sed -i 's/upload_max_filesize =.*/upload_max_filesize = 100M/g' ${php72_location}/etc/php.ini
-    sed -i 's/;date.timezone =.*/date.timezone = PRC/g' ${php72_location}/etc/php.ini
-    sed -i 's/short_open_tag =.*/short_open_tag = On/g' ${php72_location}/etc/php.ini
-    sed -i 's/expose_php =.*/expose_php = Off/g' ${php72_location}/etc/php.ini
-    sed -i 's/;cgi.fix_pathinfo=.*/cgi.fix_pathinfo=1/g' ${php72_location}/etc/php.ini
-    sed -i 's/max_execution_time =.*/max_execution_time = 300/g' ${php72_location}/etc/php.ini
+    sed -i 's/;default_charset =.*/default_charset = "UTF-8"/g' ${php55_location}/etc/php.ini
+    sed -i 's/;always_populate_raw_post_data =.*/always_populate_raw_post_data = -1/g' ${php55_location}/etc/php.ini
+    sed -i 's/post_max_size =.*/post_max_size = 100M/g' ${php55_location}/etc/php.ini
+    sed -i 's/upload_max_filesize =.*/upload_max_filesize = 100M/g' ${php55_location}/etc/php.ini
+    sed -i 's/;date.timezone =.*/date.timezone = PRC/g' ${php55_location}/etc/php.ini
+    sed -i 's/short_open_tag =.*/short_open_tag = On/g' ${php55_location}/etc/php.ini
+    sed -i 's/expose_php =.*/expose_php = Off/g' ${php55_location}/etc/php.ini
+    sed -i 's/;cgi.fix_pathinfo=.*/cgi.fix_pathinfo=1/g' ${php55_location}/etc/php.ini
+    sed -i 's/max_execution_time =.*/max_execution_time = 300/g' ${php55_location}/etc/php.ini
     if [ -f /etc/pki/tls/certs/ca-bundle.crt ]; then
-        sed -i 's#;curl.cainfo =.*#curl.cainfo = /etc/pki/tls/certs/ca-bundle.crt#g' ${php72_location}/etc/php.ini
-        sed -i 's#;openssl.cafile=.*#openssl.cafile=/etc/pki/tls/certs/ca-bundle.crt#g' ${php72_location}/etc/php.ini
+        sed -i 's#;curl.cainfo =.*#curl.cainfo = /etc/pki/tls/certs/ca-bundle.crt#g' ${php55_location}/etc/php.ini
+        sed -i 's#;openssl.cafile=.*#openssl.cafile=/etc/pki/tls/certs/ca-bundle.crt#g' ${php55_location}/etc/php.ini
     elif [ -f /etc/ssl/certs/ca-certificates.crt ]; then
-        sed -i 's#;curl.cainfo =.*#curl.cainfo = /etc/ssl/certs/ca-certificates.crt#g' ${php72_location}/etc/php.ini
-        sed -i 's#;openssl.cafile=.*#openssl.cafile=/etc/ssl/certs/ca-certificates.crt#g' ${php72_location}/etc/php.ini
+        sed -i 's#;curl.cainfo =.*#curl.cainfo = /etc/ssl/certs/ca-certificates.crt#g' ${php55_location}/etc/php.ini
+        sed -i 's#;openssl.cafile=.*#openssl.cafile=/etc/ssl/certs/ca-certificates.crt#g' ${php55_location}/etc/php.ini
     fi
-    sed -i 's/disable_functions =.*/disable_functions = passthru,exec,system,chroot,chgrp,chown,shell_exec,popen,proc_open,pcntl_exec,ini_alter,ini_restore,dl,openlog,syslog,popepassthru,pcntl_alarm,pcntl_fork,pcntl_waitpid,pcntl_wait,pcntl_wifexited,pcntl_wifstopped,pcntl_wifsignaled,pcntl_wifcontinued,pcntl_wexitstatus,pcntl_wtermsig,pcntl_wstopsig,pcntl_signal,pcntl_signal_dispatch,pcntl_get_last_error,pcntl_strerror,pcntl_sigprocmask,pcntl_sigwaitinfo,pcntl_sigtimedwait,pcntl_exec,pcntl_getpriority,pcntl_setpriority,imap_open,apache_setenv/g' ${php72_location}/etc/php.ini
+    sed -i 's/disable_functions =.*/disable_functions = passthru,exec,system,chroot,chgrp,chown,shell_exec,popen,proc_open,pcntl_exec,ini_alter,ini_restore,dl,openlog,syslog,popepassthru,pcntl_alarm,pcntl_fork,pcntl_waitpid,pcntl_wait,pcntl_wifexited,pcntl_wifstopped,pcntl_wifsignaled,pcntl_wifcontinued,pcntl_wexitstatus,pcntl_wtermsig,pcntl_wstopsig,pcntl_signal,pcntl_signal_dispatch,pcntl_get_last_error,pcntl_strerror,pcntl_sigprocmask,pcntl_sigwaitinfo,pcntl_sigtimedwait,pcntl_exec,pcntl_getpriority,pcntl_setpriority,imap_open,apache_setenv/g' ${php55_location}/etc/php.ini
 
-    extension_dir=$(${php72_location}/bin/php-config --extension-dir)
-    cat > ${php72_location}/php.d/opcache.ini<<EOF
+    extension_dir=$(${php55_location}/bin/php-config --extension-dir)
+
+    Is64bit && sys_bit=x86_64 || sys_bit=i686
+    if [ "${sys_bit}" == "x86_64" ]; then
+        DownloadFile  "${zend_loader_php55_x86_64_filename}_update1.tar.gz" "${zend_loader_php55_x86_64_download_url}"
+        tar zxf ${zend_loader_php55_x86_64_filename}_update1.tar.gz
+        cp -f ${zend_loader_php55_x86_64_filename}/opcache.so ${extension_dir}
+        cp -f ${zend_loader_php55_x86_64_filename}/ZendGuardLoader.so ${extension_dir}
+    elif [ "${sys_bit}" == "i686" ]; then
+        DownloadFile  "${zend_loader_php55_i386_filename}_update1.tar.gz" "${zend_loader_php55_i386_download_url}"
+        tar zxf ${zend_loader_php55_i386_filename}_update1.tar.gz
+        cp -f ${zend_loader_php55_i386_filename}/opcache.so ${extension_dir}
+        cp -f ${zend_loader_php55_i386_filename}/ZendGuardLoader.so ${extension_dir}
+    fi
+
+    cat > ${php55_location}/php.d/zendloader.ini<<EOF
+[ZendGuardLoader]
+zend_extension=${extension_dir}/ZendGuardLoader.so
+zend_loader.enable=1
+EOF
+
+    cat > ${php55_location}/php.d/opcache.ini<<EOF
 [opcache]
 zend_extension=${extension_dir}/opcache.so
 opcache.enable_cli=1
@@ -391,13 +429,13 @@ opcache.save_comments=1
 EOF
 
     # php-fpm
-    cat > ${php72_location}/etc/default.conf<<EOF
+    cat > ${php55_location}/etc/default.conf<<EOF
 [global]
-    pid = ${php72_location}/var/run/default.pid
-    error_log = ${php72_location}/var/log/default.log
+    pid = ${php55_location}/var/run/default.pid
+    error_log = ${php55_location}/var/log/default.log
 [default]
     security.limit_extensions = .php .php3 .php4 .php5 .php7
-    listen = /tmp/${php72_filename}-default.sock
+    listen = /tmp/${php55_filename}-default.sock
     listen.owner = www
     listen.group = www
     listen.mode = 0660
@@ -410,45 +448,46 @@ EOF
     pm.min_spare_servers = 1
     pm.max_spare_servers = 3
 EOF
-    mkdir -p ${php72_location}/var/run
-    mkdir -p ${php72_location}/var/log
+    mkdir -p ${php55_location}/var/run
+    mkdir -p ${php55_location}/var/log
 
-    _start_php72
+    _start_php55
     _warn "Please add the following two lines to your httpd.conf"
     echo AddType application/x-httpd-php .php .phtml
     echo AddType application/x-httpd-php-source .phps
 }
 
-install_php72(){
+install_php55(){
     if [ $# -lt 1 ]; then
         echo "[Parameter Error]: php_location"
         exit 1
     fi
-    php72_location=${1}
+    php55_location=${1}
 
     _install_php_depend
 
-    CheckError "rm -fr ${php72_location}"
+    CheckError "rm -fr ${php55_location}"
     cd /tmp
-    _info "Downloading and Extracting ${php72_filename} files..."
-    DownloadFile  "${php72_filename}.tar.gz" "${php72_download_url}"
-    rm -fr ${php72_filename}
-    tar zxf ${php72_filename}.tar.gz
-    cd ${php72_filename}
-    _info "Install ${php72_filename} ..."
+    _info "Downloading and Extracting ${php55_filename} files..."
+    DownloadFile  "${php55_filename}.tar.gz" "${php55_download_url}"
+    rm -fr ${php55_filename}
+    tar zxf ${php55_filename}.tar.gz
+    cd ${php55_filename}
+    _info "Install ${php55_filename} ..."
     Is64bit && with_libdir="--with-libdir=lib64" || with_libdir=""
-    php_configure_args="--prefix=${php72_location} \
-    --with-config-file-path=${php72_location}/etc \
-    --with-config-file-scan-dir=${php72_location}/php.d \
+    php_configure_args="--prefix=${php55_location} \
+    --with-config-file-path=${php55_location}/etc \
+    --with-config-file-scan-dir=${php55_location}/php.d \
     --with-libxml-dir=${libxml2_location} \
     --with-pcre-dir=${pcre_location} \
     --with-openssl=${openssl102_location} \
     ${with_libdir} \
+    --with-mysql=mysqlnd \
     --with-mysqli=mysqlnd \
     --with-mysql-sock=/tmp/mysql.sock \
     --with-pdo-mysql=mysqlnd \
     --with-gd \
-    --with-webp-dir \
+    --with-vpx-dir \
     --with-jpeg-dir \
     --with-png-dir \
     --with-xpm-dir \
@@ -474,6 +513,8 @@ install_php72(){
     --with-iconv=${libiconv_location} \
     --without-pear \
     --disable-phar \
+    --with-mcrypt \
+    --enable-gd-native-ttf \
     --enable-mysqlnd \
     --enable-fpm \
     --enable-bcmath \
@@ -497,8 +538,22 @@ install_php72(){
     CheckError "./configure ${php_configure_args}"
     CheckError "parallel_make ZEND_EXTRA_LIBS='-liconv'"
     CheckError "make install"
-    _info "Config ${php72_filename}..."
+    _info "Config ${php55_filename}..."
     _config_php
-    _success "${php72_filename} install completed..."
-    rm -fr /tmp/${php72_filename}
+    _success "${php55_filename} install completed..."
+    rm -fr /tmp/${php55_filename}
 }
+
+main() {
+    include config
+    include public
+    load_config
+    IsRoot
+    InstallPreSetting
+    install_php55 ${1}
+}
+echo "The installation log will be written to /tmp/install.log"
+echo "Use tail -f /tmp/install.log to view dynamically"
+rm -fr ${cur_dir}/tmps
+main "$@" > /tmp/install.log 2>&1
+rm -fr ${cur_dir}/tmps

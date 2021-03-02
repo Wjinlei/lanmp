@@ -1,3 +1,21 @@
+#!/usr/bin/env bash
+export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+cur_dir=$(pwd)
+
+include(){
+    local include=${1}
+    if [[ -s ${cur_dir}/tmps/include/${include}.sh ]];then
+        . ${cur_dir}/tmps/include/${include}.sh
+    else
+        wget --no-check-certificate -cv -t3 -T60 -P tmps/include http://d.hws.com/linux/master/script/include/${include}.sh >/dev/null 2>&1
+        if [ "$?" -ne 0 ]; then
+            echo "Error: ${cur_dir}/tmps/include/${include}.sh not found, shell can not be executed."
+            exit 1
+        fi
+        . ${cur_dir}/tmps/include/${include}.sh
+    fi
+}
+
 _install_php_depend(){
     _info "Starting to install dependencies packages for PHP..."
     if [ "${PM}" = "yum" ];then
@@ -24,7 +42,7 @@ _install_php_depend(){
             libpcre3-dev libtool libjpeg-dev libpng-dev libpspell-dev
             libmhash-dev libenchant-dev libwebp-dev libxpm-dev libvpx-dev
             libreadline-dev libzip-dev libmcrypt-dev unixodbc-dev
-            libtidy-dev python-dev libsqlite3-dev libonig-dev
+            libtidy-dev python-dev
         )
         for depend in ${apt_depends[@]}
         do
@@ -88,7 +106,7 @@ _install_php_depend(){
         _install_freetype
     fi
     _install_openssl102
-    _install_pcre2
+    _install_pcre
     _install_re2c
     _install_icu4c
     _install_libxml2
@@ -101,7 +119,7 @@ _install_php_depend(){
     fi
     id -u www >/dev/null 2>&1
     [ $? -ne 0 ] && useradd -M -U www -r -d /dev/null -s /sbin/nologin
-    mkdir -p ${php80_location}
+    mkdir -p ${php73_location}
 }
 
 _install_openssl102(){
@@ -134,29 +152,35 @@ _install_openssl102(){
 
     AddToEnv "${openssl102_location}"
     CreateLib64Dir "${openssl102_location}"
-    export PKG_CONFIG_PATH=${openssl102_location}/lib/pkgconfig:$PKG_CONFIG_PATH
+    if ! grep -qE "^${openssl102_location}/lib" /etc/ld.so.conf.d/*.conf; then
+        echo "${openssl102_location}/lib" > /etc/ld.so.conf.d/openssl102.conf
+    fi
+    ldconfig
 
     _success "${openssl102_filename} install completed..."
     rm -f /tmp/${openssl102_filename}.tar.gz
     rm -fr /tmp/${openssl102_filename}
 }
 
-_install_pcre2(){
+_install_pcre(){
     cd /tmp
-    _info "${pcre2_filename} install start..."
-    rm -fr ${pcre2_filename}
-    DownloadFile "${pcre2_filename}.tar.gz" "${pcre2_download_url}"
-    tar zxf ${pcre2_filename}.tar.gz
-    cd ${pcre2_filename}
-    CheckError "./configure --prefix=${pcre2_location}"
+    _info "${pcre_filename} install start..."
+    rm -fr ${pcre_filename}
+    DownloadFile "${pcre_filename}.tar.gz" "${pcre_download_url}"
+    tar zxf ${pcre_filename}.tar.gz
+    cd ${pcre_filename}
+    CheckError "./configure --prefix=${pcre_location}"
     CheckError "parallel_make"
     CheckError "make install"
-    AddToEnv "${pcre2_location}"
-    CreateLib64Dir "${pcre2_location}"
-    export PKG_CONFIG_PATH=${pcre2_location}/lib/pkgconfig:$PKG_CONFIG_PATH
-    _success "${pcre2_filename} install completed..."
-    rm -f /tmp/${pcre2_filename}.tar.gz
-    rm -fr /tmp/${pcre2_filename}
+    AddToEnv "${pcre_location}"
+    CreateLib64Dir "${pcre_location}"
+    if ! grep -qE "^${pcre_location}/lib" /etc/ld.so.conf.d/*.conf; then
+        echo "${pcre_location}/lib" > /etc/ld.so.conf.d/pcre.conf
+    fi
+    ldconfig
+    _success "${pcre_filename} install completed..."
+    rm -f /tmp/${pcre_filename}.tar.gz
+    rm -fr /tmp/${pcre_filename}
 }
 
 _install_icu4c() {
@@ -171,7 +195,10 @@ _install_icu4c() {
     CheckError "make install"
     AddToEnv "${icu4c_location}"
     CreateLib64Dir "${icu4c_location}"
-    export PKG_CONFIG_PATH=${icu4c_location}/lib/pkgconfig:$PKG_CONFIG_PATH
+    if ! grep -qE "^${icu4c_location}/lib" /etc/ld.so.conf.d/*.conf; then
+        echo "${icu4c_location}/lib" > /etc/ld.so.conf.d/icu4c.conf
+    fi
+    ldconfig
     _success "${icu4c_filename} install completed..."
     rm -f /tmp/${icu4c_filename}.tgz
     rm -fr /tmp/${icu4c_dirname}
@@ -189,7 +216,10 @@ _install_libxml2() {
     CheckError "make install"
     AddToEnv "${libxml2_location}"
     CreateLib64Dir "${libxml2_location}"
-    export PKG_CONFIG_PATH=${libxml2_location}/lib/pkgconfig:$PKG_CONFIG_PATH
+    if ! grep -qE "^${libxml2_location}/lib" /etc/ld.so.conf.d/*.conf; then
+        echo "${libxml2_location}/lib" > /etc/ld.so.conf.d/libxml2.conf
+    fi
+    ldconfig
     _success "${libxml2_filename} install completed..."
     rm -f /tmp/${libxml2_filename}.tar.gz
     rm -fr /tmp/${libxml2_filename}
@@ -207,7 +237,6 @@ _install_curl(){
     CheckError "make install"
     AddToEnv "${curl102_location}"
     CreateLib64Dir "${curl102_location}"
-    export PKG_CONFIG_PATH=${curl102_location}/lib/pkgconfig:$PKG_CONFIG_PATH
     _success "${curl_filename} install completed..."
     rm -f /tmp/${curl_filename}.tar.gz
     rm -fr /tmp/${curl_filename}
@@ -309,7 +338,7 @@ _install_libzip(){
     CheckError "./configure"
     CheckError "parallel_make"
     CheckError "make install"
-    export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
+    ldconfig
     _success "${libzip_filename} install completed..."
     rm -f /tmp/${libzip_filename}.tar.gz
     rm -fr /tmp/${libzip_filename}
@@ -331,43 +360,43 @@ _install_freetype() {
     rm -fr /tmp/${freetype_filename}
 }
 
-_start_php80() {
-    CheckError "${php80_location}/sbin/php-fpm --daemonize \
-        --fpm-config ${php80_location}/etc/default.conf \
-        --pid ${php80_location}/var/run/default.pid"
-    DownloadUrl "/etc/init.d/php80" "${download_sysv_url}/php-fpm"
-    sed -i "s|^prefix={php-fpm_location}$|prefix=${php80_location}|g" /etc/init.d/php80
-    CheckError "chmod +x /etc/init.d/php80"
-    chkconfig --add php80 > /dev/null 2>&1
-    update-rc.d -f php80 defaults > /dev/null 2>&1
-    CheckError "/etc/init.d/php80 restart"
+_start_php73() {
+    CheckError "${php73_location}/sbin/php-fpm --daemonize \
+        --fpm-config ${php73_location}/etc/default.conf \
+        --pid ${php73_location}/var/run/default.pid"
+    DownloadUrl "/etc/init.d/php73" "${download_sysv_url}/php-fpm"
+    sed -i "s|^prefix={php-fpm_location}$|prefix=${php73_location}|g" /etc/init.d/php73
+    CheckError "chmod +x /etc/init.d/php73"
+    chkconfig --add php73 > /dev/null 2>&1
+    update-rc.d -f php73 defaults > /dev/null 2>&1
+    CheckError "/etc/init.d/php73 restart"
 }
 
 _config_php(){
     # php.ini
-    mkdir -p ${php80_location}/{etc,php.d}
-    cp -f php.ini-production ${php80_location}/etc/php.ini
+    mkdir -p ${php73_location}/{etc,php.d}
+    cp -f php.ini-production ${php73_location}/etc/php.ini
 
-    sed -i 's/default_charset =.*/default_charset = "UTF-8"/g' ${php80_location}/etc/php.ini
-    sed -i 's/;always_populate_raw_post_data =.*/always_populate_raw_post_data = -1/g' ${php80_location}/etc/php.ini
-    sed -i 's/post_max_size =.*/post_max_size = 100M/g' ${php80_location}/etc/php.ini
-    sed -i 's/upload_max_filesize =.*/upload_max_filesize = 100M/g' ${php80_location}/etc/php.ini
-    sed -i 's/;date.timezone =.*/date.timezone = PRC/g' ${php80_location}/etc/php.ini
-    sed -i 's/short_open_tag =.*/short_open_tag = On/g' ${php80_location}/etc/php.ini
-    sed -i 's/expose_php =.*/expose_php = Off/g' ${php80_location}/etc/php.ini
-    sed -i 's/;cgi.fix_pathinfo=.*/cgi.fix_pathinfo=1/g' ${php80_location}/etc/php.ini
-    sed -i 's/max_execution_time =.*/max_execution_time = 300/g' ${php80_location}/etc/php.ini
+    sed -i 's/default_charset =.*/default_charset = "UTF-8"/g' ${php73_location}/etc/php.ini
+    sed -i 's/;always_populate_raw_post_data =.*/always_populate_raw_post_data = -1/g' ${php73_location}/etc/php.ini
+    sed -i 's/post_max_size =.*/post_max_size = 100M/g' ${php73_location}/etc/php.ini
+    sed -i 's/upload_max_filesize =.*/upload_max_filesize = 100M/g' ${php73_location}/etc/php.ini
+    sed -i 's/;date.timezone =.*/date.timezone = PRC/g' ${php73_location}/etc/php.ini
+    sed -i 's/short_open_tag =.*/short_open_tag = On/g' ${php73_location}/etc/php.ini
+    sed -i 's/expose_php =.*/expose_php = Off/g' ${php73_location}/etc/php.ini
+    sed -i 's/;cgi.fix_pathinfo=.*/cgi.fix_pathinfo=1/g' ${php73_location}/etc/php.ini
+    sed -i 's/max_execution_time =.*/max_execution_time = 300/g' ${php73_location}/etc/php.ini
     if [ -f /etc/pki/tls/certs/ca-bundle.crt ]; then
-        sed -i 's#;curl.cainfo =.*#curl.cainfo = /etc/pki/tls/certs/ca-bundle.crt#g' ${php80_location}/etc/php.ini
-        sed -i 's#;openssl.cafile=.*#openssl.cafile=/etc/pki/tls/certs/ca-bundle.crt#g' ${php80_location}/etc/php.ini
+        sed -i 's#;curl.cainfo =.*#curl.cainfo = /etc/pki/tls/certs/ca-bundle.crt#g' ${php73_location}/etc/php.ini
+        sed -i 's#;openssl.cafile=.*#openssl.cafile=/etc/pki/tls/certs/ca-bundle.crt#g' ${php73_location}/etc/php.ini
     elif [ -f /etc/ssl/certs/ca-certificates.crt ]; then
-        sed -i 's#;curl.cainfo =.*#curl.cainfo = /etc/ssl/certs/ca-certificates.crt#g' ${php80_location}/etc/php.ini
-        sed -i 's#;openssl.cafile=.*#openssl.cafile=/etc/ssl/certs/ca-certificates.crt#g' ${php80_location}/etc/php.ini
+        sed -i 's#;curl.cainfo =.*#curl.cainfo = /etc/ssl/certs/ca-certificates.crt#g' ${php73_location}/etc/php.ini
+        sed -i 's#;openssl.cafile=.*#openssl.cafile=/etc/ssl/certs/ca-certificates.crt#g' ${php73_location}/etc/php.ini
     fi
-    sed -i 's/disable_functions =.*/disable_functions = passthru,exec,system,chroot,chgrp,chown,shell_exec,popen,proc_open,pcntl_exec,ini_alter,ini_restore,dl,openlog,syslog,popepassthru,pcntl_alarm,pcntl_fork,pcntl_waitpid,pcntl_wait,pcntl_wifexited,pcntl_wifstopped,pcntl_wifsignaled,pcntl_wifcontinued,pcntl_wexitstatus,pcntl_wtermsig,pcntl_wstopsig,pcntl_signal,pcntl_signal_dispatch,pcntl_get_last_error,pcntl_strerror,pcntl_sigprocmask,pcntl_sigwaitinfo,pcntl_sigtimedwait,pcntl_exec,pcntl_getpriority,pcntl_setpriority,imap_open,apache_setenv/g' ${php80_location}/etc/php.ini
+    sed -i 's/disable_functions =.*/disable_functions = passthru,exec,system,chroot,chgrp,chown,shell_exec,popen,proc_open,pcntl_exec,ini_alter,ini_restore,dl,openlog,syslog,popepassthru,pcntl_alarm,pcntl_fork,pcntl_waitpid,pcntl_wait,pcntl_wifexited,pcntl_wifstopped,pcntl_wifsignaled,pcntl_wifcontinued,pcntl_wexitstatus,pcntl_wtermsig,pcntl_wstopsig,pcntl_signal,pcntl_signal_dispatch,pcntl_get_last_error,pcntl_strerror,pcntl_sigprocmask,pcntl_sigwaitinfo,pcntl_sigtimedwait,pcntl_exec,pcntl_getpriority,pcntl_setpriority,imap_open,apache_setenv/g' ${php73_location}/etc/php.ini
 
-    extension_dir=$(${php80_location}/bin/php-config --extension-dir)
-    cat > ${php80_location}/php.d/opcache.ini<<EOF
+    extension_dir=$(${php73_location}/bin/php-config --extension-dir)
+    cat > ${php73_location}/php.d/opcache.ini<<EOF
 [opcache]
 zend_extension=${extension_dir}/opcache.so
 opcache.enable_cli=1
@@ -380,13 +409,13 @@ opcache.save_comments=1
 EOF
 
     # php-fpm
-    cat > ${php80_location}/etc/default.conf<<EOF
+    cat > ${php73_location}/etc/default.conf<<EOF
 [global]
-    pid = ${php80_location}/var/run/default.pid
-    error_log = ${php80_location}/var/log/default.log
+    pid = ${php73_location}/var/run/default.pid
+    error_log = ${php73_location}/var/log/default.log
 [default]
     security.limit_extensions = .php .php3 .php4 .php5 .php7
-    listen = /tmp/${php80_filename}-default.sock
+    listen = /tmp/${php73_filename}-default.sock
     listen.owner = www
     listen.group = www
     listen.mode = 0660
@@ -399,59 +428,64 @@ EOF
     pm.min_spare_servers = 1
     pm.max_spare_servers = 3
 EOF
-    mkdir -p ${php80_location}/var/run
-    mkdir -p ${php80_location}/var/log
+    mkdir -p ${php73_location}/var/run
+    mkdir -p ${php73_location}/var/log
 
-    _start_php80
+    _start_php73
     _warn "Please add the following two lines to your httpd.conf"
     echo AddType application/x-httpd-php .php .phtml
     echo AddType application/x-httpd-php-source .phps
 }
 
-install_php80(){
+install_php73(){
     if [ $# -lt 1 ]; then
         echo "[Parameter Error]: php_location"
         exit 1
     fi
-    php80_location=${1}
+    php73_location=${1}
 
     _install_php_depend
 
-    CheckError "rm -fr ${php80_location}"
+    CheckError "rm -fr ${php73_location}"
     cd /tmp
-    _info "Downloading and Extracting ${php80_filename} files..."
-    DownloadFile  "${php80_filename}.tar.gz" "${php80_download_url}"
-    rm -fr ${php80_filename}
-    tar zxf ${php80_filename}.tar.gz
-    cd ${php80_filename}
-    _info "Install ${php80_filename} ..."
+    _info "Downloading and Extracting ${php73_filename} files..."
+    DownloadFile  "${php73_filename}.tar.gz" "${php73_download_url}"
+    rm -fr ${php73_filename}
+    tar zxf ${php73_filename}.tar.gz
+    cd ${php73_filename}
+    _info "Install ${php73_filename} ..."
     Is64bit && with_libdir="--with-libdir=lib64" || with_libdir=""
-    php_configure_args="--prefix=${php80_location} \
-    --with-config-file-path=${php80_location}/etc \
-    --with-config-file-scan-dir=${php80_location}/php.d \
-    --with-external-pcre=${pcre2_location} \
+    php_configure_args="--prefix=${php73_location} \
+    --with-config-file-path=${php73_location}/etc \
+    --with-config-file-scan-dir=${php73_location}/php.d \
+    --with-libxml-dir=${libxml2_location} \
+    --with-pcre-dir=${pcre_location} \
     --with-openssl=${openssl102_location} \
     ${with_libdir} \
     --with-mysqli=mysqlnd \
     --with-mysql-sock=/tmp/mysql.sock \
     --with-pdo-mysql=mysqlnd \
-    --with-webp \
-    --with-jpeg \
-    --with-xpm \
-    --with-freetype \
+    --with-gd \
+    --with-webp-dir \
+    --with-jpeg-dir \
+    --with-png-dir \
+    --with-xpm-dir \
+    --with-freetype-dir \
     --with-zlib \
     --with-bz2 \
     --with-curl=${curl102_location} \
     --with-gettext \
     --with-gmp \
     --with-mhash \
-    --with-pdo-odbc=unixODBC \
+    --with-icu-dir=${icu4c_location} \
+    --with-onig \
+    --with-unixODBC \
     --with-pspell=/usr \
     --with-enchant=/usr \
     --with-readline \
     --with-tidy=/usr \
+    --with-xmlrpc \
     --with-xsl \
-    --with-zip \
     --with-fpm-user=www \
     --with-fpm-group=www \
     --with-iconv=${libiconv_location} \
@@ -464,13 +498,15 @@ install_php80(){
     --enable-dba \
     --enable-exif \
     --enable-ftp \
-    --enable-gd \
+    --enable-gd-jis-conv \
     --enable-intl \
     --enable-mbstring \
     --enable-pcntl \
     --enable-shmop \
     --enable-soap \
     --enable-sockets \
+    --enable-wddx \
+    --enable-zip \
     ${disable_fileinfo}"
     unset LD_LIBRARY_PATH
     unset CPPFLAGS
@@ -478,8 +514,22 @@ install_php80(){
     CheckError "./configure ${php_configure_args}"
     CheckError "parallel_make ZEND_EXTRA_LIBS='-liconv'"
     CheckError "make install"
-    _info "Config ${php80_filename}..."
+    _info "Config ${php73_filename}..."
     _config_php
-    _success "${php80_filename} install completed..."
-    rm -fr /tmp/${php80_filename}
+    _success "${php73_filename} install completed..."
+    rm -fr /tmp/${php73_filename}
 }
+
+main() {
+    include config
+    include public
+    load_config
+    IsRoot
+    InstallPreSetting
+    install_php73 ${1}
+}
+echo "The installation log will be written to /tmp/install.log"
+echo "Use tail -f /tmp/install.log to view dynamically"
+rm -fr ${cur_dir}/tmps
+main "$@" > /tmp/install.log 2>&1
+rm -fr ${cur_dir}/tmps

@@ -1,3 +1,21 @@
+#!/usr/bin/env bash
+export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+cur_dir=$(pwd)
+
+include(){
+    local include=${1}
+    if [[ -s ${cur_dir}/tmps/include/${include}.sh ]];then
+        . ${cur_dir}/tmps/include/${include}.sh
+    else
+        wget --no-check-certificate -cv -t3 -T60 -P tmps/include http://d.hws.com/linux/master/script/include/${include}.sh >/dev/null 2>&1
+        if [ "$?" -ne 0 ]; then
+            echo "Error: ${cur_dir}/tmps/include/${include}.sh not found, shell can not be executed."
+            exit 1
+        fi
+        . ${cur_dir}/tmps/include/${include}.sh
+    fi
+}
+
 _install_php_depend(){
     _info "Starting to install dependencies packages for PHP..."
     if [ "${PM}" = "yum" ];then
@@ -101,7 +119,7 @@ _install_php_depend(){
     fi
     id -u www >/dev/null 2>&1
     [ $? -ne 0 ] && useradd -M -U www -r -d /dev/null -s /sbin/nologin
-    mkdir -p ${php54_location}
+    mkdir -p ${php70_location}
 }
 
 _install_openssl102(){
@@ -342,49 +360,62 @@ _install_freetype() {
     rm -fr /tmp/${freetype_filename}
 }
 
-_start_php54() {
-    CheckError "${php54_location}/sbin/php-fpm --daemonize \
-        --fpm-config ${php54_location}/etc/default.conf \
-        --pid ${php54_location}/var/run/default.pid"
-    DownloadUrl "/etc/init.d/php54" "${download_sysv_url}/php-fpm"
-    sed -i "s|^prefix={php-fpm_location}$|prefix=${php54_location}|g" /etc/init.d/php54
-    CheckError "chmod +x /etc/init.d/php54"
-    chkconfig --add php54 > /dev/null 2>&1
-    update-rc.d -f php54 defaults > /dev/null 2>&1
-    CheckError "/etc/init.d/php54 restart"
+_start_php70() {
+    CheckError "${php70_location}/sbin/php-fpm --daemonize \
+        --fpm-config ${php70_location}/etc/default.conf \
+        --pid ${php70_location}/var/run/default.pid"
+    DownloadUrl "/etc/init.d/php70" "${download_sysv_url}/php-fpm"
+    sed -i "s|^prefix={php-fpm_location}$|prefix=${php70_location}|g" /etc/init.d/php70
+    CheckError "chmod +x /etc/init.d/php70"
+    chkconfig --add php70 > /dev/null 2>&1
+    update-rc.d -f php70 defaults > /dev/null 2>&1
+    CheckError "/etc/init.d/php70 restart"
 }
 
 _config_php(){
     # php.ini
-    mkdir -p ${php54_location}/{etc,php.d}
-    cp -f php.ini-production ${php54_location}/etc/php.ini
+    mkdir -p ${php70_location}/{etc,php.d}
+    cp -f php.ini-production ${php70_location}/etc/php.ini
 
-    sed -i 's/;default_charset =.*/default_charset = "UTF-8"/g' ${php54_location}/etc/php.ini
-    sed -i 's/;always_populate_raw_post_data =.*/always_populate_raw_post_data = -1/g' ${php54_location}/etc/php.ini
-    sed -i 's/post_max_size =.*/post_max_size = 100M/g' ${php54_location}/etc/php.ini
-    sed -i 's/upload_max_filesize =.*/upload_max_filesize = 100M/g' ${php54_location}/etc/php.ini
-    sed -i 's/;date.timezone =.*/date.timezone = PRC/g' ${php54_location}/etc/php.ini
-    sed -i 's/short_open_tag =.*/short_open_tag = On/g' ${php54_location}/etc/php.ini
-    sed -i 's/expose_php =.*/expose_php = Off/g' ${php54_location}/etc/php.ini
-    sed -i 's/;cgi.fix_pathinfo=.*/cgi.fix_pathinfo=1/g' ${php54_location}/etc/php.ini
-    sed -i 's/max_execution_time =.*/max_execution_time = 300/g' ${php54_location}/etc/php.ini
+    sed -i 's/default_charset =.*/default_charset = "UTF-8"/g' ${php70_location}/etc/php.ini
+    sed -i 's/;always_populate_raw_post_data =.*/always_populate_raw_post_data = -1/g' ${php70_location}/etc/php.ini
+    sed -i 's/post_max_size =.*/post_max_size = 100M/g' ${php70_location}/etc/php.ini
+    sed -i 's/upload_max_filesize =.*/upload_max_filesize = 100M/g' ${php70_location}/etc/php.ini
+    sed -i 's/;date.timezone =.*/date.timezone = PRC/g' ${php70_location}/etc/php.ini
+    sed -i 's/short_open_tag =.*/short_open_tag = On/g' ${php70_location}/etc/php.ini
+    sed -i 's/expose_php =.*/expose_php = Off/g' ${php70_location}/etc/php.ini
+    sed -i 's/;cgi.fix_pathinfo=.*/cgi.fix_pathinfo=1/g' ${php70_location}/etc/php.ini
+    sed -i 's/max_execution_time =.*/max_execution_time = 300/g' ${php70_location}/etc/php.ini
     if [ -f /etc/pki/tls/certs/ca-bundle.crt ]; then
-        sed -i 's#;curl.cainfo =.*#curl.cainfo = /etc/pki/tls/certs/ca-bundle.crt#g' ${php54_location}/etc/php.ini
-        sed -i 's#;openssl.cafile=.*#openssl.cafile=/etc/pki/tls/certs/ca-bundle.crt#g' ${php54_location}/etc/php.ini
+        sed -i 's#;curl.cainfo =.*#curl.cainfo = /etc/pki/tls/certs/ca-bundle.crt#g' ${php70_location}/etc/php.ini
+        sed -i 's#;openssl.cafile=.*#openssl.cafile=/etc/pki/tls/certs/ca-bundle.crt#g' ${php70_location}/etc/php.ini
     elif [ -f /etc/ssl/certs/ca-certificates.crt ]; then
-        sed -i 's#;curl.cainfo =.*#curl.cainfo = /etc/ssl/certs/ca-certificates.crt#g' ${php54_location}/etc/php.ini
-        sed -i 's#;openssl.cafile=.*#openssl.cafile=/etc/ssl/certs/ca-certificates.crt#g' ${php54_location}/etc/php.ini
+        sed -i 's#;curl.cainfo =.*#curl.cainfo = /etc/ssl/certs/ca-certificates.crt#g' ${php70_location}/etc/php.ini
+        sed -i 's#;openssl.cafile=.*#openssl.cafile=/etc/ssl/certs/ca-certificates.crt#g' ${php70_location}/etc/php.ini
     fi
-    sed -i 's/disable_functions =.*/disable_functions = passthru,exec,system,chroot,chgrp,chown,shell_exec,popen,proc_open,pcntl_exec,ini_alter,ini_restore,dl,openlog,syslog,popepassthru,pcntl_alarm,pcntl_fork,pcntl_waitpid,pcntl_wait,pcntl_wifexited,pcntl_wifstopped,pcntl_wifsignaled,pcntl_wifcontinued,pcntl_wexitstatus,pcntl_wtermsig,pcntl_wstopsig,pcntl_signal,pcntl_signal_dispatch,pcntl_get_last_error,pcntl_strerror,pcntl_sigprocmask,pcntl_sigwaitinfo,pcntl_sigtimedwait,pcntl_exec,pcntl_getpriority,pcntl_setpriority,imap_open,apache_setenv/g' ${php54_location}/etc/php.ini
+    sed -i 's/disable_functions =.*/disable_functions = passthru,exec,system,chroot,chgrp,chown,shell_exec,popen,proc_open,pcntl_exec,ini_alter,ini_restore,dl,openlog,syslog,popepassthru,pcntl_alarm,pcntl_fork,pcntl_waitpid,pcntl_wait,pcntl_wifexited,pcntl_wifstopped,pcntl_wifsignaled,pcntl_wifcontinued,pcntl_wexitstatus,pcntl_wtermsig,pcntl_wstopsig,pcntl_signal,pcntl_signal_dispatch,pcntl_get_last_error,pcntl_strerror,pcntl_sigprocmask,pcntl_sigwaitinfo,pcntl_sigtimedwait,pcntl_exec,pcntl_getpriority,pcntl_setpriority,imap_open,apache_setenv/g' ${php70_location}/etc/php.ini
+
+    extension_dir=$(${php70_location}/bin/php-config --extension-dir)
+    cat > ${php70_location}/php.d/opcache.ini<<EOF
+[opcache]
+zend_extension=${extension_dir}/opcache.so
+opcache.enable_cli=1
+opcache.memory_consumption=128
+opcache.interned_strings_buffer=8
+opcache.max_accelerated_files=4000
+opcache.revalidate_freq=60
+opcache.fast_shutdown=1
+opcache.save_comments=1
+EOF
 
     # php-fpm
-    cat > ${php54_location}/etc/default.conf<<EOF
+    cat > ${php70_location}/etc/default.conf<<EOF
 [global]
-    pid = ${php54_location}/var/run/default.pid
-    error_log = ${php54_location}/var/log/default.log
+    pid = ${php70_location}/var/run/default.pid
+    error_log = ${php70_location}/var/log/default.log
 [default]
     security.limit_extensions = .php .php3 .php4 .php5 .php7
-    listen = /tmp/${php54_filename}-default.sock
+    listen = /tmp/${php70_filename}-default.sock
     listen.owner = www
     listen.group = www
     listen.mode = 0660
@@ -397,45 +428,45 @@ _config_php(){
     pm.min_spare_servers = 1
     pm.max_spare_servers = 3
 EOF
-    mkdir -p ${php54_location}/var/run
-    mkdir -p ${php54_location}/var/log
+    mkdir -p ${php70_location}/var/run
+    mkdir -p ${php70_location}/var/log
 
-    _start_php54
+    _start_php70
     _warn "Please add the following two lines to your httpd.conf"
     echo AddType application/x-httpd-php .php .phtml
     echo AddType application/x-httpd-php-source .phps
 }
 
-install_php54(){
+install_php70(){
     if [ $# -lt 1 ]; then
         echo "[Parameter Error]: php_location"
         exit 1
     fi
-    php54_location=${1}
+    php70_location=${1}
 
     _install_php_depend
 
-    CheckError "rm -fr ${php54_location}"
+    CheckError "rm -fr ${php70_location}"
     cd /tmp
-    _info "Downloading and Extracting ${php54_filename} files..."
-    DownloadFile  "${php54_filename}.tar.gz" "${php54_download_url}"
-    rm -fr ${php54_filename}
-    tar zxf ${php54_filename}.tar.gz
-    cd ${php54_filename}
-    _info "Install ${php54_filename} ..."
+    _info "Downloading and Extracting ${php70_filename} files..."
+    DownloadFile  "${php70_filename}.tar.gz" "${php70_download_url}"
+    rm -fr ${php70_filename}
+    tar zxf ${php70_filename}.tar.gz
+    cd ${php70_filename}
+    _info "Install ${php70_filename} ..."
     Is64bit && with_libdir="--with-libdir=lib64" || with_libdir=""
-    php_configure_args="--prefix=${php54_location} \
-    --with-config-file-path=${php54_location}/etc \
-    --with-config-file-scan-dir=${php54_location}/php.d \
+    php_configure_args="--prefix=${php70_location} \
+    --with-config-file-path=${php70_location}/etc \
+    --with-config-file-scan-dir=${php70_location}/php.d \
     --with-libxml-dir=${libxml2_location} \
     --with-pcre-dir=${pcre_location} \
     --with-openssl=${openssl102_location} \
     ${with_libdir} \
-    --with-mysql=mysqlnd \
     --with-mysqli=mysqlnd \
     --with-mysql-sock=/tmp/mysql.sock \
     --with-pdo-mysql=mysqlnd \
     --with-gd \
+    --with-webp-dir \
     --with-jpeg-dir \
     --with-png-dir \
     --with-xpm-dir \
@@ -486,8 +517,22 @@ install_php54(){
     CheckError "./configure ${php_configure_args}"
     CheckError "parallel_make ZEND_EXTRA_LIBS='-liconv'"
     CheckError "make install"
-    _info "Config ${php54_filename}..."
+    _info "Config ${php70_filename}..."
     _config_php
-    _success "${php54_filename} install completed..."
-    rm -fr /tmp/${php54_filename}
+    _success "${php70_filename} install completed..."
+    rm -fr /tmp/${php70_filename}
 }
+
+main() {
+    include config
+    include public
+    load_config
+    IsRoot
+    InstallPreSetting
+    install_php70 ${1}
+}
+echo "The installation log will be written to /tmp/install.log"
+echo "Use tail -f /tmp/install.log to view dynamically"
+rm -fr ${cur_dir}/tmps
+main "$@" > /tmp/install.log 2>&1
+rm -fr ${cur_dir}/tmps
