@@ -152,8 +152,8 @@ apr_util_filename="apr-util-1.6.1"
 apr_util_download_url="http://ftp.jaist.ac.jp/pub/apache/apr/apr-util-1.6.1.tar.gz"
 
 # phpmyadmin
-phpmyadmin_filename="phpMyAdmin-4.6.6-all-languages"
-phpmyadmin_download_url="https://files.phpmyadmin.net/phpMyAdmin/4.6.6/phpMyAdmin-4.6.6-all-languages.tar.gz"
+phpmyadmin_filename="phpMyAdmin-4.4.15.10-all-languages"
+phpmyadmin_download_url="https://files.phpmyadmin.net/phpMyAdmin/4.4.15.10/phpMyAdmin-4.4.15.10-all-languages.tar.gz"
 phpmyadmin_conf_download_url="http://d.hws.com/linux/master/conf/phpMyAdmin.conf.tar.gz"
 
 # depends
