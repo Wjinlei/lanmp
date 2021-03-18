@@ -362,13 +362,13 @@ _install_freetype() {
 }
 
 _start_php52() {
-    CheckError "${php52_location}/sbin/php-fpm start"
+    #CheckError "${php52_location}/sbin/php-fpm start"
     DownloadUrl "/etc/init.d/php52" "${download_sysv_url}/php52"
     sed -i "s|^prefix={php52_location}$|prefix=${php52_location}|g" /etc/init.d/php52
     CheckError "chmod +x /etc/init.d/php52"
-    chkconfig --add php52 > /dev/null 2>&1
     update-rc.d -f php52 defaults > /dev/null 2>&1
-    CheckError "/etc/init.d/php52 restart"
+    chkconfig --add php52 > /dev/null 2>&1
+    /etc/init.d/php52 start
 }
 
 _config_php(){

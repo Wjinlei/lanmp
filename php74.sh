@@ -350,15 +350,15 @@ _install_freetype() {
 }
 
 _start_php74() {
-    CheckError "${php74_location}/sbin/php-fpm --daemonize \
-        --fpm-config ${php74_location}/etc/default.conf \
-        --pid ${php74_location}/var/run/default.pid"
+    #CheckError "${php74_location}/sbin/php-fpm --daemonize \
+        #--fpm-config ${php74_location}/etc/default.conf \
+        #--pid ${php74_location}/var/run/default.pid"
     DownloadUrl "/etc/init.d/php74" "${download_sysv_url}/php-fpm"
     sed -i "s|^prefix={php-fpm_location}$|prefix=${php74_location}|g" /etc/init.d/php74
     CheckError "chmod +x /etc/init.d/php74"
-    chkconfig --add php74 > /dev/null 2>&1
     update-rc.d -f php74 defaults > /dev/null 2>&1
-    CheckError "/etc/init.d/php74 restart"
+    chkconfig --add php74 > /dev/null 2>&1
+    /etc/init.d/php74 start
 }
 
 _config_php(){

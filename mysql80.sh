@@ -55,19 +55,12 @@ _install_mysql_depend(){
 }
 
 _config_mysql(){
-    ${mysql_location}/bin/mysqld_safe --defaults-file=${mysql_location}/my.cnf &
-    wait_for_pid created ${mysql_location}/mysql_data/mysql.pid
-    if [ -n "$try" ] ; then
-        echo "wait_for_pid failed"
-        exit 1
-    else
-        DownloadUrl "/etc/init.d/mysqld" "${download_sysv_url}/mysqld"
-        sed -i "s|^prefix={mysql_location}$|prefix=${mysql_location}|g" /etc/init.d/mysqld
-        CheckError "chmod +x /etc/init.d/mysqld"
-        chkconfig --add mysqld > /dev/null 2>&1
-        update-rc.d -f mysqld defaults > /dev/null 2>&1
-        CheckError "/etc/init.d/mysqld restart"
-    fi
+    DownloadUrl "/etc/init.d/mysqld" "${download_sysv_url}/mysqld"
+    sed -i "s|^prefix={mysql_location}$|prefix=${mysql_location}|g" /etc/init.d/mysqld
+    CheckError "chmod +x /etc/init.d/mysqld"
+    update-rc.d -f mysqld defaults > /dev/null 2>&1
+    chkconfig --add mysqld > /dev/null 2>&1
+    /etc/init.d/mysqld start
     ${mysql_location}/bin/mysql -uroot -S /tmp/mysql.sock \
         -e "CREATE USER root@'127.0.0.1' IDENTIFIED WITH mysql_native_password BY \"${mysql_pass}\";"
     ${mysql_location}/bin/mysql -uroot -S /tmp/mysql.sock \
@@ -78,7 +71,7 @@ _config_mysql(){
         -e "GRANT ALL PRIVILEGES ON *.* to root@'localhost' WITH GRANT OPTION;" >/dev/null 2>&1
     ${mysql_location}/bin/mysql -uroot -p${mysql_pass} -S /tmp/mysql.sock \
         -e "FLUSH PRIVILEGES;" >/dev/null 2>&1
-    CheckError "/etc/init.d/mysqld restart"
+    /etc/init.d/mysqld restart
 }
 
 

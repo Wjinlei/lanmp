@@ -361,15 +361,15 @@ _install_freetype() {
 }
 
 _start_php56() {
-    CheckError "${php56_location}/sbin/php-fpm --daemonize \
-        --fpm-config ${php56_location}/etc/default.conf \
-        --pid ${php56_location}/var/run/default.pid"
+    #CheckError "${php56_location}/sbin/php-fpm --daemonize \
+        #--fpm-config ${php56_location}/etc/default.conf \
+        #--pid ${php56_location}/var/run/default.pid"
     DownloadUrl "/etc/init.d/php56" "${download_sysv_url}/php-fpm"
     sed -i "s|^prefix={php-fpm_location}$|prefix=${php56_location}|g" /etc/init.d/php56
     CheckError "chmod +x /etc/init.d/php56"
-    chkconfig --add php56 > /dev/null 2>&1
     update-rc.d -f php56 defaults > /dev/null 2>&1
-    CheckError "/etc/init.d/php56 restart"
+    chkconfig --add php56 > /dev/null 2>&1
+    /etc/init.d/php56 start
 }
 
 _config_php(){

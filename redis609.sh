@@ -17,19 +17,12 @@ include(){
 }
 
 _start_redis() {
-    CheckError "${redis_location}/bin/redis-server ${redis_location}/etc/redis.conf"
-    wait_for_pid created ${redis_location}/var/run/redis.pid
-    if [ -n "$try" ] ; then
-        echo "wait_for_pid failed"
-        exit 1
-    else
-        DownloadUrl "/etc/init.d/redis" "${download_sysv_url}/redis"
-        sed -i "s|^prefix={redis_location}$|prefix=${redis_location}|g" /etc/init.d/redis
-        CheckError "chmod +x /etc/init.d/redis"
-        chkconfig --add redis > /dev/null 2>&1
-        update-rc.d -f redis defaults > /dev/null 2>&1
-        CheckError "/etc/init.d/redis restart"
-    fi
+    DownloadUrl "/etc/init.d/redis" "${download_sysv_url}/redis"
+    sed -i "s|^prefix={redis_location}$|prefix=${redis_location}|g" /etc/init.d/redis
+    CheckError "chmod +x /etc/init.d/redis"
+    update-rc.d -f redis defaults > /dev/null 2>&1
+    chkconfig --add redis > /dev/null 2>&1
+    /etc/init.d/redis start
 }
 
 install_redis609(){

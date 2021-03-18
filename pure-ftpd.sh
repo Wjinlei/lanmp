@@ -38,19 +38,12 @@ _install_pureftpd_depends(){
 }
 
 _start_pureftpd() {
-    CheckError "${pureftpd_location}/sbin/pure-ftpd ${pureftpd_location}/etc/pure-ftpd.conf"
-    wait_for_pid created ${pureftpd_location}/var/run/pure-ftpd.pid
-    if [ -n "$try" ] ; then
-        echo "wait_for_pid failed"
-        exit 1
-    else
-        DownloadUrl "/etc/init.d/pure-ftpd" "${download_sysv_url}/pure-ftpd"
-        sed -i "s|^prefix={pureftpd_location}$|prefix=${pureftpd_location}|g" /etc/init.d/pure-ftpd
-        CheckError "chmod +x /etc/init.d/pure-ftpd"
-        chkconfig --add pure-ftpd > /dev/null 2>&1
-        update-rc.d -f pure-ftpd defaults > /dev/null 2>&1
-        CheckError "/etc/init.d/pure-ftpd restart"
-    fi
+    DownloadUrl "/etc/init.d/pure-ftpd" "${download_sysv_url}/pure-ftpd"
+    sed -i "s|^prefix={pureftpd_location}$|prefix=${pureftpd_location}|g" /etc/init.d/pure-ftpd
+    CheckError "chmod +x /etc/init.d/pure-ftpd"
+    update-rc.d -f pure-ftpd defaults > /dev/null 2>&1
+    chkconfig --add pure-ftpd > /dev/null 2>&1
+    /etc/init.d/pure-ftpd start
 }
 
 install_pure-ftpd(){

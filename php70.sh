@@ -361,15 +361,15 @@ _install_freetype() {
 }
 
 _start_php70() {
-    CheckError "${php70_location}/sbin/php-fpm --daemonize \
-        --fpm-config ${php70_location}/etc/default.conf \
-        --pid ${php70_location}/var/run/default.pid"
+    #CheckError "${php70_location}/sbin/php-fpm --daemonize \
+        #--fpm-config ${php70_location}/etc/default.conf \
+        #--pid ${php70_location}/var/run/default.pid"
     DownloadUrl "/etc/init.d/php70" "${download_sysv_url}/php-fpm"
     sed -i "s|^prefix={php-fpm_location}$|prefix=${php70_location}|g" /etc/init.d/php70
     CheckError "chmod +x /etc/init.d/php70"
-    chkconfig --add php70 > /dev/null 2>&1
     update-rc.d -f php70 defaults > /dev/null 2>&1
-    CheckError "/etc/init.d/php70 restart"
+    chkconfig --add php70 > /dev/null 2>&1
+    /etc/init.d/php70 start
 }
 
 _config_php(){

@@ -191,20 +191,13 @@ _install_nghttp2(){
 }
 
 _start_apache() {
-    CheckError "${apache_location}/bin/apachectl -k start"
-    wait_for_pid created ${apache_location}/logs/httpd.pid
-    if [ -n "$try" ] ; then
-        echo "wait_for_pid failed"
-        exit 1
-    else
-        DownloadUrl "/etc/init.d/httpd" "${download_sysv_url}/httpd"
-        sed -i "s|^prefix={apache_location}$|prefix=${apache_location}|g" /etc/init.d/httpd
-        sed -i "s|{openssl102_location_lib}|${openssl102_location}/lib|g" /etc/init.d/httpd
-        CheckError "chmod +x /etc/init.d/httpd"
-        chkconfig --add httpd > /dev/null 2>&1
-        update-rc.d -f httpd defaults > /dev/null 2>&1
-        CheckError "/etc/init.d/httpd restart"
-    fi
+    DownloadUrl "/etc/init.d/httpd" "${download_sysv_url}/httpd"
+    sed -i "s|^prefix={apache_location}$|prefix=${apache_location}|g" /etc/init.d/httpd
+    sed -i "s|{openssl102_location_lib}|${openssl102_location}/lib|g" /etc/init.d/httpd
+    CheckError "chmod +x /etc/init.d/httpd"
+    update-rc.d -f httpd defaults > /dev/null 2>&1
+    chkconfig --add httpd > /dev/null 2>&1
+    /etc/init.d/httpd start
 }
 
 install_apache2441(){

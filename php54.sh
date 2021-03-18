@@ -361,15 +361,15 @@ _install_freetype() {
 }
 
 _start_php54() {
-    CheckError "${php54_location}/sbin/php-fpm --daemonize \
-        --fpm-config ${php54_location}/etc/default.conf \
-        --pid ${php54_location}/var/run/default.pid"
+    #CheckError "${php54_location}/sbin/php-fpm --daemonize \
+        #--fpm-config ${php54_location}/etc/default.conf \
+        #--pid ${php54_location}/var/run/default.pid"
     DownloadUrl "/etc/init.d/php54" "${download_sysv_url}/php-fpm"
     sed -i "s|^prefix={php-fpm_location}$|prefix=${php54_location}|g" /etc/init.d/php54
     CheckError "chmod +x /etc/init.d/php54"
-    chkconfig --add php54 > /dev/null 2>&1
     update-rc.d -f php54 defaults > /dev/null 2>&1
-    CheckError "/etc/init.d/php54 restart"
+    chkconfig --add php54 > /dev/null 2>&1
+    /etc/init.d/php54 start
 }
 
 _config_php(){

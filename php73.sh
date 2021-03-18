@@ -361,15 +361,15 @@ _install_freetype() {
 }
 
 _start_php73() {
-    CheckError "${php73_location}/sbin/php-fpm --daemonize \
-        --fpm-config ${php73_location}/etc/default.conf \
-        --pid ${php73_location}/var/run/default.pid"
+    #CheckError "${php73_location}/sbin/php-fpm --daemonize \
+        #--fpm-config ${php73_location}/etc/default.conf \
+        #--pid ${php73_location}/var/run/default.pid"
     DownloadUrl "/etc/init.d/php73" "${download_sysv_url}/php-fpm"
     sed -i "s|^prefix={php-fpm_location}$|prefix=${php73_location}|g" /etc/init.d/php73
     CheckError "chmod +x /etc/init.d/php73"
-    chkconfig --add php73 > /dev/null 2>&1
     update-rc.d -f php73 defaults > /dev/null 2>&1
-    CheckError "/etc/init.d/php73 restart"
+    chkconfig --add php73 > /dev/null 2>&1
+    /etc/init.d/php73 start
 }
 
 _config_php(){

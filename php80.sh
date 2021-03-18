@@ -350,15 +350,15 @@ _install_freetype() {
 }
 
 _start_php80() {
-    CheckError "${php80_location}/sbin/php-fpm --daemonize \
-        --fpm-config ${php80_location}/etc/default.conf \
-        --pid ${php80_location}/var/run/default.pid"
+    #CheckError "${php80_location}/sbin/php-fpm --daemonize \
+        #--fpm-config ${php80_location}/etc/default.conf \
+        #--pid ${php80_location}/var/run/default.pid"
     DownloadUrl "/etc/init.d/php80" "${download_sysv_url}/php-fpm"
     sed -i "s|^prefix={php-fpm_location}$|prefix=${php80_location}|g" /etc/init.d/php80
     CheckError "chmod +x /etc/init.d/php80"
-    chkconfig --add php80 > /dev/null 2>&1
     update-rc.d -f php80 defaults > /dev/null 2>&1
-    CheckError "/etc/init.d/php80 restart"
+    chkconfig --add php80 > /dev/null 2>&1
+    /etc/init.d/php80 start
 }
 
 _config_php(){
