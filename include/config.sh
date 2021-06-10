@@ -4,8 +4,8 @@ load_config(){
 var=/var/hwsmaster
 
 # download Url
-download_root_url="http://d.hws.com/linux/master/soft/"
-download_sysv_url="http://d.hws.com/linux/master/script/init.d/"
+download_root_url="http://d.hws.com/linux/master/soft"
+download_sysv_url="http://d.hws.com/linux/master/script/init.d"
 
 # parallel compile option,1:enable,0:disable
 parallel_compile=1
@@ -117,7 +117,7 @@ libiconv_location=/usr/local/libiconv
 libiconv_filename="libiconv-1.16"
 libiconv_download_url="https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.16.tar.gz"
 libiconv_patch_filename="libiconv-1.16.glibc"
-libiconv_patch_download_url="${download_root_url}libiconv-1.16.glibc.tar.gz"
+libiconv_patch_download_url="${download_root_url}/libiconv-1.16.glibc.tar.gz"
 
 # re2c
 re2c_filename="re2c-1.3"

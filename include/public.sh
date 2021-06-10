@@ -35,7 +35,7 @@ DownloadFile(){
         _info "$1 [found]"
     else
         _info "$1 not found, download now..."
-        wget --no-check-certificate -cv -t3 -T60 -O ${1} ${download_root_url}${1}
+        wget --no-check-certificate -cv -t3 -T60 -O ${1} ${download_root_url}/${1}
         if [ $? -eq 0 ]; then
             _success "$1 download completed..."
         else
