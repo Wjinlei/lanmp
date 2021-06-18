@@ -148,5 +148,5 @@ case "$1" in
         reload
         ;;
     *)
-        echo $"Usage: $0 {start|stop|restart|status|reload}"
+        echo "Usage: $0 {start|stop|restart|status|reload}"
 esac

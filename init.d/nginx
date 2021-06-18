@@ -129,5 +129,5 @@ case "$1" in
         configtest
         ;;
     *)
-        echo $"Usage: $0 {start|stop|restart|reload|status|test}"
+        echo "Usage: $0 {start|stop|restart|reload|status|test}"
 esac

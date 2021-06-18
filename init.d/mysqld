@@ -191,5 +191,5 @@ case "$1" in
         set-root-password $2
         ;;
     *)
-        echo $"Usage: $0 {start|skip-grant-tables-start|stop|restart|reload|status|set-root-password}"
+        echo "Usage: $0 {start|skip-grant-tables-start|stop|restart|reload|status|set-root-password}"
 esac

@@ -174,5 +174,5 @@ case "$1" in
         force-stop
         ;;
     *)
-        echo $"Usage: $0 {start|stop|restart|reload|status|force-stop}"
+        echo "Usage: $0 {start|stop|restart|reload|status|force-stop}"
 esac
