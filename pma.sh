@@ -23,12 +23,12 @@ install_pma(){
     fi
     pma_location=${1}
     cd /tmp
-    CheckError "rm -fr phpMyAdmin-4.4.15.10-all-languages"
+    CheckError "rm -fr ${phpmyadmin_filename}"
     CheckError "rm -fr ${pma_location}"
     _info "${phpmyadmin_filename} install start..."
-    DownloadFile "phpMyAdmin-4.4.15.10-all-languages.tar.gz" "${phpmyadmin_download_url}"
-    CheckError "tar zxf phpMyAdmin-4.4.15.10-all-languages.tar.gz"
-    CheckError "mv phpMyAdmin-4.4.15.10-all-languages ${pma_location}"
+    DownloadFile "${phpmyadmin_filename}.tar.gz" "${phpmyadmin_download_url}"
+    CheckError "tar zxf ${phpmyadmin_filename}.tar.gz"
+    CheckError "mv ${phpmyadmin_filename} ${pma_location}"
     CheckError "mkdir -p ${pma_location}/upload"
     CheckError "mkdir -p ${pma_location}/save"
     CheckError "rm -fr ${pma_location}/setup"
