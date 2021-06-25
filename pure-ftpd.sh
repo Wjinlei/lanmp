@@ -91,7 +91,7 @@ install_pure-ftpd(){
     _config_pureftpd
     mkdir -p /etc/ssl/private
     openssl rand -writerand ~/.rnd
-    openssl req -x509 -nodes -subj /C=CN/ST=Sichuan/L=Chengdu/O=HWS-LINUXMASTER/OU=HWS/CN=$(GetIp)/emailAddress=admin@hws.com -days 3560 -newkey rsa:2048 -keyout /etc/ssl/private/pure-ftpd.pem -out /etc/ssl/private/pure-ftpd.pem
+    openssl req -x509 -nodes -subj /C=CN/ST=Sichuan/L=Chengdu/O=HWS-LINUXMASTER/OU=HWS/CN=127.0.0.1/emailAddress=admin@hws.com -days 3560 -newkey rsa:2048 -keyout /etc/ssl/private/pure-ftpd.pem -out /etc/ssl/private/pure-ftpd.pem
     if [ -f '/etc/ssl/private/pure-ftpd.pem' ];then
         chmod 600 /etc/ssl/private/pure-ftpd.pem
     fi
