@@ -153,7 +153,10 @@ _install_openssl102(){
     AddToEnv "${openssl102_location}"
     CreateLib64Dir "${openssl102_location}"
     export PKG_CONFIG_PATH=${openssl102_location}/lib/pkgconfig:$PKG_CONFIG_PATH
-
+    if ! grep -qE "^${openssl102_location}/lib" /etc/ld.so.conf.d/*.conf; then
+        echo "${openssl102_location}/lib" > /etc/ld.so.conf.d/openssl102.conf
+    fi
+    ldconfig
     _success "${openssl102_filename} install completed..."
     rm -f /tmp/${openssl102_filename}.tar.gz
     rm -fr /tmp/${openssl102_filename}
@@ -172,6 +175,10 @@ _install_pcre2(){
     AddToEnv "${pcre2_location}"
     CreateLib64Dir "${pcre2_location}"
     export PKG_CONFIG_PATH=${pcre2_location}/lib/pkgconfig:$PKG_CONFIG_PATH
+    if ! grep -qE "^${pcre2_location}/lib" /etc/ld.so.conf.d/*.conf; then
+        echo "${pcre2_location}/lib" > /etc/ld.so.conf.d/pcre2.conf
+    fi
+    ldconfig
     _success "${pcre2_filename} install completed..."
     rm -f /tmp/${pcre2_filename}.tar.gz
     rm -fr /tmp/${pcre2_filename}
@@ -190,6 +197,10 @@ _install_icu4c() {
     AddToEnv "${icu4c_location}"
     CreateLib64Dir "${icu4c_location}"
     export PKG_CONFIG_PATH=${icu4c_location}/lib/pkgconfig:$PKG_CONFIG_PATH
+    if ! grep -qE "^${icu4c_location}/lib" /etc/ld.so.conf.d/*.conf; then
+        echo "${icu4c_location}/lib" > /etc/ld.so.conf.d/icu4c.conf
+    fi
+    ldconfig
     _success "${icu4c_filename} install completed..."
     rm -f /tmp/${icu4c_filename}.tgz
     rm -fr /tmp/${icu4c_dirname}
@@ -208,6 +219,10 @@ _install_libxml2() {
     AddToEnv "${libxml2_location}"
     CreateLib64Dir "${libxml2_location}"
     export PKG_CONFIG_PATH=${libxml2_location}/lib/pkgconfig:$PKG_CONFIG_PATH
+    if ! grep -qE "^${libxml2_location}/lib" /etc/ld.so.conf.d/*.conf; then
+        echo "${libxml2_location}/lib" > /etc/ld.so.conf.d/libxml2.conf
+    fi
+    ldconfig
     _success "${libxml2_filename} install completed..."
     rm -f /tmp/${libxml2_filename}.tar.gz
     rm -fr /tmp/${libxml2_filename}
