@@ -16,13 +16,162 @@ include(){
     fi
 }
 
-_start_redis() {
-    DownloadUrl "/etc/init.d/redis" "${download_sysv_url}/redis"
+_create_sysv_script(){
+    cat > /etc/init.d/redis << 'EOF'
+#!/bin/bash
+# chkconfig: 2345 55 25
+# description: redis service script
+
+### BEGIN INIT INFO
+# Provides:          redis
+# Required-Start:    $all
+# Required-Stop:     $all
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: redis
+# Description:       redis service script
+### END INIT INFO
+
+prefix={redis_location}
+
+NAME=redis-server
+BIN=$prefix/bin/$NAME
+PID_FILE=$prefix/var/run/redis.pid
+CONFIG_FILE=$prefix/etc/redis.conf
+
+wait_for_pid () {
+    try=0
+    while test $try -lt 35 ; do
+        case "$1" in
+            'created')
+            if [ -f "$2" ] ; then
+                try=''
+                break
+            fi
+            ;;
+            'removed')
+            if [ ! -f "$2" ] ; then
+                try=''
+                break
+            fi
+            ;;
+        esac
+        echo -n .
+        try=`expr $try + 1`
+        sleep 1
+    done
+}
+
+start()
+{
+    echo -n "Starting $NAME..."
+    if [ -f $PID_FILE ];then
+        mPID=`cat $PID_FILE`
+        isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
+        if [ "$isRunning" != '' ];then
+            echo "$NAME (pid $mPID) already running."
+            exit 1
+        fi
+    fi
+    $BIN $CONFIG_FILE
+    if [ "$?" != 0 ] ; then
+        echo " failed"
+        exit 1
+    fi
+    wait_for_pid created $PID_FILE
+    if [ -n "$try" ] ; then
+        echo " failed"
+        exit 1
+    else
+        echo " done"
+    fi
+}
+
+stop()
+{
+    echo -n "Stoping $NAME... "
+    if [ -f $PID_FILE ];then
+        mPID=`cat $PID_FILE`
+        isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
+        if [ "$isRunning" = '' ];then
+            echo "$NAME is not running."
+            exit 1
+        fi
+    else
+        echo "PID file found, $NAME is not running ?"
+        exit 1
+    fi
+    kill -TERM `cat $PID_FILE`
+    wait_for_pid removed $PID_FILE
+    if [ -n "$try" ] ; then
+        echo " failed"
+        exit 1
+    else
+        echo " done"
+    fi
+}
+
+restart(){
+    $0 stop
+    $0 start
+}
+
+status(){
+    if [ -f $PID_FILE ];then
+        mPID=`cat $PID_FILE`
+        isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
+        if [ "$isRunning" != '' ];then
+            echo "$NAME (pid $mPID) is running."
+            exit 0
+        else
+            echo "$NAME already stopped."
+            exit 1
+        fi
+    else
+        echo "$NAME already stopped."
+        exit 1
+    fi
+}
+
+reload() {
+    echo -n "Reload service $NAME... "
+    if [ -f $PID_FILE ];then
+        mPID=`cat $PID_FILE`
+        isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
+        if [ "$isRunning" != '' ];then
+            kill -USR2 `cat $PID_FILE`
+            echo " done"
+        else
+            echo "$NAME is not running, can't reload."
+            exit 1
+        fi
+    else
+        echo "$NAME is not running, can't reload."
+        exit 1
+    fi
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+        restart
+        ;;
+    status)
+        status
+        ;;
+    reload)
+        reload
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart|status|reload}"
+esac
+EOF
     sed -i "s|^prefix={redis_location}$|prefix=${redis_location}|g" /etc/init.d/redis
-    CheckError "chmod +x /etc/init.d/redis"
-    update-rc.d -f redis defaults > /dev/null 2>&1
-    chkconfig --add redis > /dev/null 2>&1
-    /etc/init.d/redis start
 }
 
 install_redis506(){
@@ -32,8 +181,9 @@ install_redis506(){
     fi
     redis_location=${1}
 
-    # 如果存在第二个参数
-    if [ $# -ge 2 ]; then
+    if [ $# -lt 2 ]; then
+        redis_port=6379
+    else
         redis_port=${2}
     fi
 
@@ -53,7 +203,13 @@ install_redis506(){
     if [ -f "src/redis-server" ]; then
         mkdir -p ${redis_location}/{bin,etc,var}
         mkdir -p ${redis_location}/var/{log,run}
-        cp src/{redis-benchmark,redis-check-aof,redis-check-rdb,redis-cli,redis-sentinel,redis-server} ${redis_location}/bin/
+        cp src/redis-benchmark ${redis_location}/bin
+        cp src/redis-check-aof ${redis_location}/bin
+        cp src/redis-check-rdb ${redis_location}/bin
+        cp src/redis-cli ${redis_location}/bin
+        cp src/redis-sentinel ${redis_location}/bin
+        cp src/redis-server ${redis_location}/bin
+        # Config
         _info "Config ${redis506_filename}"
         cp redis.conf ${redis_location}/etc/
         sed -i "s@pidfile.*@pidfile ${redis_location}/var/run/redis.pid@" ${redis_location}/etc/redis.conf
@@ -63,8 +219,13 @@ install_redis506(){
         sed -i "s@port 6379@port ${redis_port}@" ${redis_location}/etc/redis.conf
         sed -i "s@^# bind 127.0.0.1@bind 127.0.0.1@" ${redis_location}/etc/redis.conf
         [ -z "$(grep ^maxmemory ${redis_location}/etc/redis.conf)" ] && sed -i "s@maxmemory <bytes>@maxmemory <bytes>\nmaxmemory $(expr ${Mem} / 8)000000@" ${redis_location}/etc/redis.conf
-
-        _start_redis
+        # Start
+        _create_sysv_script
+        chmod +x /etc/init.d/redis
+        update-rc.d -f redis defaults > /dev/null 2>&1
+        chkconfig --add redis > /dev/null 2>&1
+        /etc/init.d/redis start
+        # Clean
         rm -fr ${redis506_filename}
         _success "redis-server install completed!"
     else
@@ -72,14 +233,54 @@ install_redis506(){
     fi
 }
 
+rpminstall_redis506(){
+    rpm_package_name="redis-5.0.6-1.el7.x86_64.rpm"
+    DownloadUrl ${rpm_package_name} ${download_root_url}/rpms/${rpm_package_name}
+    CheckError "rpm -ivh ${rpm_package_name}"
+}
+
+debinstall_redis506(){
+    deb_package_name="redis-5.0.6-linux-amd64.deb"
+    DownloadUrl ${deb_package_name} ${download_root_url}/debs/${deb_package_name}
+    CheckError "dpkg --force-depends -i ${deb_package_name}"
+}
+
 main() {
+    case "$1" in
+        -h|--help)
+            printf "Usage: $0 Options prefix [port]
+Options:
+-h, --help                      Print this help text and exit
+-sc, --sc-install               Source code make install
+-pm, --pm-install               Package manager install
+"
+            ;;
+        -sc|--sc-install)
     include config
     include public
     load_config
     IsRoot
     InstallPreSetting
-    install_redis506 ${1} ${2}
+            install_redis506 ${2} ${3}
+            ;;
+        -pm|--pm-install)
+    include config
+    include public
+    load_config
+    IsRoot
+    InstallPreSetting
+            if [ ${PM} == "yum" ]; then
+                rpminstall_redis506
+            else
+                debinstall_redis506
+            fi
+            ;;
+        *)
+            echo "Missing parameters,Please Usage: $0 -h, Show Help" && exit 1
+            ;;
+    esac
 }
+
 echo "The installation log will be written to /tmp/install.log"
 echo "Use tail -f /tmp/install.log to view dynamically"
 rm -fr ${cur_dir}/tmps
