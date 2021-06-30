@@ -176,7 +176,7 @@ EOF
 
 install_redis506(){
     if [ $# -lt 1 ]; then
-        echo "[Parameter Error]: redis_location [default_port]"
+        echo "[Parameter Error]: redis_location [port]"
         exit 1
     fi
     redis_location=${1}

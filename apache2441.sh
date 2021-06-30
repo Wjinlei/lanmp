@@ -598,7 +598,7 @@ debinstall_apache2441(){
 main() {
     case "$1" in
         -h|--help)
-            printf "Usage: $0 Options prefix [port]
+            printf "Usage: $0 Options prefix
 Options:
 -h, --help                      Print this help text and exit
 -sc, --sc-install               Source code make install

@@ -326,7 +326,7 @@ EOF
 
 install_pure-ftpd(){
     if [ $# -lt 1 ]; then
-        echo "[Parameter Error]: pureftpd_location [default_port]"
+        echo "[Parameter Error]: pureftpd_location [port]"
         exit 1
     fi
     pureftpd_location=${1}
