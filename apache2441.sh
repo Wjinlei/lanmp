@@ -190,107 +190,7 @@ _install_nghttp2(){
     rm -fr /tmp/${nghttp2_filename}
 }
 
-_start_apache() {
-    DownloadUrl "/etc/init.d/httpd" "${download_sysv_url}/httpd"
-    sed -i "s|^prefix={apache_location}$|prefix=${apache_location}|g" /etc/init.d/httpd
-    sed -i "s|{openssl102_location_lib}|${openssl102_location}/lib|g" /etc/init.d/httpd
-    CheckError "chmod +x /etc/init.d/httpd"
-    update-rc.d -f httpd defaults > /dev/null 2>&1
-    chkconfig --add httpd > /dev/null 2>&1
-    /etc/init.d/httpd start
-}
-
-install_apache2441(){
-    if [ $# -lt 1 ]; then
-        echo "[Parameter Error]: apache_location"
-        exit 1
-    fi
-    apache_location=${1}
-
-    _install_apache_depend
-
-    CheckError "rm -fr ${apache_location}"
-    cd /tmp
-    _info "Downloading and Extracting ${apache2441_filename} files..."
-    DownloadFile "${apache2441_filename}.tar.gz" ${apache2441_download_url}
-    rm -fr ${apache2441_filename}
-    tar zxf ${apache2441_filename}.tar.gz
-    _info "Downloading and Extracting ${apr_filename} files..."
-    DownloadFile "${apr_filename}.tar.gz" ${apr_download_url}
-    rm -fr ${apr_filename}
-    tar zxf ${apr_filename}.tar.gz
-    _info "Downloading and Extracting ${apr_util_filename} files..."
-    DownloadFile "${apr_util_filename}.tar.gz" ${apr_util_download_url}
-    rm -fr ${apr_util_filename}
-    tar zxf ${apr_util_filename}.tar.gz
-    cd ${apache2441_filename}
-    mv /tmp/${apr_filename} srclib/apr
-    mv /tmp/${apr_util_filename} srclib/apr-util
-    _info "Make Install ${apache2441_filename}..."
-    apache_configure_args="--prefix=${apache_location} \
-    --bindir=${apache_location}/bin \
-    --sbindir=${apache_location}/bin \
-    --sysconfdir=${apache_location}/conf \
-    --libexecdir=${apache_location}/modules \
-    --with-pcre=${pcre_location} \
-    --with-ssl=${openssl102_location} \
-    --with-nghttp2=${nghttp2_location} \
-    --with-libxml2=${libxml2_location} \
-    --with-curl=${curl102_location} \
-    --with-mpm=event \
-    --with-included-apr \
-    --enable-modules=reallyall \
-    --enable-mods-shared=reallyall"
-    LDFLAGS=-ldl
-    CheckError "./configure ${apache_configure_args}"
-    CheckError "parallel_make"
-    CheckError "make install"
-    unset LDFLAGS
-    _info "Config ${apache2441_filename}"
-    _config_apache
-    _start_apache
-    _success "${apache2441_filename} install completed..."
-    rm -fr /tmp/${apache2441_filename}
-}
-
-_config_apache(){
-    [ -f "${apache_location}/conf/httpd.conf" ] && cp -f ${apache_location}/conf/httpd.conf ${apache_location}/conf/httpd.conf.bak
-    [ -f "${apache_location}/conf/extra/httpd-vhosts.conf" ] && cp -f ${apache_location}/conf/extra/httpd-vhosts.conf ${apache_location}/conf/extra/httpd-vhosts.conf.bak
-    # httpd.conf
-    grep -qE "^\s*#\s*Include conf/extra/httpd-vhosts.conf" ${apache_location}/conf/httpd.conf && \
-    sed -i 's#^\s*\#\s*Include conf/extra/httpd-vhosts.conf#Include conf/extra/httpd-vhosts.conf#' ${apache_location}/conf/httpd.conf || \
-    sed -i '$aInclude conf/extra/httpd-vhosts.conf' ${apache_location}/conf/httpd.conf
-    sed -i 's/^User.*/User www/g' ${apache_location}/conf/httpd.conf
-    sed -i 's/^Group.*/Group www/g' ${apache_location}/conf/httpd.conf
-    sed -i 's/^ServerAdmin you@example.com/ServerAdmin admin@localhost/' ${apache_location}/conf/httpd.conf
-    sed -i "s/^#ServerName www.example.com:80/ServerName 0.0.0.0:80/g" ${apache_location}/conf/httpd.conf
-    sed -i 's@^#Include conf/extra/httpd-default.conf@Include conf/extra/httpd-default.conf@' ${apache_location}/conf/httpd.conf
-    sed -i 's@^#Include conf/extra/httpd-info.conf@Include conf/extra/httpd-info.conf@' ${apache_location}/conf/httpd.conf
-    sed -i 's@DirectoryIndex index.html@DirectoryIndex index.php default.php index.html index.htm default.html default.htm@' ${apache_location}/conf/httpd.conf
-    sed -i 's/Require all granted/Require all denied/g' ${apache_location}/conf/httpd.conf
-    sed -i 's/Require host .example.com/Require host localhost/g' ${apache_location}/conf/extra/httpd-info.conf
-    sed -i "s@AddType\(.*\)Z@AddType\1Z\n    AddType application/x-httpd-php .php .phtml\n    AddType application/x-httpd-php-source .phps@" ${apache_location}/conf/httpd.conf
-    sed -i "s@^export LD_LIBRARY_PATH.*@export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:${openssl102_location}/lib@" ${apache_location}/bin/envvars
-    mkdir -p ${apache_location}/conf/vhost/
-    #cat > ${apache_location}/conf/extra/httpd-ssl.conf <<EOF
-#Listen 443
-#AddType application/x-x509-ca-cert .crt
-#AddType application/x-pkcs7-crl .crl
-#SSLPassPhraseDialog  builtin
-#SSLSessionCache  "shmcb:logs/ssl_scache(512000)"
-#SSLSessionCacheTimeout  300
-#SSLUseStapling On
-#SSLStaplingCache "shmcb:logs/ssl_stapling(512000)"
-#SSLProtocol -All +TLSv1.2 +TLSv1.3
-#SSLProxyProtocol -All +TLSv1.2 +TLSv1.3
-#SSLCipherSuite HIGH:!aNULL:!MD5:!3DES:!CAMELLIA:!AES128
-#SSLProxyCipherSuite HIGH:!aNULL:!MD5:!3DES:!CAMELLIA:!AES128
-#SSLHonorCipherOrder on
-#SSLCompression off
-#Mutex sysvsem default
-#SSLStrictSNIVHostCheck on
-#EOF
-
+_create_logrotate_file(){
     # 定期清理日志
     cat > /etc/logrotate.d/apache-logs <<EOF
 ${apache_location}/logs/*.log {
@@ -342,6 +242,190 @@ ${var}/wwwlogs/*.log {
     endscript
 }
 EOF
+}
+
+_create_sysv_script(){
+    cat > /etc/init.d/httpd <<'EOF'
+#!/bin/bash
+# chkconfig: 2345 55 25
+# description: apache service script
+
+### BEGIN INIT INFO
+# Provides:          apache
+# Required-Start:    $all
+# Required-Stop:     $all
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: apache
+# Description:       apache service script
+### END INIT INFO
+
+prefix={apache_location}
+
+NAME=httpd
+PID_FILE=$prefix/logs/$NAME.pid
+BIN=$prefix/bin/$NAME
+CONFIG_FILE=$prefix/conf/$NAME.conf
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:{openssl_location_lib}
+
+start()
+{
+    echo -n "Starting $NAME..."
+    if [ -f $PID_FILE ];then
+        mPID=`cat $PID_FILE`
+        isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
+        if [ "$isRunning" != '' ];then
+            echo "$NAME (pid `pidof $NAME`) already running."
+            exit 1
+        fi
+    fi
+    $BIN -k start
+    if [ "$?" != 0 ] ; then
+        echo " failed"
+        exit 1
+    else
+        echo " done"
+    fi
+}
+
+stop()
+{
+    echo -n "Stoping $NAME... "
+    if [ -f $PID_FILE ];then
+        mPID=`cat $PID_FILE`
+        isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
+        if [ "$isRunning" = '' ];then
+            echo "$NAME is not running."
+            exit 1
+        fi
+    else
+        echo "PID file found, $NAME is not running ?"
+        exit 1
+    fi
+    $BIN -k stop
+    if [ "$?" != 0 ] ; then
+        echo " failed"
+        exit 1
+    else
+        echo " done"
+    fi
+}
+
+restart(){
+    echo -n "Restarting $NAME..."
+    $BIN -k restart
+    if [ "$?" != 0 ] ; then
+        echo " failed"
+        exit 1
+    else
+        echo " done"
+    fi
+}
+
+reload() {
+    echo -n "Reload service $NAME... "
+    if [ -f $PID_FILE ];then
+        mPID=`cat $PID_FILE`
+        isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
+        if [ "$isRunning" != '' ];then
+            $BIN -k graceful
+            echo " done"
+        else
+            echo "$NAME is not running, can't reload."
+            exit 1
+        fi
+    else
+        echo "$NAME is not running, can't reload."
+        exit 1
+    fi
+}
+
+status(){
+    if [ -f $PID_FILE ];then
+        mPID=`cat $PID_FILE`
+        isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
+        if [ "$isRunning" != '' ];then
+            echo "$NAME (pid `pidof $NAME`) is running."
+            exit 0
+        else
+            echo "$NAME already stopped."
+            exit 1
+        fi
+    else
+        echo "$NAME already stopped."
+        exit 1
+    fi
+}
+
+configtest() {
+    echo "Test $NAME configure files... "
+    $BIN -t
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+        restart
+        ;;
+    status)
+        status
+        ;;
+    reload)
+        reload
+        ;;
+    test)
+        configtest
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart|reload|status|test}"
+esac
+EOF
+    sed -i "s|^prefix={apache_location}$|prefix=${apache_location}|g" httpd
+    sed -i "s|{openssl102_location_lib}|${openssl102_location}/lib|g" httpd
+}
+
+_config_apache(){
+    [ -f "${apache_location}/conf/httpd.conf" ] && cp -f ${apache_location}/conf/httpd.conf ${apache_location}/conf/httpd.conf.bak
+    [ -f "${apache_location}/conf/extra/httpd-vhosts.conf" ] && cp -f ${apache_location}/conf/extra/httpd-vhosts.conf ${apache_location}/conf/extra/httpd-vhosts.conf.bak
+    # httpd.conf
+    grep -qE "^\s*#\s*Include conf/extra/httpd-vhosts.conf" ${apache_location}/conf/httpd.conf && \
+    sed -i 's#^\s*\#\s*Include conf/extra/httpd-vhosts.conf#Include conf/extra/httpd-vhosts.conf#' ${apache_location}/conf/httpd.conf || \
+    sed -i '$aInclude conf/extra/httpd-vhosts.conf' ${apache_location}/conf/httpd.conf
+    sed -i 's/^User.*/User www/g' ${apache_location}/conf/httpd.conf
+    sed -i 's/^Group.*/Group www/g' ${apache_location}/conf/httpd.conf
+    sed -i 's/^ServerAdmin you@example.com/ServerAdmin admin@localhost/' ${apache_location}/conf/httpd.conf
+    sed -i "s/^#ServerName www.example.com:80/ServerName 0.0.0.0:80/g" ${apache_location}/conf/httpd.conf
+    sed -i 's@^#Include conf/extra/httpd-default.conf@Include conf/extra/httpd-default.conf@' ${apache_location}/conf/httpd.conf
+    sed -i 's@^#Include conf/extra/httpd-info.conf@Include conf/extra/httpd-info.conf@' ${apache_location}/conf/httpd.conf
+    sed -i 's@DirectoryIndex index.html@DirectoryIndex index.php default.php index.html index.htm default.html default.htm@' ${apache_location}/conf/httpd.conf
+    sed -i 's/Require all granted/Require all denied/g' ${apache_location}/conf/httpd.conf
+    sed -i 's/Require host .example.com/Require host localhost/g' ${apache_location}/conf/extra/httpd-info.conf
+    sed -i "s@AddType\(.*\)Z@AddType\1Z\n    AddType application/x-httpd-php .php .phtml\n    AddType application/x-httpd-php-source .phps@" ${apache_location}/conf/httpd.conf
+    sed -i "s@^export LD_LIBRARY_PATH.*@export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:${openssl102_location}/lib@" ${apache_location}/bin/envvars
+    mkdir -p ${apache_location}/conf/vhost/
+    #cat > ${apache_location}/conf/extra/httpd-ssl.conf <<EOF
+#Listen 443
+#AddType application/x-x509-ca-cert .crt
+#AddType application/x-pkcs7-crl .crl
+#SSLPassPhraseDialog  builtin
+#SSLSessionCache  "shmcb:logs/ssl_scache(512000)"
+#SSLSessionCacheTimeout  300
+#SSLUseStapling On
+#SSLStaplingCache "shmcb:logs/ssl_stapling(512000)"
+#SSLProtocol -All +TLSv1.2 +TLSv1.3
+#SSLProxyProtocol -All +TLSv1.2 +TLSv1.3
+#SSLCipherSuite HIGH:!aNULL:!MD5:!3DES:!CAMELLIA:!AES128
+#SSLProxyCipherSuite HIGH:!aNULL:!MD5:!3DES:!CAMELLIA:!AES128
+#SSLHonorCipherOrder on
+#SSLCompression off
+#Mutex sysvsem default
+#SSLStrictSNIVHostCheck on
+#EOF
 
 # httpd modules array
 httpd_mod_list=(
@@ -429,14 +513,104 @@ EOF
     chown -R www:www ${apache_location}
 }
 
+install_apache2441(){
+    if [ $# -lt 1 ]; then
+        echo "[Parameter Error]: apache_location"
+        exit 1
+    fi
+    apache_location=${1}
+
+    _install_apache_depend
+
+    CheckError "rm -fr ${apache_location}"
+    cd /tmp
+    _info "Downloading and Extracting ${apache2441_filename} files..."
+    DownloadFile "${apache2441_filename}.tar.gz" ${apache2441_download_url}
+    rm -fr ${apache2441_filename}
+    tar zxf ${apache2441_filename}.tar.gz
+    _info "Downloading and Extracting ${apr_filename} files..."
+    DownloadFile "${apr_filename}.tar.gz" ${apr_download_url}
+    rm -fr ${apr_filename}
+    tar zxf ${apr_filename}.tar.gz
+    _info "Downloading and Extracting ${apr_util_filename} files..."
+    DownloadFile "${apr_util_filename}.tar.gz" ${apr_util_download_url}
+    rm -fr ${apr_util_filename}
+    tar zxf ${apr_util_filename}.tar.gz
+    cd ${apache2441_filename}
+    mv /tmp/${apr_filename} srclib/apr
+    mv /tmp/${apr_util_filename} srclib/apr-util
+    _info "Make Install ${apache2441_filename}..."
+    apache_configure_args="--prefix=${apache_location} \
+    --bindir=${apache_location}/bin \
+    --sbindir=${apache_location}/bin \
+    --sysconfdir=${apache_location}/conf \
+    --libexecdir=${apache_location}/modules \
+    --with-pcre=${pcre_location} \
+    --with-ssl=${openssl102_location} \
+    --with-nghttp2=${nghttp2_location} \
+    --with-libxml2=${libxml2_location} \
+    --with-curl=${curl102_location} \
+    --with-mpm=event \
+    --with-included-apr \
+    --enable-modules=reallyall \
+    --enable-mods-shared=reallyall"
+    LDFLAGS=-ldl
+    CheckError "./configure ${apache_configure_args}"
+    CheckError "parallel_make"
+    CheckError "make install"
+    unset LDFLAGS
+    # Config
+    _info "Config ${apache2441_filename}"
+    _create_logrotate_file
+    _config_apache
+    # Start
+    _create_sysv_script
+    chmod +x /etc/init.d/httpd
+    update-rc.d -f httpd defaults > /dev/null 2>&1
+    chkconfig --add httpd > /dev/null 2>&1
+    /etc/init.d/httpd start
+    # Clean
+    rm -fr /tmp/${apache2441_filename}
+    _success "${apache2441_filename} install completed..."
+}
+
+rpminstall_apache2441(){
+    apache_location=/hws.com/hwsmaster/server/apache-2_4_41
+    _install_apache_depend
+    DownloadUrl httpd-2.4.41-1.el7.x86_64.rpm ${download_root_url}/rpms/httpd-2.4.41-1.el7.x86_64.rpm
+    CheckError "rpm -ivh httpd-2.4.41-1.el7.x86_64.rpm --force --nodeps"
+    _config_apache
+    /etc/init.d/httpd restart
+}
+
+debinstall_apache2441(){
+    _install_apache_depend
+    DownloadUrl httpd-2.4.41-linux-amd64.deb ${download_root_url}/debs/httpd-2.4.41-linux-amd64.deb
+    CheckError "dpkg --force-depends -i httpd-2.4.41-linux-amd64.deb"
+    mkdir -p ${var}/wwwlogs
+    mkdir -p ${var}/wwwconf/apache
+    mkdir -p ${var}/default/wwwlogs
+    mkdir -p ${var}/default/wwwconf/apache
+}
+
 main() {
     include config
     include public
     load_config
     IsRoot
     InstallPreSetting
-    install_apache2441 ${1}
+
+    if [ $# -lt 2 ];then
+        install_apache2441 ${1}
+    else
+        if [ ${PM} == "yum" ]; then
+            rpminstall_apache2441
+        else
+            debinstall_apache2441
+        fi
+    fi
 }
+
 echo "The installation log will be written to /tmp/install.log"
 echo "Use tail -f /tmp/install.log to view dynamically"
 rm -fr ${cur_dir}/tmps
