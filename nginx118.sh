@@ -37,77 +37,197 @@ _install_nginx_depend(){
     _success "Install dependencies packages for Nginx completed..."
 }
 
-_start_nginx() {
-    DownloadUrl "/etc/init.d/nginx" "${download_sysv_url}/nginx"
-    sed -i "s|^prefix={nginx_location}$|prefix=${nginx_location}|g" /etc/init.d/nginx
-    CheckError "chmod +x /etc/init.d/nginx"
-    update-rc.d -f nginx defaults > /dev/null 2>&1
-    chkconfig --add nginx > /dev/null 2>&1
-    /etc/init.d/nginx start
+_create_sysv_script() {
+    cat > /etc/init.d/nginx <<'EOF'
+#!/bin/bash
+# chkconfig: 2345 55 25
+# description: nginx service script
+
+### BEGIN INIT INFO
+# Provides:          nginx
+# Required-Start:    $all
+# Required-Stop:     $all
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: nginx
+# Description:       nginx service script
+### END INIT INFO
+
+prefix={nginx_location}
+
+NAME=nginx
+PID_FILE=$prefix/var/run/$NAME.pid
+BIN=$prefix/sbin/$NAME
+CONFIG_FILE=$prefix/etc/$NAME.conf
+
+ulimit -n 10240
+start()
+{
+    echo -n "Starting $NAME..."
+    if [ -f $PID_FILE ];then
+        mPID=`cat $PID_FILE`
+        isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
+        if [ "$isRunning" != '' ];then
+            echo "$NAME (pid `pidof $NAME`) already running."
+            exit 1
+        fi
+    fi
+    $BIN -c $CONFIG_FILE
+    if [ "$?" != 0 ] ; then
+        echo " failed"
+        exit 1
+    else
+        echo " done"
+    fi
 }
 
-install_nginx118(){
-    if [ $# -lt 1 ]; then
-        echo "[Parameter Error]: nginx_location"
+stop()
+{
+    echo -n "Stoping $NAME... "
+    if [ -f $PID_FILE ];then
+        mPID=`cat $PID_FILE`
+        isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
+        if [ "$isRunning" = '' ];then
+            echo "$NAME is not running."
+            exit 1
+        fi
+    else
+        echo "PID file found, $NAME is not running ?"
         exit 1
     fi
-    nginx_location=${1}
+    $BIN -s stop
+    if [ "$?" != 0 ] ; then
+        echo " failed"
+        exit 1
+    else
+        echo " done"
+    fi
+}
 
-    _install_nginx_depend
+restart(){
+    $0 stop
+    sleep 1
+    $0 start
+}
 
-    CheckError "rm -fr ${nginx_location}"
-    cd /tmp
-    _info "Downloading and Extracting ${pcre_filename} files..."
-    DownloadFile "${pcre_filename}.tar.gz" ${pcre_download_url}
-    rm -fr ${pcre_filename}
-    tar zxf ${pcre_filename}.tar.gz
-    _info "Downloading and Extracting ${openssl102_filename} files..."
-    DownloadFile "${openssl102_filename}.tar.gz" ${openssl102_download_url}
-    rm -fr ${openssl102_filename}
-    tar zxf ${openssl102_filename}.tar.gz
-    _info "Downloading and Extracting ${nginx118_filename} files..."
-    DownloadFile "${nginx118_filename}.tar.gz" ${nginx118_download_url}
-    rm -fr ${nginx118_filename}
-    tar zxf ${nginx118_filename}.tar.gz
-    cd ${nginx118_filename}
-    nginx_configure_args="--prefix=${nginx_location} \
-    --conf-path=${nginx_location}/etc/nginx.conf \
-    --error-log-path=${nginx_location}/var/log/error.log \
-    --pid-path=${nginx_location}/var/run/nginx.pid \
-    --lock-path=${nginx_location}/var/lock/nginx.lock \
-    --http-log-path=${nginx_location}/var/log/access.log \
-    --http-client-body-temp-path=${nginx_location}/var/tmp/client \
-    --http-proxy-temp-path=${nginx_location}/var/tmp/proxy \
-    --http-fastcgi-temp-path=${nginx_location}/var/tmp/fastcgi \
-    --http-uwsgi-temp-path=${nginx_location}/var/tmp/uwsgi \
-    --http-scgi-temp-path=${nginx_location}/var/tmp/scgi \
-    --with-pcre=/tmp/${pcre_filename} \
-    --with-openssl=/tmp/${openssl102_filename} \
-    --user=www \
-    --group=www \
-    --with-stream \
-    --with-threads \
-    --with-http_ssl_module \
-    --with-http_v2_module \
-    --with-http_flv_module \
-    --with-http_mp4_module \
-    --with-http_gzip_static_module \
-    --with-http_realip_module \
-    --with-http_stub_status_module"
-    _info "Make Install ${nginx118_filename}..."
-    CheckError "./configure ${nginx_configure_args}"
-    CheckError "parallel_make"
-    CheckError "make install"
-    mkdir -p ${nginx_location}/var/{log,run,lock,tmp}
-    mkdir -p ${nginx_location}/var/tmp/{client,proxy,fastcgi,uwsgi}
-    mkdir -p ${nginx_location}/etc/vhost
-    _info "Config ${nginx118_filename}"
-    _config_nginx
-    _start_nginx
-    _success "${nginx118_filename} install completed..."
-    rm -fr /tmp/${pcre_filename}
-    rm -fr /tmp/${openssl102_filename}
-    rm -fr /tmp/${nginx118_filename}
+reload() {
+    echo -n "Reload service $NAME... "
+    if [ -f $PID_FILE ];then
+        mPID=`cat $PID_FILE`
+        isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
+        if [ "$isRunning" != '' ];then
+            $BIN -s reload
+            echo " done"
+        else
+            echo "$NAME is not running, can't reload."
+            exit 1
+        fi
+    else
+        echo "$NAME is not running, can't reload."
+        exit 1
+    fi
+}
+
+status(){
+    if [ -f $PID_FILE ];then
+        mPID=`cat $PID_FILE`
+        isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
+        if [ "$isRunning" != '' ];then
+            echo "$NAME (pid `pidof $NAME`) is running."
+            exit 0
+        else
+            echo "$NAME already stopped."
+            exit 1
+        fi
+    else
+        echo "$NAME already stopped."
+        exit 1
+    fi
+}
+
+configtest() {
+    echo "Test $NAME configure files... "
+    $BIN -t
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+        restart
+        ;;
+    status)
+        status
+        ;;
+    reload)
+        reload
+        ;;
+    test)
+        configtest
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart|reload|status|test}"
+esac
+EOF
+sed -i "s|^prefix={nginx_location}$|prefix=${nginx_location}|g" /etc/init.d/nginx
+}
+
+_create_logrotate_file(){
+    # 定期清理日志
+    cat > /etc/logrotate.d/nginx-logs <<EOF
+${nginx_location}/var/log/*.log {
+    daily
+    rotate 30
+    missingok
+    notifempty
+    compress
+    sharedscripts
+    postrotate
+        [ ! -f ${nginx_location}/var/run/nginx.pid ] || kill -USR1 \`cat ${nginx_location}/var/run/nginx.pid\`
+    endscript
+}
+EOF
+    cat > /etc/logrotate.d/nginx-wwwlogs <<EOF
+${var}/default/wwwlogs/*.log {
+    daily
+    rotate 30
+    missingok
+    notifempty
+    compress
+    sharedscripts
+    postrotate
+        [ ! -f ${nginx_location}/var/run/nginx.pid ] || kill -USR1 \`cat ${nginx_location}/var/run/nginx.pid\`
+    endscript
+}
+
+${var}/default/wwwlogs/nginx/*.log {
+    daily
+    rotate 30
+    missingok
+    notifempty
+    compress
+    sharedscripts
+    postrotate
+        [ ! -f ${nginx_location}/var/run/nginx.pid ] || kill -USR1 \`cat ${nginx_location}/var/run/nginx.pid\`
+    endscript
+}
+
+${var}/wwwlogs/*.log {
+    daily
+    rotate 30
+    missingok
+    notifempty
+    compress
+    sharedscripts
+    postrotate
+        [ ! -f ${nginx_location}/var/run/nginx.pid ] || kill -USR1 \`cat ${nginx_location}/var/run/nginx.pid\`
+    endscript
+}
+EOF
 }
 
 _config_nginx(){
@@ -184,57 +304,6 @@ http {
 }
 EOF
 
-    # 定期清理日志
-    cat > /etc/logrotate.d/nginx-logs <<EOF
-${nginx_location}/var/log/*.log {
-    daily
-    rotate 30
-    missingok
-    notifempty
-    compress
-    sharedscripts
-    postrotate
-        [ ! -f ${nginx_location}/var/run/nginx.pid ] || kill -USR1 \`cat ${nginx_location}/var/run/nginx.pid\`
-    endscript
-}
-EOF
-    cat > /etc/logrotate.d/nginx-wwwlogs <<EOF
-${var}/default/wwwlogs/*.log {
-    daily
-    rotate 30
-    missingok
-    notifempty
-    compress
-    sharedscripts
-    postrotate
-        [ ! -f ${nginx_location}/var/run/nginx.pid ] || kill -USR1 \`cat ${nginx_location}/var/run/nginx.pid\`
-    endscript
-}
-
-${var}/default/wwwlogs/nginx/*.log {
-    daily
-    rotate 30
-    missingok
-    notifempty
-    compress
-    sharedscripts
-    postrotate
-        [ ! -f ${nginx_location}/var/run/nginx.pid ] || kill -USR1 \`cat ${nginx_location}/var/run/nginx.pid\`
-    endscript
-}
-
-${var}/wwwlogs/*.log {
-    daily
-    rotate 30
-    missingok
-    notifempty
-    compress
-    sharedscripts
-    postrotate
-        [ ! -f ${nginx_location}/var/run/nginx.pid ] || kill -USR1 \`cat ${nginx_location}/var/run/nginx.pid\`
-    endscript
-}
-EOF
     # 授权
     mkdir -p ${var}/wwwlogs
     mkdir -p ${var}/wwwconf/nginx
@@ -243,14 +312,116 @@ EOF
     chown -R www:www ${nginx_location}
 }
 
+
+install_nginx118(){
+    if [ $# -lt 1 ]; then
+        echo "[Parameter Error]: nginx_location"
+        exit 1
+    fi
+    nginx_location=${1}
+
+    _install_nginx_depend
+
+    CheckError "rm -fr ${nginx_location}"
+    cd /tmp
+    _info "Downloading and Extracting ${pcre_filename} files..."
+    DownloadFile "${pcre_filename}.tar.gz" ${pcre_download_url}
+    rm -fr ${pcre_filename}
+    tar zxf ${pcre_filename}.tar.gz
+    _info "Downloading and Extracting ${openssl102_filename} files..."
+    DownloadFile "${openssl102_filename}.tar.gz" ${openssl102_download_url}
+    rm -fr ${openssl102_filename}
+    tar zxf ${openssl102_filename}.tar.gz
+    _info "Downloading and Extracting ${nginx118_filename} files..."
+    DownloadFile "${nginx118_filename}.tar.gz" ${nginx118_download_url}
+    rm -fr ${nginx118_filename}
+    tar zxf ${nginx118_filename}.tar.gz
+    cd ${nginx118_filename}
+    nginx_configure_args="--prefix=${nginx_location} \
+    --conf-path=${nginx_location}/etc/nginx.conf \
+    --error-log-path=${nginx_location}/var/log/error.log \
+    --pid-path=${nginx_location}/var/run/nginx.pid \
+    --lock-path=${nginx_location}/var/lock/nginx.lock \
+    --http-log-path=${nginx_location}/var/log/access.log \
+    --http-client-body-temp-path=${nginx_location}/var/tmp/client \
+    --http-proxy-temp-path=${nginx_location}/var/tmp/proxy \
+    --http-fastcgi-temp-path=${nginx_location}/var/tmp/fastcgi \
+    --http-uwsgi-temp-path=${nginx_location}/var/tmp/uwsgi \
+    --http-scgi-temp-path=${nginx_location}/var/tmp/scgi \
+    --with-pcre=/tmp/${pcre_filename} \
+    --with-openssl=/tmp/${openssl102_filename} \
+    --user=www \
+    --group=www \
+    --with-stream \
+    --with-threads \
+    --with-http_ssl_module \
+    --with-http_v2_module \
+    --with-http_flv_module \
+    --with-http_mp4_module \
+    --with-http_gzip_static_module \
+    --with-http_realip_module \
+    --with-http_stub_status_module"
+    _info "Make Install ${nginx118_filename}..."
+    CheckError "./configure ${nginx_configure_args}"
+    CheckError "parallel_make"
+    CheckError "make install"
+    mkdir -p ${nginx_location}/var/{log,run,lock,tmp}
+    mkdir -p ${nginx_location}/var/tmp/{client,proxy,fastcgi,uwsgi}
+    mkdir -p ${nginx_location}/etc/vhost
+    # Config
+    _info "Config ${nginx118_filename}"
+    _create_logrotate_file
+    _config_nginx
+    # Start
+    _create_sysv_script
+    chmod +x /etc/init.d/nginx
+    update-rc.d -f nginx defaults > /dev/null 2>&1
+    chkconfig --add nginx > /dev/null 2>&1
+    /etc/init.d/nginx start
+    # Clean
+    rm -fr /tmp/${pcre_filename}
+    rm -fr /tmp/${openssl102_filename}
+    rm -fr /tmp/${nginx118_filename}
+    _success "${nginx118_filename} install completed..."
+}
+
+rpminstall_nginx118(){
+    nginx_location=/hws.com/hwsmaster/server/nginx-1_18_0 # 如果要改变包的安装路径,改这个就行
+    _install_nginx_depend
+    DownloadUrl nginx-1.18.0-1.el7.x86_64.rpm ${download_root_url}/rpms/nginx-1.18.0-1.el7.x86_64.rpm
+    CheckError "rpm -ivh nginx-1.18.0-1.el7.x86_64.rpm --force --nodeps"
+    _config_nginx
+    /etc/init.d/nginx restart
+}
+
+debinstall_nginx118(){
+    _install_nginx_depend
+    DownloadUrl nginx-1.18.0-linux-amd64.deb ${download_root_url}/debs/nginx-1.18.0-linux-amd64.deb
+    CheckError "dpkg --force-depends -i nginx-1.18.0-linux-amd64.deb"
+    mkdir -p ${var}/wwwlogs
+    mkdir -p ${var}/wwwconf/nginx
+    mkdir -p ${var}/default/wwwlogs
+    mkdir -p ${var}/default/wwwconf/nginx
+}
+
 main() {
     include config
     include public
     load_config
     IsRoot
     InstallPreSetting
-    install_nginx118 ${1}
+
+    if [ $# -lt 2 ];then
+        install_nginx118 ${1}
+    else
+        if [ ${PM} == "yum" ]; then
+            rpminstall_nginx118
+        else
+            debinstall_nginx118
+        fi
+    fi
 }
+
 echo "The installation log will be written to /tmp/install.log"
 echo "Use tail -f /tmp/install.log to view dynamically"
 rm -fr ${cur_dir}/tmps
