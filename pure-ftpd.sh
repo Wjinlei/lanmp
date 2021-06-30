@@ -388,15 +388,17 @@ install_pure-ftpd(){
 }
 
 rpminstall_pure-ftpd(){
+    rpm_package_name="pure-ftpd-1.0.49-1.el7.x86_64.rpm"
     _install_pureftpd_depends
-    DownloadUrl pure-ftpd-1.0.49-1.el7.x86_64.rpm ${download_root_url}/rpms/pure-ftpd-1.0.49-1.el7.x86_64.rpm
-    CheckError "rpm -ivh pure-ftpd-1.0.49-1.el7.x86_64.rpm --force --nodeps"
+    DownloadUrl ${rpm_package_name} ${download_root_url}/rpms/${rpm_package_name}
+    CheckError "rpm -ivh ${rpm_package_name} --force --nodeps"
 }
 
 debinstall_pure-ftpd(){
+    deb_package_name="pureftpd-1.0.49-linux-amd64.deb"
     _install_pureftpd_depends
-    DownloadUrl pureftpd-1.0.49-linux-amd64.deb ${download_root_url}/debs/pureftpd-1.0.49-linux-amd64.deb
-    CheckError "dpkg --force-depends -i pureftpd-1.0.49-linux-amd64.deb"
+    DownloadUrl ${deb_package_name} ${download_root_url}/debs/${deb_package_name}
+    CheckError "dpkg --force-depends -i ${deb_package_name}"
 }
 
 main() {
@@ -409,11 +411,11 @@ main() {
     if [ $# -lt 3 ];then
         install_pure-ftpd ${1} ${2}
     else
-        if [ ${PM} == "yum" ]; then
-            rpminstall_pure-ftpd
-        else
-            debinstall_pure-ftpd
-        fi
+    if [ ${PM} == "yum" ]; then
+        rpminstall_pure-ftpd
+    else
+        debinstall_pure-ftpd
+    fi
     fi
 }
 
