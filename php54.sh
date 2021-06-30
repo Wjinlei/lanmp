@@ -105,13 +105,13 @@ _install_php_depend(){
         fi
         _install_freetype
     fi
-    _install_openssl102
-    _install_pcre
+    CheckError "_install_openssl102" ${openssl102_location}
+    CheckError "_install_pcre" ${pcre_location}
     _install_re2c
-    _install_icu4c
-    _install_libxml2
-    _install_libiconv
-    _install_curl
+    CheckError "_install_icu4c" ${icu4c_location}
+    CheckError "_install_libxml2" ${libxml2_location}
+    CheckError "_install_libiconv" ${libiconv_location}
+    CheckError "_install_curl" ${curl102_location}
     _success "Install dependencies packages for PHP completed..."
     # Fixed unixODBC issue
     if [ -f /usr/include/sqlext.h ] && [ ! -f /usr/local/include/sqlext.h ]; then
@@ -119,7 +119,7 @@ _install_php_depend(){
     fi
     id -u www >/dev/null 2>&1
     [ $? -ne 0 ] && useradd -M -U www -r -d /dev/null -s /sbin/nologin
-    mkdir -p ${php54_location}
+    mkdir -p ${php54_location} > /dev/null 2>&1
 }
 
 _install_openssl102(){
@@ -360,16 +360,192 @@ _install_freetype() {
     rm -fr /tmp/${freetype_filename}
 }
 
-_start_php54() {
-    #CheckError "${php54_location}/sbin/php-fpm --daemonize \
-        #--fpm-config ${php54_location}/etc/default.conf \
-        #--pid ${php54_location}/var/run/default.pid"
-    DownloadUrl "/etc/init.d/php54" "${download_sysv_url}/php-fpm"
+_create_sysv_script(){
+    cat > /etc/init.d/php54 << 'EOF'
+#!/bin/bash
+# chkconfig: 2345 55 25
+# description: php-fpm service script
+
+### BEGIN INIT INFO
+# Provides:          php-fpm
+# Required-Start:    $all
+# Required-Stop:     $all
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: php-fpm
+# Description:       php-fpm service script
+### END INIT INFO
+
+prefix={php-fpm_location}
+
+NAME=php-fpm
+BIN=$prefix/sbin/$NAME
+PID_FILE=$prefix/var/run/default.pid
+CONFIG_FILE=$prefix/etc/default.conf
+
+wait_for_pid () {
+    try=0
+    while test $try -lt 35 ; do
+        case "$1" in
+            'created')
+            if [ -f "$2" ] ; then
+                try=''
+                break
+            fi
+            ;;
+            'removed')
+            if [ ! -f "$2" ] ; then
+                try=''
+                break
+            fi
+            ;;
+        esac
+        echo -n .
+        try=`expr $try + 1`
+        sleep 1
+    done
+}
+
+start()
+{
+    echo -n "Starting $NAME..."
+    if [ -f $PID_FILE ];then
+        mPID=`cat $PID_FILE`
+        isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
+        if [ "$isRunning" != '' ];then
+            echo "$NAME (pid $mPID) already running."
+            exit 1
+        fi
+    fi
+    $BIN --daemonize --fpm-config $CONFIG_FILE --pid $PID_FILE
+    if [ "$?" != 0 ] ; then
+        echo " failed"
+        exit 1
+    fi
+    wait_for_pid created $PID_FILE
+    if [ -n "$try" ] ; then
+        echo " failed"
+        exit 1
+    else
+        echo " done"
+    fi
+}
+
+stop()
+{
+    echo -n "Stoping $NAME... "
+    if [ -f $PID_FILE ];then
+        mPID=`cat $PID_FILE`
+        isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
+        if [ "$isRunning" = '' ];then
+            echo "$NAME is not running."
+            exit 1
+        fi
+    else
+        echo "PID file found, $NAME is not running ?"
+        exit 1
+    fi
+    kill -QUIT `cat $PID_FILE`
+    wait_for_pid removed $PID_FILE
+    if [ -n "$try" ] ; then
+        echo " failed"
+        exit 1
+    else
+        echo " done"
+    fi
+}
+
+restart(){
+    $0 stop
+    $0 start
+}
+
+reload() {
+    echo -n "Reload service $NAME... "
+    if [ -f $PID_FILE ];then
+        mPID=`cat $PID_FILE`
+        isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
+        if [ "$isRunning" = '' ];then
+            echo "$NAME is not running."
+            exit 1
+        fi
+    else
+        echo "PID file found, $NAME is not running ?"
+        exit 1
+    fi
+    kill -USR2 `cat $PID_FILE`
+    if [ "$?" != 0 ] ; then
+        echo " failed"
+        exit 1
+    else
+        echo " done"
+    fi
+}
+
+status(){
+    if [ -f $PID_FILE ];then
+        mPID=`cat $PID_FILE`
+        isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
+        if [ "$isRunning" != '' ];then
+            echo "$NAME (pid $mPID) is running."
+            exit 0
+        else
+            echo "$NAME already stopped."
+            exit 1
+        fi
+    else
+        echo "$NAME already stopped."
+        exit 1
+    fi
+}
+
+force-stop() {
+    echo -n "force-stop $NAME "
+    if [ -f $PID_FILE ];then
+        mPID=`cat $PID_FILE`
+        isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
+        if [ "$isRunning" = '' ];then
+            echo "$NAME is not running."
+            exit 1
+        fi
+    else
+        echo "PID file found, $NAME is not running ?"
+        exit 1
+    fi
+    kill -TERM `cat $PID_FILE`
+    wait_for_pid removed $PID_FILE
+    if [ -n "$try" ] ; then
+        echo " failed"
+        exit 1
+    else
+        echo " done"
+    fi
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+        restart
+        ;;
+    status)
+        status
+        ;;
+    reload)
+        reload
+        ;;
+    force-stop)
+        force-stop
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart|reload|status|force-stop}"
+esac
+EOF
     sed -i "s|^prefix={php-fpm_location}$|prefix=${php54_location}|g" /etc/init.d/php54
-    CheckError "chmod +x /etc/init.d/php54"
-    update-rc.d -f php54 defaults > /dev/null 2>&1
-    chkconfig --add php54 > /dev/null 2>&1
-    /etc/init.d/php54 start
 }
 
 _config_php(){
@@ -417,11 +593,6 @@ _config_php(){
 EOF
     mkdir -p ${php54_location}/var/run
     mkdir -p ${php54_location}/var/log
-
-    _start_php54
-    _warn "Please add the following two lines to your httpd.conf"
-    echo AddType application/x-httpd-php .php .phtml
-    echo AddType application/x-httpd-php-source .phps
 }
 
 install_php54(){
@@ -504,20 +675,76 @@ install_php54(){
     CheckError "./configure ${php_configure_args}"
     CheckError "parallel_make ZEND_EXTRA_LIBS='-liconv'"
     CheckError "make install"
+    # Config
     _info "Config ${php54_filename}..."
     _config_php
-    _success "${php54_filename} install completed..."
+    _warn "Please add the following two lines to your httpd.conf"
+    echo AddType application/x-httpd-php .php .phtml
+    echo AddType application/x-httpd-php-source .phps
+    # Start
+    _create_sysv_script
+    chmod +x /etc/init.d/php54
+    update-rc.d -f php54 defaults > /dev/null 2>&1
+    chkconfig --add php54 > /dev/null 2>&1
+    /etc/init.d/php54 start
+    # Clean
     rm -fr /tmp/${php54_filename}
+    _success "${php54_filename} install completed..."
+}
+
+rpminstall_php54(){
+    rpm_package_name="php54-5.4.45-1.el7.x86_64.rpm"
+    php54_location=/hws.com/hwsmaster/server/php-5_4_45
+    _install_php_depend
+    DownloadUrl ${rpm_package_name} ${download_root_url}/rpms/${rpm_package_name}
+    CheckError "rpm -ivh ${rpm_package_name} --force --nodeps"
+    _config_php
+    /etc/init.d/php54 restart
+}
+
+debinstall_php54(){
+    deb_package_name="php-5.4.45-linux-amd64.deb"
+    _install_php_depend
+    DownloadUrl ${deb_package_name} ${download_root_url}/debs/${deb_package_name}
+    CheckError "dpkg --force-depends -i ${deb_package_name}"
 }
 
 main() {
+    case "$1" in
+        -h|--help)
+            printf "Usage: $0 Options prefix [port]
+Options:
+-h, --help                      Print this help text and exit
+-sc, --sc-install               Source code make install
+-pm, --pm-install               Package manager install
+"
+            ;;
+        -sc|--sc-install)
     include config
     include public
     load_config
     IsRoot
     InstallPreSetting
-    install_php54 ${1}
+            install_php54 ${2}
+            ;;
+        -pm|--pm-install)
+    include config
+    include public
+    load_config
+    IsRoot
+    InstallPreSetting
+            if [ ${PM} == "yum" ]; then
+                rpminstall_php54
+            else
+                debinstall_php54
+            fi
+            ;;
+        *)
+            echo "Missing parameters,Please Usage: $0 -h, Show Help" && exit 1
+            ;;
+    esac
 }
+
 echo "The installation log will be written to /tmp/install.log"
 echo "Use tail -f /tmp/install.log to view dynamically"
 rm -fr ${cur_dir}/tmps
