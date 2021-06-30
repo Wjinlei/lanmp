@@ -33,10 +33,10 @@ _install_apache_depend(){
     fi
     CheckInstalled "_install_pcre" ${pcre_location}
     CheckInstalled "_install_openssl102" ${openssl102_location}
-    _install_nghttp2
-    _install_icu4c
-    _install_libxml2
-    _install_curl
+    CheckInstalled "_install_nghttp2" ${nghttp2_location}
+    CheckInstalled "_install_icu4c" ${icu4c_location}
+    CheckInstalled "_install_libxml2" ${libxml2_location}
+    CheckInstalled "_install_curl" ${curl102_location}
 
     id -u www >/dev/null 2>&1
     [ $? -ne 0 ] && useradd -M -U www -r -d /dev/null -s /sbin/nologin
