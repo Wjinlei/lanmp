@@ -549,10 +549,6 @@ EOF
 }
 
 _config_php(){
-    # php.ini
-    mkdir -p ${php54_location}/{etc,php.d}
-    cp -f php.ini-production ${php54_location}/etc/php.ini
-
     sed -i 's/;default_charset =.*/default_charset = "UTF-8"/g' ${php54_location}/etc/php.ini
     sed -i 's/;always_populate_raw_post_data =.*/always_populate_raw_post_data = -1/g' ${php54_location}/etc/php.ini
     sed -i 's/post_max_size =.*/post_max_size = 100M/g' ${php54_location}/etc/php.ini
@@ -593,6 +589,7 @@ _config_php(){
 EOF
     mkdir -p ${php54_location}/var/run
     mkdir -p ${php54_location}/var/log
+    mkdir -p ${php54_location}/php.d
 }
 
 install_php54(){
@@ -677,6 +674,8 @@ install_php54(){
     CheckError "make install"
     # Config
     _info "Config ${php54_filename}..."
+    mkdir -p ${php54_location}/etc
+    cp -f php.ini-production ${php54_location}/etc/php.ini
     _config_php
     _warn "Please add the following two lines to your httpd.conf"
     echo AddType application/x-httpd-php .php .phtml

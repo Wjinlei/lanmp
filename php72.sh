@@ -549,10 +549,6 @@ EOF
 }
 
 _config_php(){
-    # php.ini
-    mkdir -p ${php72_location}/{etc,php.d}
-    cp -f php.ini-production ${php72_location}/etc/php.ini
-
     sed -i 's/default_charset =.*/default_charset = "UTF-8"/g' ${php72_location}/etc/php.ini
     sed -i 's/;always_populate_raw_post_data =.*/always_populate_raw_post_data = -1/g' ${php72_location}/etc/php.ini
     sed -i 's/post_max_size =.*/post_max_size = 100M/g' ${php72_location}/etc/php.ini
@@ -571,6 +567,7 @@ _config_php(){
     fi
     sed -i 's/disable_functions =.*/disable_functions = passthru,exec,system,chroot,chgrp,chown,shell_exec,popen,proc_open,pcntl_exec,ini_alter,ini_restore,dl,openlog,syslog,popepassthru,pcntl_alarm,pcntl_fork,pcntl_waitpid,pcntl_wait,pcntl_wifexited,pcntl_wifstopped,pcntl_wifsignaled,pcntl_wifcontinued,pcntl_wexitstatus,pcntl_wtermsig,pcntl_wstopsig,pcntl_signal,pcntl_signal_dispatch,pcntl_get_last_error,pcntl_strerror,pcntl_sigprocmask,pcntl_sigwaitinfo,pcntl_sigtimedwait,pcntl_exec,pcntl_getpriority,pcntl_setpriority,imap_open,apache_setenv/g' ${php72_location}/etc/php.ini
 
+    mkdir -p ${php72_location}/php.d
     extension_dir=$(${php72_location}/bin/php-config --extension-dir)
     cat > ${php72_location}/php.d/opcache.ini<<EOF
 [opcache]
@@ -688,6 +685,8 @@ install_php72(){
     CheckError "make install"
     # Config
     _info "Config ${php72_filename}..."
+    mkdir -p ${php72_location}/etc
+    cp -f php.ini-production ${php72_location}/etc/php.ini
     _config_php
     _warn "Please add the following two lines to your httpd.conf"
     echo AddType application/x-httpd-php .php .phtml
