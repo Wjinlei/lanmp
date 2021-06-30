@@ -54,10 +54,211 @@ _install_mysql_depend(){
     _info "Install dependencies packages for MySQL completed..."
 }
 
-_config_mysql(){
-    DownloadUrl "/etc/init.d/mysqld" "${download_sysv_url}/mysqld55"
+_create_sysv_script() {
+    cat > /etc/init.d/mysqld << 'EOF'
+#!/bin/bash
+# chkconfig: 2345 55 25
+# description: mysql service script
+
+### BEGIN INIT INFO
+# Provides:          mysql
+# Required-Start:    $all
+# Required-Stop:     $all
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: mysql
+# Description:       mysql service script
+### END INIT INFO
+
+prefix={mysql_location}
+
+NAME=mysql
+PID_FILE=$prefix/mysql_data/$NAME.pid
+BIN=$prefix/bin/mysqld_safe
+CONFIG_FILE=$prefix/my.cnf
+
+wait_for_pid () {
+    try=0
+    while test $try -lt 35 ; do
+        case "$1" in
+            'created')
+            if [ -f "$2" ] ; then
+                try=''
+                break
+            fi
+            ;;
+            'removed')
+            if [ ! -f "$2" ] ; then
+                try=''
+                break
+            fi
+            ;;
+        esac
+        echo -n .
+        try=`expr $try + 1`
+        sleep 1
+    done
+}
+
+start()
+{
+    echo -n "Starting $NAME..."
+    if [ -f $PID_FILE ];then
+        mPID=`cat $PID_FILE`
+        isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
+        if [ "$isRunning" != '' ];then
+            echo "$NAME (pid `pidof $NAME`) already running."
+            exit 1
+        fi
+    fi
+    $BIN --defaults-file=$CONFIG_FILE >/dev/null 2>&1 &
+    if [ "$?" != 0 ] ; then
+        echo " failed"
+        exit 1
+    fi
+    wait_for_pid created $PID_FILE
+    if [ -n "$try" ] ; then
+        echo " failed"
+        exit 1
+    else
+        echo " done"
+    fi
+}
+
+skip-grant-tables-start()
+{
+    echo -n "Starting $NAME..."
+    if [ -f $PID_FILE ];then
+        mPID=`cat $PID_FILE`
+        isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
+        if [ "$isRunning" != '' ];then
+            echo "$NAME (pid `pidof $NAME`) already running."
+            exit 1
+        fi
+    fi
+    $BIN --defaults-file=$CONFIG_FILE --skip-grant-tables >/dev/null 2>&1 &
+    if [ "$?" != 0 ] ; then
+        echo " failed"
+        exit 1
+    fi
+    wait_for_pid created $PID_FILE
+    if [ -n "$try" ] ; then
+        echo " failed"
+        exit 1
+    else
+        echo " done"
+    fi
+}
+
+stop()
+{
+    echo -n "Stoping $NAME... "
+    if [ -f $PID_FILE ];then
+        mPID=`cat $PID_FILE`
+        isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
+        if [ "$isRunning" = '' ];then
+            echo "$NAME is not running."
+            exit 1
+        fi
+    else
+        echo "PID file found, $NAME is not running ?"
+        exit 1
+    fi
+    kill `cat $PID_FILE`
+    wait_for_pid removed $PID_FILE
+    if [ -n "$try" ] ; then
+        echo " failed"
+        exit 1
+    else
+        echo " done"
+    fi
+}
+
+restart(){
+    $0 stop
+    $0 start
+}
+
+reload() {
+    echo -n "Reload service $NAME... "
+    if [ -f $PID_FILE ];then
+        mPID=`cat $PID_FILE`
+        isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
+        if [ "$isRunning" != '' ];then
+            kill -HUP `cat $PID_FILE`
+            echo " done"
+        else
+            echo "$NAME is not running, can't reload."
+            exit 1
+        fi
+    else
+        echo "$NAME is not running, can't reload."
+        exit 1
+    fi
+}
+
+status(){
+    if [ -f $PID_FILE ];then
+        mPID=`cat $PID_FILE`
+        isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
+        if [ "$isRunning" != '' ];then
+            echo "$NAME (pid `pidof $NAME`) is running."
+            exit 0
+        else
+            echo "$NAME already stopped."
+            exit 1
+        fi
+    else
+        echo "$NAME already stopped."
+        exit 1
+    fi
+}
+
+set-root-password(){
+    $0 stop
+    $0 skip-grant-tables-start
+    $prefix/bin/mysql -uroot -S /tmp/mysql.sock <<AAA
+FLUSH PRIVILEGES;
+ALTER USER root@'127.0.0.1' IDENTIFIED WITH mysql_native_password BY '$1';
+ALTER USER root@'localhost' IDENTIFIED WITH mysql_native_password BY '$1';
+FLUSH PRIVILEGES;
+AAA
+    $0 restart
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    skip-grant-tables-start)
+        skip-grant-tables-start
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+        restart
+        ;;
+    status)
+        status
+        ;;
+    reload)
+        reload
+        ;;
+    set-root-password)
+        set-root-password $2
+        ;;
+    *)
+        echo "Usage: $0 {start|skip-grant-tables-start|stop|restart|reload|status|set-root-password}"
+esac
+EOF
     sed -i "s|^prefix={mysql_location}$|prefix=${mysql_location}|g" /etc/init.d/mysqld
-    CheckError "chmod +x /etc/init.d/mysqld"
+}
+
+
+_config_mysql(){
+    _create_sysv_script
+    chmod +x /etc/init.d/mysqld
     update-rc.d -f mysqld defaults > /dev/null 2>&1
     chkconfig --add mysqld > /dev/null 2>&1
     /etc/init.d/mysqld start
@@ -173,8 +374,9 @@ install_mysql56(){
     mysql_location=${1}
     mysql_pass=${2}
 
-    # 如果存在第三个参数
-    if [ $# -ge 3 ]; then
+    if [ $# -lt 3 ]; then
+        mysql_port=3306
+    else
         mysql_port=${3}
     fi
 
@@ -209,8 +411,9 @@ install_mysql56(){
     CreateLib64Dir "${mysql_location}"
     echo $mysql_location > /tmp/mysql.info
     echo "Root password:${mysql_pass}, Please keep it safe."
-    _success "Install ${mysql56_filename} completed..."
+    # Clean
     rm -fr /tmp/${mysql56_filename}
+    _success "Install ${mysql56_filename} completed..."
 }
 
 main() {
@@ -221,6 +424,7 @@ main() {
     InstallPreSetting
     install_mysql56 ${1} ${2} ${3}
 }
+
 echo "The installation log will be written to /tmp/install.log"
 echo "Use tail -f /tmp/install.log to view dynamically"
 rm -fr ${cur_dir}/tmps
