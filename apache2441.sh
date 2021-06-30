@@ -385,8 +385,8 @@ case "$1" in
         echo "Usage: $0 {start|stop|restart|reload|status|test}"
 esac
 EOF
-    sed -i "s|^prefix={apache_location}$|prefix=${apache_location}|g" httpd
-    sed -i "s|{openssl102_location_lib}|${openssl102_location}/lib|g" httpd
+    sed -i "s|^prefix={apache_location}$|prefix=${apache_location}|g" /etc/init.d/httpd
+    sed -i "s|{openssl102_location_lib}|${openssl102_location}/lib|g" /etc/init.d/httpd
 }
 
 _config_apache(){
