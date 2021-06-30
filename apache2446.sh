@@ -40,7 +40,7 @@ _install_apache_depend(){
 
     id -u www >/dev/null 2>&1
     [ $? -ne 0 ] && useradd -M -U www -r -d /dev/null -s /sbin/nologin
-    mkdir -p ${apache_location}
+    mkdir -p ${apache_location} > /dev/null 2>&1
     _success "Install dependencies packages for Apache completed..."
 }
 
@@ -575,18 +575,20 @@ install_apache2446(){
 }
 
 rpminstall_apache2446(){
+    rpm_package_name="httpd-2.4.46-1.el7.x86_64.rpm"
     apache_location=/hws.com/hwsmaster/server/apache-2_4_46
     _install_apache_depend
-    DownloadUrl httpd-2.4.46-1.el7.x86_64.rpm ${download_root_url}/rpms/httpd-2.4.46-1.el7.x86_64.rpm
-    CheckError "rpm -ivh httpd-2.4.46-1.el7.x86_64.rpm --force --nodeps"
+    DownloadUrl ${rpm_package_name} ${download_root_url}/rpms/${rpm_package_name}
+    CheckError "rpm -ivh ${rpm_package_name} --force --nodeps"
     _config_apache
     /etc/init.d/httpd restart
 }
 
 debinstall_apache2446(){
+    deb_package_name="httpd-2.4.46-linux-amd64.deb"
     _install_apache_depend
-    DownloadUrl httpd-2.4.46-linux-amd64.deb ${download_root_url}/debs/httpd-2.4.46-linux-amd64.deb
-    CheckError "dpkg --force-depends -i httpd-2.4.46-linux-amd64.deb"
+    DownloadUrl ${deb_package_name} ${download_root_url}/debs/${deb_package_name}
+    CheckError "dpkg --force-depends -i ${deb_package_name}"
     mkdir -p ${var}/wwwlogs
     mkdir -p ${var}/wwwconf/apache
     mkdir -p ${var}/default/wwwlogs
@@ -594,21 +596,39 @@ debinstall_apache2446(){
 }
 
 main() {
+    case "$1" in
+        -h|--help)
+            printf "Usage: $0 Options prefix [port]
+Options:
+-h, --help                      Print this help text and exit
+-sc, --sc-install               Source code make install
+-pm, --pm-install               Package manager install
+"
+            ;;
+        -sc|--sc-install)
     include config
     include public
     load_config
     IsRoot
     InstallPreSetting
-
-    if [ $# -lt 2 ];then
-        install_apache2446 ${1}
-    else
-        if [ ${PM} == "yum" ]; then
-            rpminstall_apache2446
-        else
-            debinstall_apache2446
-        fi
-    fi
+            install_apache2446 ${2}
+            ;;
+        -pm|--pm-install)
+    include config
+    include public
+    load_config
+    IsRoot
+    InstallPreSetting
+            if [ ${PM} == "yum" ]; then
+                rpminstall_apache2446
+            else
+                debinstall_apache2446
+            fi
+            ;;
+        *)
+            echo "Missing parameters,Please Usage: $0 -h, Show Help" && exit 1
+            ;;
+    esac
 }
 
 echo "The installation log will be written to /tmp/install.log"
