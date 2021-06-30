@@ -105,13 +105,13 @@ _install_php_depend(){
         fi
         _install_freetype
     fi
-    _install_openssl102
-    _install_pcre
+    CheckError "_install_openssl102" ${openssl102_location}
+    CheckError "_install_pcre" ${pcre_location}
     _install_re2c
-    _install_icu4c
-    _install_libxml2
-    _install_libiconv
-    _install_curl
+    CheckError "_install_icu4c" ${icu4c_location}
+    CheckError "_install_libxml2" ${libxml2_location}
+    CheckError "_install_libiconv" ${libiconv_location}
+    CheckError "_install_curl" ${curl102_location}
     _success "Install dependencies packages for PHP completed..."
     # Fixed unixODBC issue
     if [ -f /usr/include/sqlext.h ] && [ ! -f /usr/local/include/sqlext.h ]; then
@@ -119,7 +119,7 @@ _install_php_depend(){
     fi
     id -u www >/dev/null 2>&1
     [ $? -ne 0 ] && useradd -M -U www -r -d /dev/null -s /sbin/nologin
-    mkdir -p ${php52_location}
+    mkdir -p ${php52_location} > /dev/null 2>&1
 }
 
 _install_openssl102(){
@@ -361,14 +361,192 @@ _install_freetype() {
 
 }
 
-_start_php52() {
-    #CheckError "${php52_location}/sbin/php-fpm start"
-    DownloadUrl "/etc/init.d/php52" "${download_sysv_url}/php52"
+_create_sysv_script(){
+    cat >> /etc/init.d/php52 << 'EOF'
+#!/bin/bash
+# chkconfig: 2345 55 25
+# description: php52 service script
+
+### BEGIN INIT INFO
+# Provides:          php52
+# Required-Start:    $all
+# Required-Stop:     $all
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: php52
+# Description:       php52 service script
+### END INIT INFO
+
+prefix={php52_location}
+
+NAME=php-cgi
+BIN=$prefix/bin/$NAME
+PID_FILE=$prefix/logs/php-fpm.pid
+CONFIG_FILE=$prefix/etc/php-fpm.conf
+
+wait_for_pid () {
+    try=0
+    while test $try -lt 35 ; do
+        case "$1" in
+            'created')
+            if [ -f "$2" ] ; then
+                try=''
+                break
+            fi
+            ;;
+            'removed')
+            if [ ! -f "$2" ] ; then
+                try=''
+                break
+            fi
+            ;;
+        esac
+        echo -n .
+        try=`expr $try + 1`
+        sleep 1
+    done
+}
+
+start()
+{
+    echo -n "Starting $NAME..."
+    if [ -f $PID_FILE ];then
+        mPID=`cat $PID_FILE`
+        isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
+        if [ "$isRunning" != '' ];then
+            echo "$NAME (pid $mPID) already running."
+            exit 1
+        fi
+    fi
+    $BIN --fpm --fpm-config $CONFIG_FILE
+    if [ "$?" != 0 ] ; then
+        echo " failed"
+        exit 1
+    fi
+    wait_for_pid created $PID_FILE
+    if [ -n "$try" ] ; then
+        echo " failed"
+        exit 1
+    else
+        echo " done"
+    fi
+}
+
+stop()
+{
+    echo -n "Stoping $NAME... "
+    if [ -f $PID_FILE ];then
+        mPID=`cat $PID_FILE`
+        isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
+        if [ "$isRunning" = '' ];then
+            echo "$NAME is not running."
+            exit 1
+        fi
+    else
+        echo "PID file found, $NAME is not running ?"
+        exit 1
+    fi
+    kill -QUIT `cat $PID_FILE`
+    wait_for_pid removed $PID_FILE
+    if [ -n "$try" ] ; then
+        echo " failed"
+        exit 1
+    else
+        echo " done"
+    fi
+}
+
+restart(){
+    $0 stop
+    $0 start
+}
+
+reload() {
+    echo -n "Reload service $NAME... "
+    if [ -f $PID_FILE ];then
+        mPID=`cat $PID_FILE`
+        isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
+        if [ "$isRunning" = '' ];then
+            echo "$NAME is not running."
+            exit 1
+        fi
+    else
+        echo "PID file found, $NAME is not running ?"
+        exit 1
+    fi
+    kill -USR2 `cat $PID_FILE`
+    if [ "$?" != 0 ] ; then
+        echo " failed"
+        exit 1
+    else
+        echo " done"
+    fi
+}
+
+status(){
+    if [ -f $PID_FILE ];then
+        mPID=`cat $PID_FILE`
+        isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
+        if [ "$isRunning" != '' ];then
+            echo "$NAME (pid $mPID) is running."
+            exit 0
+        else
+            echo "$NAME already stopped."
+            exit 1
+        fi
+    else
+        echo "$NAME already stopped."
+        exit 1
+    fi
+}
+
+force-stop() {
+    echo -n "force-stop $NAME "
+    if [ -f $PID_FILE ];then
+        mPID=`cat $PID_FILE`
+        isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
+        if [ "$isRunning" = '' ];then
+            echo "$NAME is not running."
+            exit 1
+        fi
+    else
+        echo "PID file found, $NAME is not running ?"
+        exit 1
+    fi
+    kill -TERM `cat $PID_FILE`
+    wait_for_pid removed $PID_FILE
+    if [ -n "$try" ] ; then
+        echo " failed"
+        exit 1
+    else
+        echo " done"
+    fi
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+        restart
+        ;;
+    status)
+        status
+        ;;
+    reload)
+        reload
+        ;;
+    force-stop)
+        force-stop
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart|reload|status|force-stop}"
+esac
+EOF
     sed -i "s|^prefix={php52_location}$|prefix=${php52_location}|g" /etc/init.d/php52
-    CheckError "chmod +x /etc/init.d/php52"
-    update-rc.d -f php52 defaults > /dev/null 2>&1
-    chkconfig --add php52 > /dev/null 2>&1
-    /etc/init.d/php52 start
 }
 
 _config_php(){
@@ -472,11 +650,6 @@ EOF
     </workers>
 </configuration>
 EOF
-
-    _start_php52
-    _warn "Please add the following two lines to your httpd.conf"
-    echo AddType application/x-httpd-php .php .phtml
-    echo AddType application/x-httpd-php-source .phps
 }
 
 install_php52(){
@@ -573,10 +746,21 @@ install_php52(){
     CheckError "./configure ${php_configure_args}"
     CheckError "parallel_make ZEND_EXTRA_LIBS='-liconv'"
     CheckError "make install"
+    # Config
     _info "Config ${php52_filename}..."
     _config_php
-    _success "${php52_filename} install completed..."
+    _warn "Please add the following two lines to your httpd.conf"
+    echo AddType application/x-httpd-php .php .phtml
+    echo AddType application/x-httpd-php-source .phps
+    # Start
+    _create_sysv_script
+    chmod +x /etc/init.d/php52
+    update-rc.d -f php52 defaults > /dev/null 2>&1
+    chkconfig --add php52 > /dev/null 2>&1
+    /etc/init.d/php52 start
+    # Clean
     rm -fr /tmp/${php52_filename}
+    _success "${php52_filename} install completed..."
 }
 
 main() {
@@ -587,6 +771,7 @@ main() {
     InstallPreSetting
     install_php52 ${1}
 }
+
 echo "The installation log will be written to /tmp/install.log"
 echo "Use tail -f /tmp/install.log to view dynamically"
 rm -fr ${cur_dir}/tmps
