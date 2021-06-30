@@ -33,7 +33,7 @@ _install_pureftpd_depends(){
     fi
     id -u www >/dev/null 2>&1
     [ $? -ne 0 ] && useradd -M -U www -r -d /dev/null -s /sbin/nologin
-    mkdir -p ${pureftpd_location}
+    mkdir -p ${pureftpd_location} >/dev/null 2>&1
     _success "Install dependencies packages for Pureftpd completed..."
 }
 
@@ -331,8 +331,9 @@ install_pure-ftpd(){
     fi
     pureftpd_location=${1}
 
-    # 如果存在第二个参数
-    if [ $# -ge 2 ]; then
+    if [ $# -lt 2 ]; then
+        ftp_port=21
+    else
         ftp_port=${2}
     fi
 
@@ -402,21 +403,39 @@ debinstall_pure-ftpd(){
 }
 
 main() {
+    case "$1" in
+        -h|--help)
+            printf "Usage: $0 Options prefix [port]
+Options:
+-h, --help                      Print this help text and exit
+-sc, --sc-install               Source code make install
+-pm, --pm-install               Package manager install
+"
+            ;;
+        -sc|--sc-install)
     include config
     include public
     load_config
     IsRoot
     InstallPreSetting
-
-    if [ $# -lt 3 ];then
-        install_pure-ftpd ${1} ${2}
-    else
-    if [ ${PM} == "yum" ]; then
-        rpminstall_pure-ftpd
-    else
-        debinstall_pure-ftpd
-    fi
-    fi
+            install_pure-ftpd ${2} ${3}
+            ;;
+        -pm|--pm-install)
+    include config
+    include public
+    load_config
+    IsRoot
+    InstallPreSetting
+            if [ ${PM} == "yum" ]; then
+                rpminstall_pure-ftpd
+            else
+                debinstall_pure-ftpd
+            fi
+            ;;
+        *)
+            echo "Missing parameters,Please Usage: $0 -h, Show Help" && exit 1
+            ;;
+    esac
 }
 
 echo "The installation log will be written to /tmp/install.log"
