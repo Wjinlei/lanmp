@@ -28,7 +28,7 @@ _install_pureftpd_depends(){
         local apt_depends=(libssl-dev zlib1g-dev)
         for depend in ${apt_depends[@]}
         do
-            InstallPack "apt -y install ${depend}"
+            InstallPack "apt-get -y install ${depend}"
         done
     fi
     id -u www >/dev/null 2>&1
@@ -37,68 +37,188 @@ _install_pureftpd_depends(){
     _success "Install dependencies packages for Pureftpd completed..."
 }
 
-_start_pureftpd() {
-    DownloadUrl "/etc/init.d/pure-ftpd" "${download_sysv_url}/pure-ftpd"
-    sed -i "s|^prefix={pureftpd_location}$|prefix=${pureftpd_location}|g" /etc/init.d/pure-ftpd
-    CheckError "chmod +x /etc/init.d/pure-ftpd"
-    update-rc.d -f pure-ftpd defaults > /dev/null 2>&1
-    chkconfig --add pure-ftpd > /dev/null 2>&1
-    /etc/init.d/pure-ftpd start
+_create_sysv_script(){
+    cat > /etc/init.d/pure-ftpd << 'EOF'
+#!/bin/bash
+# chkconfig: 2345 55 25
+# description: pure-ftpd service script
+
+### BEGIN INIT INFO
+# Provides:          pure-ftpd
+# Required-Start:    $all
+# Required-Stop:     $all
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: pure-ftpd
+# Description:       pure-ftpd service script
+### END INIT INFO
+
+prefix={pureftpd_location}
+
+NAME=pure-ftpd
+BIN=$prefix/sbin/$NAME
+PID_FILE=$prefix/var/run/$NAME.pid
+CONFIG_FILE=$prefix/etc/$NAME.conf
+
+wait_for_pid () {
+    try=0
+    while test $try -lt 35 ; do
+        case "$1" in
+            'created')
+            if [ -f "$2" ] ; then
+                try=''
+                break
+            fi
+            ;;
+            'removed')
+            if [ ! -f "$2" ] ; then
+                try=''
+                break
+            fi
+            ;;
+        esac
+        echo -n .
+        try=`expr $try + 1`
+        sleep 1
+    done
 }
 
-install_pure-ftpd(){
-    if [ $# -lt 1 ]; then
-        echo "[Parameter Error]: pureftpd_location [default_port]"
+start()
+{
+    echo -n "Starting $NAME..."
+    if [ -f $PID_FILE ];then
+        mPID=`cat $PID_FILE`
+        isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
+        if [ "$isRunning" != '' ];then
+            echo "$NAME (pid $mPID) already running."
+            exit 1
+        fi
+    fi
+    $BIN $CONFIG_FILE
+    if [ "$?" != 0 ] ; then
+        echo " failed"
         exit 1
     fi
-    pureftpd_location=${1}
-
-    # 如果存在第二个参数
-    if [ $# -ge 2 ]; then
-        ftp_port=${2}
+    wait_for_pid created $PID_FILE
+    if [ -n "$try" ] ; then
+        echo " failed"
+        exit 1
+    else
+        echo " done"
     fi
+}
 
-    _install_pureftpd_depends
-
-    CheckError "rm -fr ${pureftpd_location}"
-    cd /tmp
-    _info "Downloading and Extracting ${pureftpd_filename} files..."
-    DownloadFile "${pureftpd_filename}.tar.gz" ${pureftpd_download_url}
-    tar zxf ${pureftpd_filename}.tar.gz
-    cd ${pureftpd_filename}
-    pureftpd_configure_args="--prefix=${pureftpd_location} \
-    --with-puredb \
-    --with-quotas \
-    --with-cookie \
-    --with-virtualhosts \
-    --with-diraliases \
-    --with-sysquotas \
-    --with-ratios \
-    --with-altlog \
-    --with-paranoidmsg \
-    --with-shadow \
-    --with-welcomemsg \
-    --with-throttling \
-    --with-uploadscript \
-    --with-language=english \
-    --with-ftpwho \
-    --with-tls"
-    CheckError "./configure ${pureftpd_configure_args}"
-    CheckError "parallel_make"
-    CheckError "make install"
-    _info "Config ${pureftpd_filename}"
-    _create_pureftpd_config
-    _config_pureftpd
-    mkdir -p /etc/ssl/private
-    openssl rand -writerand ~/.rnd
-    openssl req -x509 -nodes -subj /C=CN/ST=Sichuan/L=Chengdu/O=HWS-LINUXMASTER/OU=HWS/CN=127.0.0.1/emailAddress=admin@hws.com -days 3560 -newkey rsa:2048 -keyout /etc/ssl/private/pure-ftpd.pem -out /etc/ssl/private/pure-ftpd.pem
-    if [ -f '/etc/ssl/private/pure-ftpd.pem' ];then
-        chmod 600 /etc/ssl/private/pure-ftpd.pem
+stop()
+{
+    echo -n "Stoping $NAME... "
+    if [ -f $PID_FILE ];then
+        mPID=`cat $PID_FILE`
+        isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
+        if [ "$isRunning" = '' ];then
+            echo "$NAME is not running."
+            exit 1
+        fi
+    else
+        echo "PID file found, $NAME is not running ?"
+        exit 1
     fi
+    kill -QUIT `cat $PID_FILE`
+    wait_for_pid removed $PID_FILE
+    if [ -n "$try" ] ; then
+        echo " failed"
+        exit 1
+    else
+        echo " done"
+    fi
+}
 
-    _start_pureftpd
-    _success "Install ${pureftpd_filename} completed..."
-    rm -fr /tmp/${pureftpd_filename}
+restart(){
+    $0 stop
+    $0 start
+}
+
+reload() {
+    echo -n "Reload service $NAME... "
+    if [ -f $PID_FILE ];then
+        mPID=`cat $PID_FILE`
+        isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
+        if [ "$isRunning" != '' ];then
+            kill -USR2 `cat $PID_FILE`
+            echo " done"
+        else
+            echo "$NAME is not running, can't reload."
+            exit 1
+        fi
+    else
+        echo "$NAME is not running, can't reload."
+        exit 1
+    fi
+}
+
+status(){
+    if [ -f $PID_FILE ];then
+        mPID=`cat $PID_FILE`
+        isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
+        if [ "$isRunning" != '' ];then
+            echo "$NAME (pid $mPID) is running."
+            exit 0
+        else
+            echo "$NAME already stopped."
+            exit 1
+        fi
+    else
+        echo "$NAME already stopped."
+        exit 1
+    fi
+}
+
+force-stop() {
+    echo -n "force-stop $NAME "
+    if [ -f $PID_FILE ];then
+        mPID=`cat $PID_FILE`
+        isRunning=`ps ax | awk '{ print $1 }' | grep -e "^${mPID}$"`
+        if [ "$isRunning" = '' ];then
+            echo "$NAME is not running."
+            exit 1
+        fi
+    else
+        echo "PID file found, $NAME is not running ?"
+        exit 1
+    fi
+    kill -TERM `cat $PID_FILE`
+    wait_for_pid removed $PID_FILE
+    if [ -n "$try" ] ; then
+        echo " failed"
+        exit 1
+    else
+        echo " done"
+    fi
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+        restart
+        ;;
+    status)
+        status
+        ;;
+    reload)
+        reload
+        ;;
+    force-stop)
+        force-stop
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart|reload|status|force-stop}"
+esac
+EOF
+    sed -i "s|^prefix={pureftpd_location}$|prefix=${pureftpd_location}|g" /etc/init.d/pure-ftpd
 }
 
 _create_pureftpd_config(){
@@ -204,10 +324,79 @@ TLS 1
 EOF
 }
 
-_config_pureftpd(){
+install_pure-ftpd(){
+    if [ $# -lt 1 ]; then
+        echo "[Parameter Error]: pureftpd_location [default_port]"
+        exit 1
+    fi
+    pureftpd_location=${1}
+
+    # 如果存在第二个参数
+    if [ $# -ge 2 ]; then
+        ftp_port=${2}
+    fi
+
+    _install_pureftpd_depends
+
+    CheckError "rm -fr ${pureftpd_location}"
+    cd /tmp
+    _info "Downloading and Extracting ${pureftpd_filename} files..."
+    DownloadFile "${pureftpd_filename}.tar.gz" ${pureftpd_download_url}
+    tar zxf ${pureftpd_filename}.tar.gz
+    cd ${pureftpd_filename}
+    pureftpd_configure_args="--prefix=${pureftpd_location} \
+    --with-puredb \
+    --with-quotas \
+    --with-cookie \
+    --with-virtualhosts \
+    --with-diraliases \
+    --with-sysquotas \
+    --with-ratios \
+    --with-altlog \
+    --with-paranoidmsg \
+    --with-shadow \
+    --with-welcomemsg \
+    --with-throttling \
+    --with-uploadscript \
+    --with-language=english \
+    --with-ftpwho \
+    --with-tls"
+    CheckError "./configure ${pureftpd_configure_args}"
+    CheckError "parallel_make"
+    CheckError "make install"
+    # Config
+    _info "Config ${pureftpd_filename}"
+    _create_pureftpd_config
     mkdir -p ${pureftpd_location}/var/run
     touch ${pureftpd_location}/etc/pureftpd.passwd
     touch ${pureftpd_location}/etc/pureftpd.pdb
+    mkdir -p /etc/ssl/private
+    openssl rand -writerand ~/.rnd
+    openssl req -x509 -nodes -subj /C=CN/ST=Sichuan/L=Chengdu/O=HWS-LINUXMASTER/OU=HWS/CN=127.0.0.1/emailAddress=admin@hws.com -days 3560 -newkey rsa:2048 -keyout /etc/ssl/private/pure-ftpd.pem -out /etc/ssl/private/pure-ftpd.pem
+    if [ -f '/etc/ssl/private/pure-ftpd.pem' ];then
+        chmod 600 /etc/ssl/private/pure-ftpd.pem
+    fi
+    # Start
+    _create_sysv_script
+    chmod +x /etc/init.d/pure-ftpd
+    update-rc.d -f pure-ftpd defaults > /dev/null 2>&1
+    chkconfig --add pure-ftpd > /dev/null 2>&1
+    /etc/init.d/pure-ftpd start
+    # Clean
+    rm -fr /tmp/${pureftpd_filename}
+    _success "Install ${pureftpd_filename} completed..."
+}
+
+rpminstall_pure-ftpd(){
+    _install_pureftpd_depends
+    DownloadUrl pure-ftpd-1.0.49-1.el7.x86_64.rpm ${download_root_url}/rpms/pure-ftpd-1.0.49-1.el7.x86_64.rpm
+    CheckError "rpm -ivh pure-ftpd-1.0.49-1.el7.x86_64.rpm --force --nodeps"
+}
+
+debinstall_pure-ftpd(){
+    _install_pureftpd_depends
+    DownloadUrl pureftpd-1.0.49-linux-amd64.deb ${download_root_url}/debs/pureftpd-1.0.49-linux-amd64.deb
+    CheckError "dpkg --force-depends -i pureftpd-1.0.49-linux-amd64.deb"
 }
 
 main() {
@@ -216,8 +405,18 @@ main() {
     load_config
     IsRoot
     InstallPreSetting
-    install_pure-ftpd ${1} ${2}
+
+    if [ $# -lt 3 ];then
+        install_pure-ftpd ${1} ${2}
+    else
+        if [ ${PM} == "yum" ]; then
+            rpminstall_pure-ftpd
+        else
+            debinstall_pure-ftpd
+        fi
+    fi
 }
+
 echo "The installation log will be written to /tmp/install.log"
 echo "Use tail -f /tmp/install.log to view dynamically"
 rm -fr ${cur_dir}/tmps
