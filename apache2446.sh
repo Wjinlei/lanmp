@@ -626,6 +626,11 @@ Options:
             fi
             ;;
         *)
+    include config
+    include public
+    load_config
+    IsRoot
+    InstallPreSetting
             install_apache2446 ${1}
             ;;
     esac

@@ -437,6 +437,11 @@ Options:
             fi
             ;;
         *)
+    include config
+    include public
+    load_config
+    IsRoot
+    InstallPreSetting
             install_nginx118 ${1}
             ;;
     esac

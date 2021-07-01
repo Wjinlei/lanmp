@@ -293,6 +293,11 @@ Options:
             fi
             ;;
         *)
+    include config
+    include public
+    load_config
+    IsRoot
+    InstallPreSetting
             install_redis609 ${1} ${2}
             ;;
     esac

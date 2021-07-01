@@ -749,6 +749,11 @@ Options:
             fi
             ;;
         *)
+    include config
+    include public
+    load_config
+    IsRoot
+    InstallPreSetting
             install_php73 ${1}
             ;;
     esac

@@ -436,6 +436,11 @@ Options:
             fi
             ;;
         *)
+    include config
+    include public
+    load_config
+    IsRoot
+    InstallPreSetting
             install_nginx116 ${1}
             ;;
     esac

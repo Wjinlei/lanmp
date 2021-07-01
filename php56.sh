@@ -773,6 +773,11 @@ Options:
             fi
             ;;
         *)
+    include config
+    include public
+    load_config
+    IsRoot
+    InstallPreSetting
             install_php56 ${1}
             ;;
     esac
