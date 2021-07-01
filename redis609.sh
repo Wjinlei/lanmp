@@ -22,7 +22,7 @@ _install_redis_depends(){
         local yum_depends=(centos-release-scl devtoolset-9-gcc devtoolset-9-gcc-c++ devtoolset-9-binutils)
         for depend in ${yum_depends[@]}
         do
-            InstallPack "yum -y install ${depend}"
+            yum -y install ${depend} > /dev/null 2>&1
         done
         source /opt/rh/devtoolset-9/enable >/dev/null 2>&1
     fi
