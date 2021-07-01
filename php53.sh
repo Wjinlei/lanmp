@@ -742,7 +742,7 @@ Options:
             fi
             ;;
         *)
-            echo "Missing parameters,Please Usage: $0 -h, Show Help" && exit 1
+            install_php53 ${1}
             ;;
     esac
 }

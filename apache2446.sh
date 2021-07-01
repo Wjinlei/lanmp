@@ -626,7 +626,7 @@ Options:
             fi
             ;;
         *)
-            echo "Missing parameters,Please Usage: $0 -h, Show Help" && exit 1
+            install_apache2446 ${1}
             ;;
     esac
 }

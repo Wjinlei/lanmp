@@ -436,7 +436,7 @@ Options:
             fi
             ;;
         *)
-            echo "Missing parameters,Please Usage: $0 -h, Show Help" && exit 1
+            install_nginx116 ${1}
             ;;
     esac
 }
