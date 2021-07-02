@@ -399,7 +399,9 @@ CheckInstalled(){
     local location="$2"
     if [ -d "${location}" ]; then
         _warn "${location} already exists, skipped the installation."
+        export PKG_CONFIG_PATH=${location}/lib/pkgconfig:$PKG_CONFIG_PATH
         AddToEnv "${location}"
+        CreateLib64Dir "${location}"
     else
         ${cmd}
     fi
