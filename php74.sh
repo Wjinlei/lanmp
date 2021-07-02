@@ -105,13 +105,13 @@ _install_php_depend(){
         fi
         _install_freetype
     fi
-    CheckError "_install_openssl102" ${openssl102_location}
-    CheckError "_install_pcre2" ${pcre2_location}
+    CheckInstalled "_install_openssl102" ${openssl102_location}
+    CheckInstalled "_install_pcre2" ${pcre2_location}
     _install_re2c
-    CheckError "_install_icu4c" ${icu4c_location}
-    CheckError "_install_libxml2" ${libxml2_location}
-    CheckError "_install_libiconv" ${libiconv_location}
-    CheckError "_install_curl" ${curl102_location}
+    CheckInstalled "_install_icu4c" ${icu4c_location}
+    CheckInstalled "_install_libxml2" ${libxml2_location}
+    CheckInstalled "_install_libiconv" ${libiconv_location}
+    CheckInstalled "_install_curl" ${curl102_location}
     _success "Install dependencies packages for PHP completed..."
     # Fixed unixODBC issue
     if [ -f /usr/include/sqlext.h ] && [ ! -f /usr/local/include/sqlext.h ]; then
