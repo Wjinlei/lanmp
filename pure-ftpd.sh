@@ -389,7 +389,8 @@ install_pure-ftpd(){
 }
 
 rpminstall_pure-ftpd(){
-    rpm_package_name="pure-ftpd-1.0.49-1.el7.x86_64.rpm"
+    _GetRPMArch
+    rpm_package_name="pure-ftpd-1.0.49-1.${RPMArch}.x86_64.rpm"
     _install_pureftpd_depends
     DownloadUrl ${rpm_package_name} ${download_root_url}/rpms/${rpm_package_name}
     CheckError "rpm -ivh ${rpm_package_name} --force --nodeps"

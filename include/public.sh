@@ -80,6 +80,14 @@ _get_package_manager(){
     fi
 }
 
+_GetRPMArch() {
+    RPMArch="el7"
+    rpm -qa bash|grep el8 > /dev/null 2>&1
+    if [ $? -eq 0 ]; then
+        RPMArch="el8"
+    fi
+}
+
 
 Is64bit(){
     if [ $(getconf WORD_BIT) = '32' ] && [ $(getconf LONG_BIT) = '64' ]; then
