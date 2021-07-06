@@ -705,7 +705,8 @@ install_php70(){
 }
 
 rpminstall_php70(){
-    rpm_package_name="php70-7.0.33-1.el7.x86_64.rpm"
+    _GetRPMArch
+    rpm_package_name="php70-7.0.33-1.${RPMArch}.x86_64.rpm"
     php70_location=/hws.com/hwsmaster/server/php-7_0_33
     _install_php_depend
     DownloadUrl ${rpm_package_name} ${download_root_url}/rpms/${rpm_package_name}

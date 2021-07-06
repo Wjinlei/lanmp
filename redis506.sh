@@ -234,7 +234,8 @@ install_redis506(){
 }
 
 rpminstall_redis506(){
-    rpm_package_name="redis-5.0.6-1.el7.x86_64.rpm"
+    _GetRPMArch
+    rpm_package_name="redis-5.0.6-1.${RPMArch}.x86_64.rpm"
     DownloadUrl ${rpm_package_name} ${download_root_url}/rpms/${rpm_package_name}
     CheckError "rpm -ivh ${rpm_package_name}"
 }

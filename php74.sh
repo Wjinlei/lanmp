@@ -700,7 +700,8 @@ install_php74(){
 }
 
 rpminstall_php74(){
-    rpm_package_name="php74-7.4.13-1.el7.x86_64.rpm"
+    _GetRPMArch
+    rpm_package_name="php74-7.4.13-1.${RPMArch}.x86_64.rpm"
     php74_location=/hws.com/hwsmaster/server/php-7_4_13
     _install_php_depend
     DownloadUrl ${rpm_package_name} ${download_root_url}/rpms/${rpm_package_name}

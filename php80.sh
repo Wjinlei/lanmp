@@ -699,7 +699,8 @@ install_php80(){
 }
 
 rpminstall_php80(){
-    rpm_package_name="php80-8.0.0-1.el7.x86_64.rpm"
+    _GetRPMArch
+    rpm_package_name="php80-8.0.0-1.${RPMArch}.x86_64.rpm"
     php80_location=/hws.com/hwsmaster/server/php-8_0_0
     _install_php_depend
     DownloadUrl ${rpm_package_name} ${download_root_url}/rpms/${rpm_package_name}

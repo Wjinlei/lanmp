@@ -695,7 +695,8 @@ install_php53(){
 }
 
 rpminstall_php53(){
-    rpm_package_name="php53-5.3.29-1.el7.x86_64.rpm"
+    _GetRPMArch
+    rpm_package_name="php53-5.3.29-1.${RPMArch}.x86_64.rpm"
     php53_location=/hws.com/hwsmaster/server/php-5_3_29
     _install_php_depend
     DownloadUrl ${rpm_package_name} ${download_root_url}/rpms/${rpm_package_name}

@@ -250,7 +250,8 @@ install_redis609(){
 }
 
 rpminstall_redis609(){
-    rpm_package_name="redis-6.0.9-1.el7.x86_64.rpm"
+    _GetRPMArch
+    rpm_package_name="redis-6.0.9-1.${RPMArch}.x86_64.rpm"
     _install_redis_depends
     DownloadUrl ${rpm_package_name} ${download_root_url}/rpms/${rpm_package_name}
     CheckError "rpm -ivh ${rpm_package_name}"

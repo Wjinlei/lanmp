@@ -575,7 +575,8 @@ install_apache2446(){
 }
 
 rpminstall_apache2446(){
-    rpm_package_name="httpd-2.4.46-1.el7.x86_64.rpm"
+    _GetRPMArch
+    rpm_package_name="httpd-2.4.46-1.${RPMArch}.x86_64.rpm"
     apache_location=/hws.com/hwsmaster/server/apache-2_4_46
     _install_apache_depend
     DownloadUrl ${rpm_package_name} ${download_root_url}/rpms/${rpm_package_name}

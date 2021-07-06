@@ -385,7 +385,8 @@ install_nginx116(){
 }
 
 rpminstall_nginx116(){
-    rpm_package_name="nginx-1.16.1-1.el7.x86_64.rpm"
+    _GetRPMArch
+    rpm_package_name="nginx-1.16.1-1.${RPMArch}.x86_64.rpm"
     nginx_location=/hws.com/hwsmaster/server/nginx-1_16_1
     _install_nginx_depend
     DownloadUrl ${rpm_package_name} ${download_root_url}/rpms/${rpm_package_name}

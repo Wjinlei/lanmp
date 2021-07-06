@@ -692,7 +692,8 @@ install_php54(){
 }
 
 rpminstall_php54(){
-    rpm_package_name="php54-5.4.45-1.el7.x86_64.rpm"
+    _GetRPMArch
+    rpm_package_name="php54-5.4.45-1.${RPMArch}.x86_64.rpm"
     php54_location=/hws.com/hwsmaster/server/php-5_4_45
     _install_php_depend
     DownloadUrl ${rpm_package_name} ${download_root_url}/rpms/${rpm_package_name}

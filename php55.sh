@@ -726,7 +726,8 @@ install_php55(){
 }
 
 rpminstall_php55(){
-    rpm_package_name="php55-5.5.38-1.el7.x86_64.rpm"
+    _GetRPMArch
+    rpm_package_name="php55-5.5.38-1.${RPMArch}.x86_64.rpm"
     php55_location=/hws.com/hwsmaster/server/php-5_5_38
     _install_php_depend
     DownloadUrl ${rpm_package_name} ${download_root_url}/rpms/${rpm_package_name}

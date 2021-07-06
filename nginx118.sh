@@ -386,7 +386,8 @@ install_nginx118(){
 }
 
 rpminstall_nginx118(){
-    rpm_package_name="nginx-1.18.0-1.el7.x86_64.rpm"
+    _GetRPMArch
+    rpm_package_name="nginx-1.18.0-1.${RPMArch}.x86_64.rpm"
     nginx_location=/hws.com/hwsmaster/server/nginx-1_18_0
     _install_nginx_depend
     DownloadUrl ${rpm_package_name} ${download_root_url}/rpms/${rpm_package_name}

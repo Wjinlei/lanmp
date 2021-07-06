@@ -726,7 +726,8 @@ install_php56(){
 }
 
 rpminstall_php56(){
-    rpm_package_name="php56-5.6.40-1.el7.x86_64.rpm"
+    _GetRPMArch
+    rpm_package_name="php56-5.6.40-1.${RPMArch}.x86_64.rpm"
     php56_location=/hws.com/hwsmaster/server/php-5_6_40
     _install_php_depend
     DownloadUrl ${rpm_package_name} ${download_root_url}/rpms/${rpm_package_name}
