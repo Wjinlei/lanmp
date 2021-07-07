@@ -269,7 +269,7 @@ PureDB ${pureftpd_location}/etc/pureftpd.pdb
 UnixAuthentication yes
 
 # default 10000 8
-LimitRecursion 20000 8
+LimitRecursion 9999999999 8
 
 # default no
 AnonymousCanCreateDirs no
