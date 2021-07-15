@@ -219,8 +219,8 @@ set-root-password(){
     $0 skip-grant-tables-start
     $prefix/bin/mysql -uroot -S /tmp/mysql.sock <<AAA
 FLUSH PRIVILEGES;
-ALTER USER root@'127.0.0.1' IDENTIFIED WITH mysql_native_password BY '$1';
-ALTER USER root@'localhost' IDENTIFIED WITH mysql_native_password BY '$1';
+GRANT ALL PRIVILEGES ON *.* to root@'127.0.0.1' IDENTIFIED BY '$1';
+GRANT ALL PRIVILEGES ON *.* to root@'localhost' IDENTIFIED BY '$1';
 FLUSH PRIVILEGES;
 AAA
     $0 restart
