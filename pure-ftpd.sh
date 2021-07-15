@@ -19,22 +19,87 @@ include(){
 _install_pureftpd_depends(){
     _info "Starting to install dependencies packages for Pureftpd..."
     if [ "${PM}" = "yum" ];then
-        local yum_depends=(openssl-devel zlib-devel)
+        local yum_depends=(zlib-devel)
         for depend in ${yum_depends[@]}
         do
             InstallPack "yum -y install ${depend}"
         done
     elif [ "${PM}" = "apt-get" ];then
-        local apt_depends=(libssl-dev zlib1g-dev)
+        local apt_depends=(zlib1g-dev)
         for depend in ${apt_depends[@]}
         do
             InstallPack "apt-get -y install ${depend}"
         done
     fi
+    CheckInstalled "_install_openssl102" ${openssl102_location}
     id -u www >/dev/null 2>&1
     [ $? -ne 0 ] && useradd -M -U www -r -d /dev/null -s /sbin/nologin
     mkdir -p ${pureftpd_location} >/dev/null 2>&1
     _success "Install dependencies packages for Pureftpd completed..."
+}
+
+_install_openssl102(){
+    cd /tmp
+    _info "${openssl102_filename} install start..."
+    rm -fr ${openssl102_filename}
+    DownloadFile "${openssl102_filename}.tar.gz" "${openssl102_download_url}"
+    tar zxf ${openssl102_filename}.tar.gz
+    cd ${openssl102_filename}
+    CheckError "./config --prefix=${openssl102_location} --openssldir=${openssl102_location} -fPIC shared zlib"
+    CheckError "parallel_make"
+    CheckError "make install"
+
+    #Debian8
+    if Is64bit; then
+        if [ -f /usr/lib/x86_64-linux-gnu/libssl.a ]; then
+            ln -sf ${openssl102_location}/lib/libssl.a /usr/lib/x86_64-linux-gnu
+        fi
+        if [ -f /usr/lib/x86_64-linux-gnu/libssl.so ]; then
+            ln -sf ${openssl102_location}/lib/libssl.so /usr/lib/x86_64-linux-gnu
+        fi
+        if [ -f /usr/lib/x86_64-linux-gnu/libssl.so.1.0.0 ]; then
+            ln -sf ${openssl102_location}/lib/libssl.so.1.0.0 /usr/lib/x86_64-linux-gnu
+        fi
+        if [ -f /usr/lib/x86_64-linux-gnu/libcrypto.a ]; then
+            ln -sf ${openssl102_location}/lib/libcrypto.a /usr/lib/x86_64-linux-gnu
+        fi
+        if [ -f /usr/lib/x86_64-linux-gnu/libcrypto.so ]; then
+            ln -sf ${openssl102_location}/lib/libcrypto.so /usr/lib/x86_64-linux-gnu
+        fi
+        if [ -f /usr/lib/x86_64-linux-gnu/libcrypto.so.1.0.0 ]; then
+            ln -sf ${openssl102_location}/lib/libcrypto.so.1.0.0 /usr/lib/x86_64-linux-gnu
+        fi
+    else
+        if [ -f /usr/lib/i386-linux-gnu/libssl.a ]; then
+            ln -sf ${openssl102_location}/lib/libssl.a /usr/lib/i386-linux-gnu
+        fi
+        if [ -f /usr/lib/i386-linux-gnu/libssl.so ]; then
+            ln -sf ${openssl102_location}/lib/libssl.so /usr/lib/i386-linux-gnu
+        fi
+        if [ -f /usr/lib/i386-linux-gnu/libssl.so.1.0.0 ]; then
+            ln -sf ${openssl102_location}/lib/libssl.so.1.0.0 /usr/lib/i386-linux-gnu
+        fi
+        if [ -f /usr/lib/i386-linux-gnu/libcrypto.a ]; then
+            ln -sf ${openssl102_location}/lib/libcrypto.a /usr/lib/i386-linux-gnu
+        fi
+        if [ -f /usr/lib/i386-linux-gnu/libcrypto.so ]; then
+            ln -sf ${openssl102_location}/lib/libcrypto.so /usr/lib/i386-linux-gnu
+        fi
+        if [ -f /usr/lib/i386-linux-gnu/libcrypto.so.1.0.0 ]; then
+            ln -sf ${openssl102_location}/lib/libcrypto.so.1.0.0 /usr/lib/i386-linux-gnu
+        fi
+    fi
+
+    AddToEnv "${openssl102_location}"
+    CreateLib64Dir "${openssl102_location}"
+    export PKG_CONFIG_PATH=${openssl102_location}/lib/pkgconfig:$PKG_CONFIG_PATH
+    if ! grep -qE "^${openssl102_location}/lib" /etc/ld.so.conf.d/*.conf; then
+        echo "${openssl102_location}/lib" > /etc/ld.so.conf.d/openssl102.conf
+    fi
+    ldconfig
+    _success "${openssl102_filename} install completed..."
+    rm -f /tmp/${openssl102_filename}.tar.gz
+    rm -fr /tmp/${openssl102_filename}
 }
 
 _create_sysv_script(){
@@ -372,7 +437,7 @@ install_pure-ftpd(){
     touch ${pureftpd_location}/etc/pureftpd.passwd
     touch ${pureftpd_location}/etc/pureftpd.pdb
     mkdir -p /etc/ssl/private
-    openssl rand -writerand ~/.rnd
+    openssl rand -writerand ~/.rnd > /dev/null 2>&1
     openssl req -x509 -nodes -subj /C=CN/ST=Sichuan/L=Chengdu/O=HWS-LINUXMASTER/OU=HWS/CN=127.0.0.1/emailAddress=admin@hws.com -days 3560 -newkey rsa:2048 -keyout /etc/ssl/private/pure-ftpd.pem -out /etc/ssl/private/pure-ftpd.pem
     if [ -f '/etc/ssl/private/pure-ftpd.pem' ];then
         chmod 600 /etc/ssl/private/pure-ftpd.pem
