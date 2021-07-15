@@ -137,41 +137,25 @@ _install_openssl102(){
 
     #Debian8
     if Is64bit; then
-        if [ -f /usr/lib/x86_64-linux-gnu/libssl.a ]; then
-            ln -sf ${openssl102_location}/lib/libssl.a /usr/lib/x86_64-linux-gnu
-        fi
-        if [ -f /usr/lib/x86_64-linux-gnu/libssl.so ]; then
-            ln -sf ${openssl102_location}/lib/libssl.so /usr/lib/x86_64-linux-gnu
-        fi
         if [ -f /usr/lib/x86_64-linux-gnu/libssl.so.1.0.0 ]; then
+            ln -sf ${openssl102_location}/lib/libssl.a /usr/lib/x86_64-linux-gnu
+            ln -sf ${openssl102_location}/lib/libssl.so /usr/lib/x86_64-linux-gnu
             ln -sf ${openssl102_location}/lib/libssl.so.1.0.0 /usr/lib/x86_64-linux-gnu
         fi
-        if [ -f /usr/lib/x86_64-linux-gnu/libcrypto.a ]; then
-            ln -sf ${openssl102_location}/lib/libcrypto.a /usr/lib/x86_64-linux-gnu
-        fi
-        if [ -f /usr/lib/x86_64-linux-gnu/libcrypto.so ]; then
-            ln -sf ${openssl102_location}/lib/libcrypto.so /usr/lib/x86_64-linux-gnu
-        fi
         if [ -f /usr/lib/x86_64-linux-gnu/libcrypto.so.1.0.0 ]; then
+            ln -sf ${openssl102_location}/lib/libcrypto.a /usr/lib/x86_64-linux-gnu
+            ln -sf ${openssl102_location}/lib/libcrypto.so /usr/lib/x86_64-linux-gnu
             ln -sf ${openssl102_location}/lib/libcrypto.so.1.0.0 /usr/lib/x86_64-linux-gnu
         fi
     else
-        if [ -f /usr/lib/i386-linux-gnu/libssl.a ]; then
-            ln -sf ${openssl102_location}/lib/libssl.a /usr/lib/i386-linux-gnu
-        fi
-        if [ -f /usr/lib/i386-linux-gnu/libssl.so ]; then
-            ln -sf ${openssl102_location}/lib/libssl.so /usr/lib/i386-linux-gnu
-        fi
         if [ -f /usr/lib/i386-linux-gnu/libssl.so.1.0.0 ]; then
+            ln -sf ${openssl102_location}/lib/libssl.a /usr/lib/i386-linux-gnu
+            ln -sf ${openssl102_location}/lib/libssl.so /usr/lib/i386-linux-gnu
             ln -sf ${openssl102_location}/lib/libssl.so.1.0.0 /usr/lib/i386-linux-gnu
         fi
-        if [ -f /usr/lib/i386-linux-gnu/libcrypto.a ]; then
-            ln -sf ${openssl102_location}/lib/libcrypto.a /usr/lib/i386-linux-gnu
-        fi
-        if [ -f /usr/lib/i386-linux-gnu/libcrypto.so ]; then
-            ln -sf ${openssl102_location}/lib/libcrypto.so /usr/lib/i386-linux-gnu
-        fi
         if [ -f /usr/lib/i386-linux-gnu/libcrypto.so.1.0.0 ]; then
+            ln -sf ${openssl102_location}/lib/libcrypto.a /usr/lib/i386-linux-gnu
+            ln -sf ${openssl102_location}/lib/libcrypto.so /usr/lib/i386-linux-gnu
             ln -sf ${openssl102_location}/lib/libcrypto.so.1.0.0 /usr/lib/i386-linux-gnu
         fi
     fi
