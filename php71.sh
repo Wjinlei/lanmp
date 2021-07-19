@@ -160,6 +160,7 @@ _install_openssl102(){
 
     AddToEnv "${openssl102_location}"
     CreateLib64Dir "${openssl102_location}"
+    export PKG_CONFIG_PATH=${openssl102_location}/lib/pkgconfig:$PKG_CONFIG_PATH
     if ! grep -qE "^${openssl102_location}/lib" /etc/ld.so.conf.d/*.conf; then
         echo "${openssl102_location}/lib" > /etc/ld.so.conf.d/openssl102.conf
     fi
