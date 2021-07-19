@@ -169,121 +169,6 @@ EOF
     source envs
 }
 
-_install_tools(){
-    _info "Starting to install development tools..."
-    if [ "${PM}" = "yum" ];then
-        InstallPack "yum -y install epel-release"
-        yum_depends=(
-            gcc
-            gcc-c++
-            make
-            perl
-            wget
-            net-tools
-            openssl
-            zlib
-            automake
-            psmisc
-            procps
-            zip
-            unzip
-            bzip2
-            xz
-            tar
-            e2fsprogs
-        )
-        for depend in ${yum_depends[@]}
-        do
-            InstallPack "yum -y install ${depend}"
-        done
-        # Centos8, 开启PowerTools仓库
-        dnf -y install dnf-plugins-core >/dev/null 2>&1
-        dnf config-manager --enable powertools >/dev/null 2>&1
-        dnf config-manager --enable PowerTools >/dev/null 2>&1
-        # 安装时间同步工具
-        yum -y install ntpdate >/dev/null 2>&1
-        dnf -y install chrony >/dev/null 2>&1
-    elif [ "${PM}" = "apt-get" ];then
-        apt_depends=(
-            gcc
-            g++
-            make
-            perl
-            wget
-            net-tools
-            openssl
-            zlib1g
-            automake
-            psmisc
-            procps
-            zip
-            unzip
-            bzip2
-            xz-utils
-            tar
-            e2fsprogs
-        )
-        apt-get update > /dev/null 2>&1
-        for depend in ${apt_depends[@]}
-        do
-            InstallPack "apt-get -y install ${depend}"
-        done
-        apt-get -y install ntpdate >/dev/null 2>&1
-    fi
-    if ! grep -qE "^/usr/local/lib" /etc/ld.so.conf.d/*.conf; then
-        echo "/usr/local/lib" > /etc/ld.so.conf.d/locallib.conf
-    fi
-    if Is64bit; then
-        if ! grep -qE "^/usr/lib/x86_64-linux-gnu" /etc/ld.so.conf.d/*.conf; then
-            echo "/lib/x86_64-linux-gnu" > /etc/ld.so.conf.d/x86_64-linux-gnu.conf
-            echo "/usr/lib/x86_64-linux-gnu" >> /etc/ld.so.conf.d/x86_64-linux-gnu.conf
-            echo "/usr/local/lib/x86_64-linux-gnu" >> /etc/ld.so.conf.d/x86_64-linux-gnu.conf
-        fi
-    else
-        if ! grep -qE "^/usr/lib/i386-linux-gnu" /etc/ld.so.conf.d/*.conf; then
-            echo "/lib/i386-linux-gnu" > /etc/ld.so.conf.d/i386-linux-gnu.conf
-            echo "/usr/lib/i386-linux-gnu" >> /etc/ld.so.conf.d/i386-linux-gnu.conf
-            echo "/usr/local/lib/i386-linux-gnu" >> /etc/ld.so.conf.d/i386-linux-gnu.conf
-        fi
-    fi
-    ldconfig
-    _info "Install development tools completed..."
-
-    _check_command_exist "gcc"
-    _check_command_exist "g++"
-    _check_command_exist "make"
-    _check_command_exist "wget"
-    _check_command_exist "perl"
-    _check_command_exist "netstat"
-    _check_command_exist "openssl"
-    _check_command_exist "automake"
-    _check_command_exist "killall"
-    _check_command_exist "pkill"
-    _check_command_exist "zip"
-    _check_command_exist "unzip"
-    _check_command_exist "xz"
-    _check_command_exist "tar"
-    _check_command_exist "chattr"
-    _check_command_exist "lsattr"
-    _check_command_exist "free"
-}
-
-
-_check_command_exist(){
-    local cmd="$1"
-    if eval type type > /dev/null 2>&1; then
-        eval type "$cmd" > /dev/null 2>&1
-    elif command > /dev/null 2>&1; then
-        command -v "$cmd" > /dev/null 2>&1
-    else
-        which "$cmd" > /dev/null 2>&1
-    fi
-    rt=$?
-    if [ ${rt} -ne 0 ]; then
-        _error "$cmd is not installed, please install it and try again."
-    fi
-}
-
 _set_timezone() {
     _info "Starting set to timezone..."
     rm -f /etc/localtime
@@ -419,7 +304,6 @@ InstallPreSetting(){
     _set_envs
     _disable_selinux
     _get_package_manager
-    _install_tools
     _check_ram
     _sync_time
 }
