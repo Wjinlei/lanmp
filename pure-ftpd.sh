@@ -19,19 +19,18 @@ include(){
 _install_pureftpd_depends(){
     _info "Starting to install dependencies packages for Pureftpd..."
     if [ "${PM}" = "yum" ];then
-        local yum_depends=(zlib-devel)
+        local yum_depends=(openssl-devel zlib-devel)
         for depend in ${yum_depends[@]}
         do
             InstallPack "yum -y install ${depend}"
         done
     elif [ "${PM}" = "apt-get" ];then
-        local apt_depends=(zlib1g-dev)
+        local apt_depends=(openssl-dev zlib1g-dev)
         for depend in ${apt_depends[@]}
         do
             InstallPack "apt-get -y install ${depend}"
         done
     fi
-    CheckInstalled "_install_openssl102" ${openssl102_location}
     id -u www >/dev/null 2>&1
     [ $? -ne 0 ] && useradd -M -U www -r -d /dev/null -s /sbin/nologin
     mkdir -p ${pureftpd_location} >/dev/null 2>&1
@@ -449,6 +448,7 @@ rpminstall_pure-ftpd(){
 debinstall_pure-ftpd(){
     deb_package_name="pureftpd-1.0.49-linux-amd64.deb"
     _install_pureftpd_depends
+    CheckInstalled "_install_openssl102" ${openssl102_location}
     DownloadUrl ${deb_package_name} ${download_root_url}/debs/${deb_package_name}
     CheckError "dpkg --force-depends -i ${deb_package_name}"
 }
