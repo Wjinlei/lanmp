@@ -25,7 +25,7 @@ _install_pureftpd_depends(){
             InstallPack "yum -y install ${depend}"
         done
     elif [ "${PM}" = "apt-get" ];then
-        local apt_depends=(openssl-dev zlib1g-dev)
+        local apt_depends=(libssl-dev zlib1g-dev)
         for depend in ${apt_depends[@]}
         do
             InstallPack "apt-get -y install ${depend}"
