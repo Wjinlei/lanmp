@@ -349,6 +349,7 @@ install_nginx116(){
     --http-scgi-temp-path=${nginx_location}/var/tmp/scgi \
     --with-pcre=/tmp/${pcre_filename} \
     --with-openssl=/tmp/${openssl102_filename} \
+    --with-compat \
     --user=www \
     --group=www \
     --with-stream \
