@@ -309,7 +309,6 @@ EOF
     mkdir -p ${var}/wwwconf/nginx
     mkdir -p ${var}/default/wwwlogs
     mkdir -p ${var}/default/wwwconf/nginx
-    chown -R www:www ${nginx_location}
 }
 
 

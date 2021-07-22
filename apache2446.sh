@@ -519,7 +519,6 @@ EOF
     mkdir -p ${var}/wwwconf/apache
     mkdir -p ${var}/default/wwwlogs
     mkdir -p ${var}/default/wwwconf/apache
-    chown -R www:www ${apache_location}
 }
 
 install_apache2446(){
