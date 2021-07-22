@@ -42,7 +42,7 @@ _install_php_depend(){
             libpcre3-dev libtool libjpeg-dev libpng-dev libpspell-dev
             libmhash-dev libenchant-dev libwebp-dev libxpm-dev libvpx-dev
             libreadline-dev libzip-dev libmcrypt-dev unixodbc-dev
-            libtidy-dev python-dev
+            libtidy-dev python-dev libonig-dev
         )
         for depend in ${apt_depends[@]}
         do
