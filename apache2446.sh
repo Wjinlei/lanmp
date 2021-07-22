@@ -260,7 +260,7 @@ _create_sysv_script(){
 # description: apache service script
 
 ### BEGIN INIT INFO
-# Provides:          apache
+# Provides:          httpd
 # Required-Start:    $all
 # Required-Stop:     $all
 # Default-Start:     2 3 4 5

@@ -37,7 +37,7 @@ _create_sysv_script(){
 # description: redis service script
 
 ### BEGIN INIT INFO
-# Provides:          redis
+# Provides:          redis609
 # Required-Start:    $all
 # Required-Stop:     $all
 # Default-Start:     2 3 4 5

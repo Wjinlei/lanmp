@@ -379,7 +379,7 @@ _create_sysv_script(){
 # description: php-fpm service script
 
 ### BEGIN INIT INFO
-# Provides:          php-fpm
+# Provides:          php74-fpm
 # Required-Start:    $all
 # Required-Stop:     $all
 # Default-Start:     2 3 4 5
