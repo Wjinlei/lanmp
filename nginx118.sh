@@ -32,7 +32,7 @@ _install_nginx_depend(){
         done
     fi
     id -u www >/dev/null 2>&1
-    [ $? -ne 0 ] && useradd -M -U www -r -d /dev/null -s /sbin/nologin
+    [ $? -ne 0 ] && useradd -M -U www -d /home/www -s /sbin/nologin
     mkdir -p ${nginx_location} > /dev/null 2>&1
     _success "Install dependencies packages for Nginx completed..."
 }

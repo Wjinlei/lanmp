@@ -50,7 +50,7 @@ _install_mysql_depend(){
         InstallPack "yum -y install ncurses-compat-libs"
     fi
     id -u mysql >/dev/null 2>&1
-    [ $? -ne 0 ] && useradd -M -U mysql -r -d /dev/null -s /sbin/nologin
+    [ $? -ne 0 ] && useradd -M -U mysql -d /home/mysql -s /sbin/nologin
     _info "Install dependencies packages for MariaDB completed..."
 }
 

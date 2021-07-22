@@ -118,7 +118,7 @@ _install_php_depend(){
         ln -sf /usr/include/sqlext.h /usr/local/include/
     fi
     id -u www >/dev/null 2>&1
-    [ $? -ne 0 ] && useradd -M -U www -r -d /dev/null -s /sbin/nologin
+    [ $? -ne 0 ] && useradd -M -U www -d /home/www -s /sbin/nologin
     mkdir -p ${php56_location} > /dev/null 2>&1
 }
 
