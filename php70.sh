@@ -724,6 +724,7 @@ rpminstall_php70(){
     _install_php_depend
     DownloadUrl ${rpm_package_name} ${download_root_url}/rpms/${rpm_package_name}
     CheckError "rpm -ivh ${rpm_package_name} --force --nodeps"
+    # 不知道为什么在centos8.0以上安装好包后，无法停止，无奈只好强制杀死进程再重启
     kill -9 -`cat ${php70_location}/var/run/default.pid`
     _config_php
     /etc/init.d/php70 start
