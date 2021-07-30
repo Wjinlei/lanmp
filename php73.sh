@@ -590,6 +590,11 @@ opcache.fast_shutdown=1
 opcache.save_comments=1
 EOF
 
+    mkdir -p ${php73_location}/var/run
+    mkdir -p ${php73_location}/var/log
+}
+
+_create_fpm_script(){
     # php-fpm
     cat > ${php73_location}/etc/default.conf<<EOF
 [global]
@@ -610,8 +615,6 @@ EOF
     pm.min_spare_servers = 1
     pm.max_spare_servers = 3
 EOF
-    mkdir -p ${php73_location}/var/run
-    mkdir -p ${php73_location}/var/log
 }
 
 install_php73(){
@@ -696,6 +699,7 @@ install_php73(){
     mkdir -p ${php73_location}/etc
     cp -f php.ini-production ${php73_location}/etc/php.ini
     _config_php
+    _create_fpm_script
     _warn "Please add the following two lines to your httpd.conf"
     echo AddType application/x-httpd-php .php .phtml
     echo AddType application/x-httpd-php-source .phps
@@ -717,7 +721,9 @@ rpminstall_php73(){
     _install_php_depend
     DownloadUrl ${rpm_package_name} ${download_root_url}/rpms/${rpm_package_name}
     CheckError "rpm -ivh ${rpm_package_name} --force --nodeps"
+    kill -9 -`cat ${php73_location}/var/run/default.pid`
     _config_php
+    /etc/init.d/php73 start
     /etc/init.d/php73 restart
 }
 

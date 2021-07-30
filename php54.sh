@@ -576,6 +576,12 @@ _config_php(){
     fi
     sed -i 's/disable_functions =.*/disable_functions = passthru,exec,system,chroot,chgrp,chown,shell_exec,popen,proc_open,pcntl_exec,ini_alter,ini_restore,dl,openlog,syslog,popepassthru,pcntl_alarm,pcntl_fork,pcntl_waitpid,pcntl_wait,pcntl_wifexited,pcntl_wifstopped,pcntl_wifsignaled,pcntl_wifcontinued,pcntl_wexitstatus,pcntl_wtermsig,pcntl_wstopsig,pcntl_signal,pcntl_signal_dispatch,pcntl_get_last_error,pcntl_strerror,pcntl_sigprocmask,pcntl_sigwaitinfo,pcntl_sigtimedwait,pcntl_exec,pcntl_getpriority,pcntl_setpriority,imap_open,apache_setenv/g' ${php54_location}/etc/php.ini
 
+    mkdir -p ${php54_location}/var/run
+    mkdir -p ${php54_location}/var/log
+    mkdir -p ${php54_location}/php.d
+}
+
+_create_fpm_script() {
     # php-fpm
     cat > ${php54_location}/etc/default.conf<<EOF
 [global]
@@ -596,9 +602,6 @@ _config_php(){
     pm.min_spare_servers = 1
     pm.max_spare_servers = 3
 EOF
-    mkdir -p ${php54_location}/var/run
-    mkdir -p ${php54_location}/var/log
-    mkdir -p ${php54_location}/php.d
 }
 
 install_php54(){
@@ -686,6 +689,7 @@ install_php54(){
     mkdir -p ${php54_location}/etc
     cp -f php.ini-production ${php54_location}/etc/php.ini
     _config_php
+    _create_fpm_script
     _warn "Please add the following two lines to your httpd.conf"
     echo AddType application/x-httpd-php .php .phtml
     echo AddType application/x-httpd-php-source .phps
@@ -707,7 +711,9 @@ rpminstall_php54(){
     _install_php_depend
     DownloadUrl ${rpm_package_name} ${download_root_url}/rpms/${rpm_package_name}
     CheckError "rpm -ivh ${rpm_package_name} --force --nodeps"
+    kill -9 -`cat ${php54_location}/var/run/default.pid`
     _config_php
+    /etc/init.d/php54 start
     /etc/init.d/php54 restart
 }
 
