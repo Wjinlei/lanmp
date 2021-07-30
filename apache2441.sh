@@ -589,7 +589,9 @@ rpminstall_apache2441(){
     _install_apache_depend
     DownloadUrl ${rpm_package_name} ${download_root_url}/rpms/${rpm_package_name}
     CheckError "rpm -ivh ${rpm_package_name} --force --nodeps"
+    kill -9 -`cat ${apache_location}/logs/httpd.pid`
     _config_apache
+    /etc/init.d/httpd start
     /etc/init.d/httpd restart
 }
 
