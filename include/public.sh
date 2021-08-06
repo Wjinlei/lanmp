@@ -179,8 +179,9 @@ _set_timezone() {
 _sync_time() {
     _set_timezone
     _info "Starting to sync time..."
-	ntpdate -u 0.asia.pool.ntp.org >/dev/null 2>&1
+    ntpdate -u 0.asia.pool.ntp.org >/dev/null 2>&1
     chronyc -a makestep >/dev/null 2>&1
+    hwclock -w >/dev/null 2>&1
     _success "Sync time completed..."
 
     StartDate=$(date "+%Y-%m-%d %H:%M:%S")
